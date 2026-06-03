@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sort By Configuration</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+<style>
+  body{background-color:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;}
+  .custom-shadow{box-shadow:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -1px rgba(0,0,0,.06);}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:translateY(0);}}
+  .animate-fade-in{animation:fadeIn .2s ease-out;}
+  .row-dragging{opacity:.4;}
+  .row-over{border-top:2px solid #18181b;}
+  .pill{display:inline-flex;align-items:center;gap:4px;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:9999px;padding:2px 8px;font-size:11px;color:#3f3f46;}
+  .pill button{color:#71717a;}
+  .pill button:hover{color:#18181b;}
+</style>
+</head>
+<body class="flex items-start justify-center min-h-screen p-6">
+
+<!-- ============ LIST VIEW ============ -->
+<div id="list-view" class="w-full max-w-4xl">
+  <h1 class="text-2xl font-bold text-black">Sort By options</h1>
+  <p class="text-sm text-gray-600 mt-1">Sort By guideline <u><strong>here</strong></u></p>
+
+  <div class="mt-5 bg-white rounded-xl custom-shadow border border-gray-200 overflow-hidden">
+    <div class="px-5 py-3 border-b border-gray-200 flex justify-between items-center">
+      <h2 class="font-semibold text-gray-800 text-sm">Sort By sets</h2>
+      <button id="add-set-btn" class="px-3 py-1.5 bg-zinc-800 text-white rounded-md text-xs font-semibold hover:bg-zinc-700 transition-colors">
+        <i class="fas fa-plus mr-1.5 text-[10px]"></i>Add Sort By set
+      </button>
+    </div>
+    <div id="sets-container" class="p-5">
+      <div id="sets-empty" class="border-2 border-dashed border-gray-200 rounded-lg py-12 flex flex-col items-center justify-center text-center">
+        <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3">
+          <i class="fas fa-sort-amount-down text-gray-400"></i>
+        </div>
+        <p class="text-sm font-medium text-gray-700">No Sort By sets yet</p>
+        <p class="text-xs text-gray-500 mt-1 mb-4">Create your first set to start customizing how products are sorted.</p>
+        <button id="add-set-btn-placeholder" class="px-4 py-2 bg-zinc-800 text-white rounded-md text-xs font-semibold hover:bg-zinc-700 transition-colors">
+          <i class="fas fa-plus mr-1.5 text-[10px]"></i>Add Sort By set
+        </button>
+      </div>
+      <ul id="sets-list" class="hidden divide-y divide-gray-100 border border-gray-200 rounded-lg overflow-hidden"></ul>
+    </div>
+  </div>
+</div>
+
+<!-- ============ EDIT VIEW ============ -->
+<div id="edit-view" class="hidden w-full max-w-4xl">
+  <div class="flex items-center gap-3">
+    <button id="back-btn" class="w-8 h-8 rounded-md border border-gray-300 bg-white hover:bg-gray-50 flex items-center justify-center text-gray-600">
+      <i class="fas fa-arrow-left text-xs"></i>
+    </button>
+    <div>
+      <h1 id="edit-title" class="text-2xl font-bold text-black">Add Sort By Set</h1>
+      <p class="text-sm text-gray-600 mt-1">Sort By guideline <u><strong>here</strong></u></p>
+    </div>
+  </div>
+
+  <!-- INFORMATION BOX -->
+  <div class="mt-5 bg-white rounded-xl custom-shadow border border-gray-200 overflow-hidden">
+    <div class="px-5 py-3 border-b border-gray-200">
+      <h2 class="font-semibold text-gray-800 text-sm">Information</h2>
+    </div>
+    <div class="p-5 space-y-5">
+      <div class="space-y-1">
+        <label class="block text-xs font-medium text-gray-600">Name</label>
+        <input id="set-name" type="text" placeholder="e.g. Default Sort By Set" class="w-full border border-gray-300 rounded-md py-1.5 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-800">
+      </div>
+
+      <div class="space-y-1">
+        <label class="block text-xs font-medium text-gray-600">Collection Apply</label>
+        <div class="relative">
+          <div id="collection-input-wrap" class="w-full min-h-[38px] border border-gray-300 rounded-md py-1.5 px-2 text-sm bg-white flex flex-wrap gap-1.5 items-center focus-within:ring-1 focus-within:ring-zinc-800">
+            <div id="selected-collections" class="flex flex-wrap gap-1.5"></div>
+            <input id="collection-search" type="text" placeholder="Search for collections" class="flex-1 min-w-[140px] border-0 outline-none text-sm py-0.5 px-1 bg-transparent">
+          </div>
+          <div id="collection-dropdown" class="hidden absolute z-30 mt-1 w-full bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 overflow-hidden animate-fade-in">
+            <div id="collection-options" class="max-h-64 overflow-y-auto py-1"></div>
+          </div>
+        </div>
+        <p class="text-[11px] text-gray-500 mt-1">Select the collections where this Sort By set will be applied</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SORT BY OPTIONS BOX -->
+  <div class="mt-5 bg-white rounded-xl custom-shadow border border-gray-200 overflow-hidden">
+    <div class="px-5 py-3 border-b border-gray-200">
+      <h2 class="font-semibold text-gray-800 text-sm">Sort By options</h2>
+    </div>
+    <div class="p-5">
+      <div class="border border-gray-200 rounded-lg overflow-hidden">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50 border-b border-gray-200">
+            <tr class="text-left text-[11px] font-semibold text-gray-600 uppercase tracking-wider">
+              <th class="py-2.5 px-3 w-10"></th>
+              <th class="py-2.5 px-2 w-20">Status</th>
+              <th class="py-2.5 px-2">Label</th>
+              <th class="py-2.5 px-2">Type</th>
+              <th class="py-2.5 px-2 w-28 text-right pr-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="sort-options-body" class="divide-y divide-gray-100"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="mt-5 flex justify-end gap-2 pb-8">
+    <button id="cancel-btn" class="px-4 py-1.5 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">Cancel</button>
+    <button id="save-btn" class="px-4 py-1.5 bg-zinc-800 border border-zinc-800 rounded-md text-sm font-medium text-white hover:bg-zinc-700 transition-colors">Save</button>
+  </div>
+</div>
+
+<!-- ============ EDIT LABEL MODAL ============ -->
+<div id="edit-modal" class="hidden fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+  <div class="bg-white rounded-xl custom-shadow w-full max-w-md overflow-hidden animate-fade-in">
+    <div class="px-5 py-3 border-b border-gray-200 flex justify-between items-center">
+      <h3 class="font-semibold text-gray-800 text-sm">Edit Sort By Label</h3>
+      <button id="modal-close" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="p-5 space-y-3">
+      <div class="space-y-1">
+        <label class="block text-xs font-medium text-gray-600">Label</label>
+        <input id="modal-label-input" type="text" class="w-full border border-gray-300 rounded-md py-1.5 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-800">
+      </div>
+      <p class="text-[11px] text-gray-500">This only renames the option as shown to shoppers. The sorting logic stays the same.</p>
+    </div>
+    <div class="px-5 py-3 border-t border-gray-200 flex justify-end gap-2 bg-gray-50">
+      <button id="modal-cancel" class="px-4 py-1.5 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">Cancel</button>
+      <button id="modal-save" class="px-4 py-1.5 bg-zinc-800 border border-zinc-800 rounded-md text-sm font-medium text-white hover:bg-zinc-700">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* -------------------- DATA -------------------- */
+const DEFAULT_OPTIONS = [
+  { id:'featured',   label:'Featured',           type:'Manual curation',     enabled:true },
+  { id:'best',       label:'Best Selling',       type:'By total sales',      enabled:true },
+  { id:'newest',     label:'Newest',             type:'By date, descending', enabled:true },
+  { id:'oldest',     label:'Oldest',             type:'By date, ascending',  enabled:false },
+  { id:'discount',   label:'% Discount',         type:'By discount amount',  enabled:false },
+  { id:'az',         label:'A-Z',                type:'Alphabetical, A→Z',   enabled:true },
+  { id:'za',         label:'Z-A',                type:'Alphabetical, Z→A',   enabled:false },
+  { id:'priceasc',   label:'Price Low to High',  type:'By price, ascending', enabled:true },
+  { id:'pricedesc',  label:'Price High to Low',  type:'By price, descending',enabled:true },
+];
+const COLLECTIONS = [
+  'All Products','Best Sellers','New Arrivals','Sale','Men','Women','Kids',
+  'Accessories','Shoes','T-Shirts','Outerwear','Home & Living','Electronics','Beauty'
+];
+
+let sets = []; // saved sets
+let editingSetId = null;
+let workingOptions = [];
+let workingCollections = [];
+let editingOptionIdx = null;
+
+/* -------------------- VIEW HELPERS -------------------- */
+const $ = (id) => document.getElementById(id);
+
+function showList(){
+  $('list-view').classList.remove('hidden');
+  $('edit-view').classList.add('hidden');
+  renderSets();
+}
+function showEdit(setId = null){
+  editingSetId = setId;
+  if(setId){
+    const s = sets.find(x => x.id === setId);
+    $('edit-title').textContent = 'Edit Sort By Set';
+    $('set-name').value = s.name;
+    workingOptions = JSON.parse(JSON.stringify(s.options));
+    workingCollections = [...s.collections];
+  } else {
+    $('edit-title').textContent = 'Add Sort By Set';
+    $('set-name').value = '';
+    workingOptions = JSON.parse(JSON.stringify(DEFAULT_OPTIONS));
+    workingCollections = [];
+  }
+  $('list-view').classList.add('hidden');
+  $('edit-view').classList.remove('hidden');
+  renderCollections();
+  renderSelectedCollections();
+  renderOptions();
+  $('collection-search').value = '';
+  $('collection-dropdown').classList.add('hidden');
+  window.scrollTo({top:0});
+}
+
+/* -------------------- SETS LIST -------------------- */
+function renderSets(){
+  const list = $('sets-list');
+  const empty = $('sets-empty');
+  if(sets.length === 0){
+    empty.classList.remove('hidden');
+    list.classList.add('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+  list.classList.remove('hidden');
+  list.innerHTML = sets.map(s => {
+    const enabledCount = s.options.filter(o=>o.enabled).length;
+    const collTxt = s.collections.length ? s.collections.slice(0,3).join(', ') + (s.collections.length>3?` +${s.collections.length-3}`:'') : 'No collections selected';
+    return `
+      <li class="px-4 py-3 flex items-center justify-between hover:bg-gray-50">
+        <div class="min-w-0">
+          <div class="text-sm font-semibold text-gray-800 truncate">${escapeHtml(s.name)}</div>
+          <div class="text-xs text-gray-500 mt-0.5 truncate">${enabledCount} option${enabledCount!==1?'s':''} active · ${escapeHtml(collTxt)}</div>
+        </div>
+        <div class="flex items-center gap-1.5 ml-3">
+          <button data-edit="${s.id}" class="w-8 h-8 rounded-md border border-gray-300 bg-white hover:bg-gray-50 text-gray-600 flex items-center justify-center"><i class="fas fa-pen text-xs"></i></button>
+          <button data-del="${s.id}" class="w-8 h-8 rounded-md border border-gray-300 bg-white hover:bg-red-50 hover:border-red-200 hover:text-red-600 text-gray-600 flex items-center justify-center"><i class="fas fa-trash text-xs"></i></button>
+        </div>
+      </li>`;
+  }).join('');
+  list.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => showEdit(b.dataset.edit));
+  list.querySelectorAll('[data-del]').forEach(b => b.onclick = () => {
+    if(confirm('Delete this Sort By set?')){ sets = sets.filter(s => s.id !== b.dataset.del); renderSets(); }
+  });
+}
+
+/* -------------------- COLLECTIONS SEARCH -------------------- */
+function renderCollections(){
+  const q = $('collection-search').value.trim().toLowerCase();
+  const filtered = COLLECTIONS.filter(c => c.toLowerCase().includes(q));
+  const box = $('collection-options');
+  if(filtered.length === 0){
+    box.innerHTML = `<div class="px-3 py-6 text-center text-xs text-gray-400">No collections found</div>`;
+    return;
+  }
+  box.innerHTML = filtered.map(c => {
+    const checked = workingCollections.includes(c);
+    return `
+      <label class="flex items-center px-3 py-2 hover:bg-gray-50 cursor-pointer text-sm">
+        <input type="checkbox" data-coll="${escapeHtml(c)}" ${checked?'checked':''} class="w-3.5 h-3.5 border-gray-300 rounded text-zinc-800 mr-2.5 focus:ring-zinc-800">
+        <span class="text-gray-700">${escapeHtml(c)}</span>
+      </label>`;
+  }).join('');
+  box.querySelectorAll('input[data-coll]').forEach(cb => {
+    cb.onchange = () => {
+      const v = cb.dataset.coll;
+      if(cb.checked){ if(!workingCollections.includes(v)) workingCollections.push(v); }
+      else { workingCollections = workingCollections.filter(x => x !== v); }
+      renderSelectedCollections();
+    };
+  });
+}
+function renderSelectedCollections(){
+  $('selected-collections').innerHTML = workingCollections.map(c => `
+    <span class="pill">${escapeHtml(c)}<button data-rm="${escapeHtml(c)}" type="button"><i class="fas fa-times text-[9px]"></i></button></span>
+  `).join('');
+  $('selected-collections').querySelectorAll('[data-rm]').forEach(b => {
+    b.onclick = () => { workingCollections = workingCollections.filter(x => x !== b.dataset.rm); renderSelectedCollections(); renderCollections(); };
+  });
+}
+
+/* -------------------- SORT OPTIONS TABLE -------------------- */
+function renderOptions(){
+  const tbody = $('sort-options-body');
+  tbody.innerHTML = workingOptions.map((o,i) => `
+    <tr draggable="true" data-idx="${i}" class="bg-white hover:bg-gray-50">
+      <td class="py-2.5 px-3 text-gray-400 cursor-grab align-middle"><i class="fas fa-grip-vertical"></i></td>
+      <td class="py-2.5 px-2 align-middle">
+        <button data-toggle="${i}" type="button" class="relative inline-flex h-5 w-9 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none ${o.enabled?'bg-zinc-800':'bg-gray-200'}">
+          <span class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow transition ${o.enabled?'translate-x-4':'translate-x-0'}"></span>
+        </button>
+      </td>
+      <td class="py-2.5 px-2 text-sm text-gray-800 font-medium align-middle">${escapeHtml(o.label)}</td>
+      <td class="py-2.5 px-2 text-xs text-gray-500 align-middle">${escapeHtml(o.type)}</td>
+      <td class="py-2.5 px-2 align-middle">
+        <div class="flex justify-end gap-1.5 pr-1">
+          <button data-edit-opt="${i}" class="w-7 h-7 rounded-md border border-gray-300 bg-white hover:bg-gray-50 text-gray-600 flex items-center justify-center"><i class="fas fa-pen text-[11px]"></i></button>
+          <button data-del-opt="${i}" class="w-7 h-7 rounded-md border border-gray-300 bg-white hover:bg-red-50 hover:border-red-200 hover:text-red-600 text-gray-600 flex items-center justify-center"><i class="fas fa-trash text-[11px]"></i></button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+
+  tbody.querySelectorAll('[data-toggle]').forEach(b => b.onclick = () => { const i=+b.dataset.toggle; workingOptions[i].enabled = !workingOptions[i].enabled; renderOptions(); });
+  tbody.querySelectorAll('[data-edit-opt]').forEach(b => b.onclick = () => openEditModal(+b.dataset.editOpt));
+  tbody.querySelectorAll('[data-del-opt]').forEach(b => b.onclick = () => {
+    const i = +b.dataset.delOpt;
+    if(confirm(`Remove "${workingOptions[i].label}" from this set?`)){ workingOptions.splice(i,1); renderOptions(); }
+  });
+  // drag & drop
+  let dragIdx = null;
+  tbody.querySelectorAll('tr').forEach(tr => {
+    tr.addEventListener('dragstart', e => { dragIdx = +tr.dataset.idx; tr.classList.add('row-dragging'); e.dataTransfer.effectAllowed='move'; });
+    tr.addEventListener('dragend',   () => { tr.classList.remove('row-dragging'); tbody.querySelectorAll('tr').forEach(r=>r.classList.remove('row-over')); });
+    tr.addEventListener('dragover',  e => { e.preventDefault(); tbody.querySelectorAll('tr').forEach(r=>r.classList.remove('row-over')); tr.classList.add('row-over'); });
+    tr.addEventListener('drop',      e => {
+      e.preventDefault();
+      const target = +tr.dataset.idx;
+      if(dragIdx === null || dragIdx === target) return;
+      const [moved] = workingOptions.splice(dragIdx,1);
+      workingOptions.splice(target,0,moved);
+      dragIdx = null; renderOptions();
+    });
+  });
+}
+
+/* -------------------- EDIT MODAL -------------------- */
+function openEditModal(idx){
+  editingOptionIdx = idx;
+  $('modal-label-input').value = workingOptions[idx].label;
+  $('edit-modal').classList.remove('hidden');
+  setTimeout(()=>$('modal-label-input').focus(),50);
+}
+function closeEditModal(){ $('edit-modal').classList.add('hidden'); editingOptionIdx = null; }
+
+/* -------------------- UTIL -------------------- */
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function uid(){ return 'set_' + Math.random().toString(36).slice(2,9); }
+
+/* -------------------- EVENTS -------------------- */
+$('add-set-btn').onclick = () => showEdit();
+$('add-set-btn-placeholder').onclick = () => showEdit();
+$('back-btn').onclick = () => showList();
+$('cancel-btn').onclick = () => showList();
+$('save-btn').onclick = () => {
+  const name = $('set-name').value.trim();
+  if(!name){ alert('Please enter a name for the Sort By set.'); return; }
+  const payload = { id: editingSetId || uid(), name, collections: [...workingCollections], options: JSON.parse(JSON.stringify(workingOptions)) };
+  if(editingSetId){ const i = sets.findIndex(s=>s.id===editingSetId); sets[i] = payload; }
+  else { sets.push(payload); }
+  showList();
+};
+
+$('collection-search').addEventListener('focus', () => { renderCollections(); $('collection-dropdown').classList.remove('hidden'); });
+$('collection-search').addEventListener('input', () => { renderCollections(); $('collection-dropdown').classList.remove('hidden'); });
+document.addEventListener('click', (e) => {
+  if(!$('collection-input-wrap').contains(e.target) && !$('collection-dropdown').contains(e.target)){
+    $('collection-dropdown').classList.add('hidden');
+  }
+});
+
+$('modal-close').onclick = closeEditModal;
+$('modal-cancel').onclick = closeEditModal;
+$('modal-save').onclick = () => {
+  const v = $('modal-label-input').value.trim();
+  if(!v){ alert('Label cannot be empty.'); return; }
+  if(editingOptionIdx !== null){ workingOptions[editingOptionIdx].label = v; renderOptions(); }
+  closeEditModal();
+};
+$('edit-modal').addEventListener('click', e => { if(e.target.id === 'edit-modal') closeEditModal(); });
+
+/* -------------------- INIT -------------------- */
+showList();
+</script>
+</body>
+</html>
