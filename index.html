@@ -61,7 +61,7 @@
   </div>
 
   <!-- INFORMATION BOX -->
-  <div class="mt-5 bg-white rounded-xl custom-shadow border border-gray-200 overflow-hidden">
+  <div class="mt-5 bg-white rounded-xl custom-shadow border border-gray-200">
     <div class="px-5 py-3 border-b border-gray-200">
       <h2 class="font-semibold text-gray-800 text-sm">Information</h2>
     </div>
@@ -141,15 +141,15 @@
 <script>
 /* -------------------- DATA -------------------- */
 const DEFAULT_OPTIONS = [
-  { id:'featured',   label:'Featured',           type:'Manual curation',     enabled:true },
-  { id:'best',       label:'Best Selling',       type:'By total sales',      enabled:true },
-  { id:'newest',     label:'Newest',             type:'By date, descending', enabled:true },
-  { id:'oldest',     label:'Oldest',             type:'By date, ascending',  enabled:false },
-  { id:'discount',   label:'% Discount',         type:'By discount amount',  enabled:false },
-  { id:'az',         label:'A-Z',                type:'Alphabetical, A→Z',   enabled:true },
-  { id:'za',         label:'Z-A',                type:'Alphabetical, Z→A',   enabled:false },
-  { id:'priceasc',   label:'Price Low to High',  type:'By price, ascending', enabled:true },
-  { id:'pricedesc',  label:'Price High to Low',  type:'By price, descending',enabled:true },
+  { id:'featured',   label:'Featured',           type:'Manual curation',              enabled:true  },
+  { id:'best',       label:'Best Selling',       type:'By total sales',               enabled:false },
+  { id:'newest',     label:'Newest',             type:'By created date, descending',  enabled:false },
+  { id:'oldest',     label:'Oldest',             type:'By created date, ascending',   enabled:false },
+  { id:'discount',   label:'% Discount',         type:'By discount amount',           enabled:false },
+  { id:'az',         label:'A-Z',                type:'Alphabetical, A→Z',            enabled:false },
+  { id:'za',         label:'Z-A',                type:'Alphabetical, Z→A',            enabled:false },
+  { id:'priceasc',   label:'Price Low to High',  type:'By price, ascending',          enabled:true  },
+  { id:'pricedesc',  label:'Price High to Low',  type:'By price, descending',         enabled:true  },
 ];
 const COLLECTIONS = [
   'All Products','Best Sellers','New Arrivals','Sale','Men','Women','Kids',
@@ -259,6 +259,7 @@ function renderSelectedCollections(){
   $('selected-collections').querySelectorAll('[data-rm]').forEach(b => {
     b.onclick = () => { workingCollections = workingCollections.filter(x => x !== b.dataset.rm); renderSelectedCollections(); renderCollections(); };
   });
+  $('collection-search').placeholder = workingCollections.length ? '' : 'Search for collections';
 }
 
 /* -------------------- SORT OPTIONS TABLE -------------------- */
