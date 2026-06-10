@@ -76,9 +76,12 @@ a{color:var(--lnk)}
 .mo-bd{padding:20px;display:flex;flex-direction:column;gap:12px}
 .mo-ft{padding:12px 20px;border-top:1px solid var(--bdr);background:var(--fill-t);display:flex;justify-content:flex-end;gap:8px}
 .row-drag{opacity:.4}.row-ov{border-top:2px solid var(--fill)!important}
+.excl-card{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--bdr);border-radius:var(--r2);background:transparent;cursor:default;transition:border-color .15s,background .15s}
+.excl-card.active{border-color:rgba(48,48,48,.45);background:rgba(48,48,48,.04)}
 .hidden{display:none!important}
 .mt3{margin-top:12px}.mt4{margin-top:16px}.mt5{margin-top:20px}
 .flex{display:flex}.frow{display:flex;gap:8px}.fend{justify-content:flex-end}
+.sec-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text2)}
 </style>
 </head>
 <body>
@@ -106,6 +109,19 @@ a{color:var(--lnk)}
       </div>
 
       <div class="tw mt5">
+
+        <!-- Exclusive sub-box: Featured / Best Selling / Most Relevant -->
+        <div style="padding:16px;border-bottom:1px solid var(--bdr)">
+          <p class="sec-lbl" style="margin-bottom:4px">Active Default Sort</p>
+          <p style="font-size:12px;color:var(--text2);margin-bottom:12px">Only one can be active. This sort is always shown first in the storefront dropdown.</p>
+          <div id="exclusive-rows" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"></div>
+        </div>
+
+        <!-- Additional sort options -->
+        <div style="padding:10px 16px 6px;background:var(--fill-t);border-bottom:1px solid var(--bdr)">
+          <p class="sec-lbl">Additional Sort Options</p>
+          <p style="font-size:12px;color:var(--text2);margin-top:2px">Enable or disable extra sort options for the storefront dropdown. Drag to reorder.</p>
+        </div>
         <table class="dt">
           <thead><tr>
             <th style="width:40px"></th>
@@ -117,7 +133,6 @@ a{color:var(--lnk)}
           <tbody id="sort-tbody"></tbody>
         </table>
       </div>
-      <p style="font-size:12px;color:var(--text2);margin-top:10px">These Sort By options apply to all collections. Drag rows to reorder.</p>
 
       <div class="frow fend mt4">
         <button id="cancel-sortby" class="btn btn-s">Cancel</button>
@@ -141,7 +156,7 @@ a{color:var(--lnk)}
         <label class="flbl" for="modal-label-input">Label</label>
         <input id="modal-label-input" type="text" class="inp">
       </div>
-      <p style="font-size:12px;color:var(--text2)">This only renames the option as shown to shoppers. Sorting logic stays the same.</p>
+      <p style="font-size:12px;color:var(--text2)">This only renames the option shown to shoppers. Sorting logic stays the same.</p>
     </div>
     <div class="mo-ft">
       <button id="modal-cancel" class="btn btn-s">Cancel</button>
@@ -159,6 +174,12 @@ const IC={
   edit:`<svg class="ic" viewBox="0 0 20 20"><path d="m11.47 3.87 4.7 4.7-8.5 8.5H3.01l-.01-4.63 8.47-8.57Zm1.06-1.06 1.94-1.94a1.5 1.5 0 0 1 2.12 0l2.55 2.55a1.5 1.5 0 0 1 0 2.12l-1.94 1.94-4.67-4.67Z" fill="currentColor"/></svg>`,
   chk:`<svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M15.78 5.97a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L3.97 10.72a.75.75 0 0 1 1.06-1.06l3 3 6.69-6.69a.75.75 0 0 1 1.06 0Z" fill="currentColor"/></svg>`,
 };
+
+// ── localStorage helpers ──
+const LS_KEY='findter_sortby';
+function lsLoad(){try{const r=localStorage.getItem(LS_KEY);return r?JSON.parse(r):null;}catch(e){return null;}}
+function lsSave(d){try{localStorage.setItem(LS_KEY,JSON.stringify(d));}catch(e){}}
+
 const NAV=[
   {id:'filter',label:'Filter'},{id:'search',label:'Search'},
   {id:'metafield',label:'Metafield'},
@@ -194,67 +215,144 @@ function updateSb(){
 }
 $('sidebar-toggle').onclick=()=>{col=!col;updateSb();};
 
-let workingOptions=[
-  {id:'featured', label:'Featured',          type:'Manually Order',              enabled:true },
-  {id:'best',     label:'Best Selling',       type:'By total sales',              enabled:false},
-  {id:'newest',   label:'Newest',             type:'By created date, descending', enabled:false},
-  {id:'oldest',   label:'Oldest',             type:'By created date, ascending',  enabled:false},
-  {id:'discount', label:'% Discount',         type:'By discount amount',          enabled:false},
-  {id:'az',       label:'Alphabetical: A-Z',  type:'By product title, A→Z',       enabled:false},
-  {id:'za',       label:'Alphabetical: Z-A',  type:'By product title, Z→A',       enabled:false},
-  {id:'priceasc', label:'Price: Low to High', type:'By price, ascending',         enabled:true },
-  {id:'pricedesc',label:'Price: High to Low', type:'By price, descending',        enabled:true },
-  {id:'inventory',label:'Stock Availability', type:'By inventory amount',         enabled:false},
+// ── Default options data ──
+const DEFAULT_OPTIONS=[
+  {id:'featured', label:'Featured',          type:'Manually ordered',            exclusive:true,  enabled:true },
+  {id:'best',     label:'Best Selling',       type:'By total sales',              exclusive:true,  enabled:true },
+  {id:'relevant', label:'Most Relevant',      type:'By search relevance score',   exclusive:true,  enabled:true },
+  {id:'newest',   label:'Newest',             type:'By created date, newest first',exclusive:false,enabled:false},
+  {id:'oldest',   label:'Oldest',             type:'By created date, oldest first',exclusive:false,enabled:false},
+  {id:'discount', label:'% Discount',         type:'By discount amount, highest first',exclusive:false,enabled:false},
+  {id:'az',       label:'Alphabetical: A–Z',  type:'By product title A → Z',      exclusive:false, enabled:false},
+  {id:'za',       label:'Alphabetical: Z–A',  type:'By product title Z → A',      exclusive:false, enabled:false},
+  {id:'priceasc', label:'Price: Low to High', type:'By price, ascending',         exclusive:false, enabled:true },
+  {id:'pricedesc',label:'Price: High to Low', type:'By price, descending',        exclusive:false, enabled:true },
+  {id:'inventory',label:'Stock Availability', type:'By inventory quantity',       exclusive:false, enabled:false},
 ];
-let savedOptions=JSON.parse(JSON.stringify(workingOptions));
-let editingIdx=null;
+
+let workingOptions=[];
+let exclusiveActive='featured';
+let savedOptions=[];
+let savedExclusive='featured';
+let editingId=null;
+
+function initFromStorage(){
+  const stored=lsLoad();
+  if(stored&&stored.options&&stored.options.length){
+    exclusiveActive=stored.exclusiveActive||'featured';
+    workingOptions=stored.options;
+    // merge in any new default options not in stored data
+    DEFAULT_OPTIONS.forEach(def=>{
+      if(!workingOptions.find(o=>o.id===def.id))workingOptions.push({...def});
+    });
+  } else {
+    exclusiveActive='featured';
+    workingOptions=DEFAULT_OPTIONS.map(o=>({...o}));
+  }
+  savedExclusive=exclusiveActive;
+  savedOptions=JSON.parse(JSON.stringify(workingOptions));
+}
+
+function renderExclusive(){
+  const excl=workingOptions.filter(o=>o.exclusive);
+  $('exclusive-rows').innerHTML=excl.map(o=>`
+    <div class="excl-card${exclusiveActive===o.id?' active':''}">
+      <div style="flex:1;min-width:0">
+        <p style="font-weight:600;font-size:13px;color:var(--text)">${escapeHtml(o.label)}</p>
+        <p style="font-size:12px;color:var(--text2);margin-top:1px">${escapeHtml(o.type)}</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <button data-excl-edit="${o.id}" class="ibtn" title="Rename" style="width:24px;height:24px;flex-shrink:0">${IC.edit}</button>
+        <button type="button" data-excl="${o.id}" class="tgl ${exclusiveActive===o.id?'on':'off'}">
+          <span class="tgl-th"></span>
+        </button>
+      </div>
+    </div>`).join('');
+  $('exclusive-rows').querySelectorAll('[data-excl]').forEach(btn=>{
+    btn.onclick=()=>{exclusiveActive=btn.dataset.excl;renderExclusive();};
+  });
+  $('exclusive-rows').querySelectorAll('[data-excl-edit]').forEach(btn=>{
+    btn.onclick=()=>openEdit(btn.dataset.exclEdit);
+  });
+}
 
 function renderOptions(){
   const tb=$('sort-tbody');
-  tb.innerHTML=workingOptions.map((o,i)=>`
-    <tr draggable="true" data-idx="${i}">
+  const regular=workingOptions.filter(o=>!o.exclusive);
+  tb.innerHTML=regular.map(o=>`
+    <tr draggable="true" data-rid="${o.id}">
       <td style="padding-left:14px">${IC.drag}</td>
       <td>
-        <button type="button" data-toggle="${i}" class="tgl ${o.enabled?'on':'off'}">
+        <button type="button" data-toggle="${o.id}" class="tgl ${o.enabled?'on':'off'}">
           <span class="tgl-th"></span>
         </button>
       </td>
       <td style="font-weight:550">${escapeHtml(o.label)}</td>
       <td style="color:var(--text2);font-size:12px">${escapeHtml(o.type)}</td>
       <td style="text-align:right">
-        <button data-edit="${i}" class="ibtn" title="Rename">${IC.edit}</button>
+        <button data-edit="${o.id}" class="ibtn" title="Rename">${IC.edit}</button>
       </td>
     </tr>`).join('');
-  tb.querySelectorAll('[data-toggle]').forEach(b=>b.onclick=()=>{const i=+b.dataset.toggle;workingOptions[i].enabled=!workingOptions[i].enabled;renderOptions();});
-  tb.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openEdit(+b.dataset.edit));
-  let dragIdx=null;
+  tb.querySelectorAll('[data-toggle]').forEach(b=>b.onclick=()=>{
+    const idx=workingOptions.findIndex(o=>o.id===b.dataset.toggle);
+    if(idx!==-1){workingOptions[idx].enabled=!workingOptions[idx].enabled;renderOptions();}
+  });
+  tb.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openEdit(b.dataset.edit));
+  let dragId=null;
   tb.querySelectorAll('tr').forEach(tr=>{
-    tr.addEventListener('dragstart',e=>{dragIdx=+tr.dataset.idx;tr.classList.add('row-drag');e.dataTransfer.effectAllowed='move';});
+    tr.addEventListener('dragstart',e=>{dragId=tr.dataset.rid;tr.classList.add('row-drag');e.dataTransfer.effectAllowed='move';});
     tr.addEventListener('dragend',()=>{tr.classList.remove('row-drag');tb.querySelectorAll('tr').forEach(r=>r.classList.remove('row-ov'));});
     tr.addEventListener('dragover',e=>{e.preventDefault();tb.querySelectorAll('tr').forEach(r=>r.classList.remove('row-ov'));tr.classList.add('row-ov');});
     tr.addEventListener('drop',e=>{
-      e.preventDefault();const t=+tr.dataset.idx;
-      if(dragIdx===null||dragIdx===t)return;
-      const[m]=workingOptions.splice(dragIdx,1);workingOptions.splice(t,0,m);dragIdx=null;renderOptions();
+      e.preventDefault();const targetId=tr.dataset.rid;
+      if(!dragId||dragId===targetId)return;
+      const from=workingOptions.findIndex(o=>o.id===dragId);
+      const to=workingOptions.findIndex(o=>o.id===targetId);
+      const[m]=workingOptions.splice(from,1);workingOptions.splice(to,0,m);
+      dragId=null;renderOptions();
     });
   });
 }
 
-function openEdit(idx){editingIdx=idx;$('modal-label-input').value=workingOptions[idx].label;$('edit-modal').classList.remove('hidden');setTimeout(()=>$('modal-label-input').focus(),50);}
-function closeEdit(){$('edit-modal').classList.add('hidden');editingIdx=null;}
+function openEdit(id){
+  const o=workingOptions.find(o=>o.id===id);
+  if(!o)return;
+  editingId=id;
+  $('modal-label-input').value=o.label;
+  $('edit-modal').classList.remove('hidden');
+  setTimeout(()=>$('modal-label-input').focus(),50);
+}
+function closeEdit(){$('edit-modal').classList.add('hidden');editingId=null;}
 $('modal-close').onclick=$('modal-cancel').onclick=closeEdit;
-$('modal-save').onclick=()=>{const v=$('modal-label-input').value.trim();if(!v){alert('Label cannot be empty.');return;}if(editingIdx!==null){workingOptions[editingIdx].label=v;renderOptions();}closeEdit();};
+$('modal-save').onclick=()=>{
+  const v=$('modal-label-input').value.trim();
+  if(!v){alert('Label cannot be empty.');return;}
+  if(editingId!==null){
+    const idx=workingOptions.findIndex(o=>o.id===editingId);
+    if(idx!==-1){workingOptions[idx].label=v;renderOptions();renderExclusive();}
+  }
+  closeEdit();
+};
 $('edit-modal').addEventListener('click',e=>{if(e.target.id==='edit-modal')closeEdit();});
 $('modal-label-input').addEventListener('keydown',e=>{if(e.key==='Enter')$('modal-save').click();});
 
 $('save-sortby').onclick=()=>{
   savedOptions=JSON.parse(JSON.stringify(workingOptions));
+  savedExclusive=exclusiveActive;
+  lsSave({exclusiveActive,options:workingOptions});
   const btn=$('save-sortby');btn.innerHTML=IC.chk+' Saved';
   setTimeout(()=>{btn.innerHTML='Save';},1500);
 };
-$('cancel-sortby').onclick=()=>{workingOptions=JSON.parse(JSON.stringify(savedOptions));renderOptions();};
+$('cancel-sortby').onclick=()=>{
+  workingOptions=JSON.parse(JSON.stringify(savedOptions));
+  exclusiveActive=savedExclusive;
+  renderExclusive();renderOptions();
+};
 
-renderNav();renderOptions();
+renderNav();
+initFromStorage();
+renderExclusive();
+renderOptions();
 </script>
 </body>
 </html>

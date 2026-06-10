@@ -120,26 +120,14 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .pcompare{font-size:13px;color:var(--text3);text-decoration:line-through}
 .psizes{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
 .psize{padding:2px 7px;border:1px solid var(--bdr);border-radius:var(--r1);font-size:11px;color:var(--text2)}
+.poos{font-size:11px;color:var(--text3);margin-top:4px;font-style:italic}
 .padd{margin-top:8px;width:100%;padding:9px;background:var(--acc);color:#fff;border-radius:var(--r2);font-size:13px;font-weight:600;transition:background .15s}
 .padd:hover{background:var(--acc-hov)}
+.padd:disabled{background:#ccc;cursor:not-allowed}
 /* No results */
 .no-res{text-align:center;padding:48px 24px;grid-column:1/-1}
 .no-res h3{font-size:18px;font-weight:700;margin-bottom:8px}
 .no-res p{font-size:13px;color:var(--text2);margin-bottom:24px}
-/* Demo panel */
-#dp{position:fixed;bottom:24px;right:24px;width:268px;background:var(--white);border-radius:var(--r3);box-shadow:0 8px 32px rgba(0,0,0,.22);z-index:60;overflow:hidden;font-family:'Inter',sans-serif}
-.dp-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#121212;color:#fff}
-.dp-hdr-ttl{font-size:12px;font-weight:700;letter-spacing:.04em;display:flex;align-items:center;gap:8px}
-.dp-toggle-btn{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;font-size:15px;display:flex;align-items:center;justify-content:center;transition:background .1s;flex-shrink:0;line-height:1}
-.dp-toggle-btn:hover{background:rgba(255,255,255,.22)}
-#dp-body{padding:12px 14px;display:flex;flex-direction:column;gap:9px}
-.dp-row{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:500;color:var(--text);cursor:pointer;user-select:none}
-.dp-row input{accent-color:var(--acc);cursor:pointer;width:14px;height:14px}
-.dp-sep{height:1px;background:var(--bdr);margin:1px 0}
-.dp-sub{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3)}
-.dp-tests{display:grid;grid-template-columns:1fr 1fr;gap:5px}
-.dp-tb{padding:7px 4px;background:var(--bg);border:1px solid var(--bdr);border-radius:var(--r1);font-size:11px;font-weight:600;color:var(--text);transition:background .1s,border-color .1s;font-family:inherit}
-.dp-tb:hover{background:#e8e8e8;border-color:var(--bdr2)}
 /* Misc */
 .hidden{display:none!important}
 .ic{width:18px;height:18px;fill:currentColor;display:block;flex-shrink:0}
@@ -206,13 +194,11 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
       </div>
       <button id="so-close-btn" class="so-close">Close</button>
     </div>
-
     <!-- Zero char: trending -->
     <div id="so-zero">
       <p class="so-sec-ttl">Trending Products</p>
       <div class="so-grid" id="so-zc-grid"></div>
     </div>
-
     <!-- Has query results -->
     <div id="so-has-results" class="hidden">
       <div id="so-rd-msg" class="so-rd hidden">
@@ -222,7 +208,6 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
       <div class="so-list" id="so-list"></div>
       <p id="so-view-all" class="hidden" style="text-align:center;padding:10px 0;font-size:13px;color:var(--text2)"></p>
     </div>
-
     <!-- No results -->
     <div id="so-empty" class="hidden">
       <div class="so-empty">
@@ -238,7 +223,6 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 <!-- ═══ MAIN ═══ -->
 <div class="pw">
   <nav class="bc">Home / <strong>All Products</strong></nav>
-
   <div class="col-hdr">
     <h1 id="col-h1">All Products</h1>
     <div class="sort-wrap">
@@ -250,9 +234,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
       <div id="sort-drop" class="hidden" style="position:fixed"></div>
     </div>
   </div>
-
   <div id="af-wrap"></div>
-
   <div class="col-layout">
     <!-- FILTER SIDEBAR -->
     <aside class="fsb">
@@ -277,39 +259,18 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
         <div class="fst-body" id="fsb-vendor"></div>
       </div>
     </aside>
-
     <!-- PRODUCT AREA -->
     <main class="col-main">
-      <p class="pcount" id="pcount">15 products</p>
+      <p class="pcount" id="pcount">20 products</p>
       <div class="pgrid" id="pgrid"></div>
     </main>
   </div>
 </div>
 
-<!-- ═══ DEMO PANEL ═══ -->
-<div id="dp">
-  <div class="dp-hdr">
-    <span class="dp-hdr-ttl">
-      <svg style="width:14px;height:14px;fill:currentColor;flex-shrink:0" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.078 2.25c-.917 0-1.699.663-1.85 1.567L9.05 4.889c-.02.12-.115.26-.297.348a7.493 7.493 0 0 0-.986.57c-.166.115-.334.126-.45.083L6.3 5.508a1.875 1.875 0 0 0-2.282.819l-.922 1.597a1.875 1.875 0 0 0 .432 2.385l.84.692c.095.078.17.229.154.43a7.598 7.598 0 0 0 0 1.139c.015.2-.059.352-.153.43l-.841.692a1.875 1.875 0 0 0-.432 2.385l.922 1.597a1.875 1.875 0 0 0 2.282.818l1.019-.382c.115-.043.283-.031.45.082.312.214.641.405.985.57.182.088.277.228.297.35l.178 1.071c.151.904.933 1.567 1.85 1.567h1.844c.916 0 1.699-.663 1.85-1.567l.178-1.072c.02-.12.114-.26.297-.349.344-.165.673-.356.985-.57.167-.114.335-.125.45-.082l1.02.382a1.875 1.875 0 0 0 2.28-.819l.923-1.597a1.875 1.875 0 0 0-.432-2.385l-.84-.692c-.095-.078-.17-.229-.154-.43a7.614 7.614 0 0 0 0-1.139c-.016-.2.059-.352.153-.43l.84-.692c.708-.582.891-1.59.433-2.385l-.922-1.597a1.875 1.875 0 0 0-2.282-.818l-1.02.382c-.114.043-.282.031-.449-.083a7.49 7.49 0 0 0-.985-.57c-.183-.087-.277-.227-.297-.348l-.179-1.072a1.875 1.875 0 0 0-1.85-1.567h-1.843ZM12 15.75a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5Z" fill="currentColor"/></svg>
-      Demo Controls
-    </span>
-    <button class="dp-toggle-btn" id="dp-tog">−</button>
-  </div>
-  <div id="dp-body">
-    <label class="dp-row"><input type="checkbox" id="dp-variants"> Show variants as separate products</label>
-    <label class="dp-row"><input type="checkbox" id="dp-synonyms" checked> Expand synonyms in search</label>
-    <label class="dp-row"><input type="checkbox" id="dp-numeric" checked> Enable numeric search</label>
-    <div class="dp-sep"></div>
-    <p class="dp-sub">Quick tests</p>
-    <div class="dp-tests">
-      <button class="dp-tb" onclick="quickSearch('tee')">Search "tee"</button>
-      <button class="dp-tb" onclick="quickSearch('laptop')">Search "laptop"</button>
-      <button class="dp-tb" onclick="quickSearch('$30-$60')">$30–$60 range</button>
-      <button class="dp-tb" onclick="quickSearch('sale')">Redirect: sale</button>
-      <button class="dp-tb" onclick="quickSearch('asdfxyz')">No results</button>
-      <button class="dp-tb" onclick="resetAll()">Reset all</button>
-    </div>
-  </div>
+<!-- ═══ SETTINGS STATUS BADGE ═══ -->
+<div id="settings-status" style="position:fixed;bottom:20px;right:20px;background:#16a34a;color:#fff;border-radius:8px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;padding:8px 14px;display:flex;align-items:center;gap:8px;box-shadow:0 4px 16px rgba(0,0,0,.25);z-index:60;cursor:default;user-select:none">
+  <span style="width:7px;height:7px;background:#fff;border-radius:50%;flex-shrink:0;opacity:.9"></span>
+  <span id="status-txt">Loading settings…</span>
 </div>
 
 <script>
@@ -326,7 +287,6 @@ const ASB_NAV=[
 ];
 const ASB_ENABLED=new Set(['settings','metafield','search','storefront']);
 let asbCol=false;
-
 function renderAsb(){
   $('asb-body').innerHTML=ASB_NAV.map(n=>{
     const en=ASB_ENABLED.has(n.id),act=n.id==='storefront';
@@ -344,7 +304,6 @@ function renderAsb(){
     };
   });
 }
-
 function setAsbWidth(w){
   document.body.style.paddingLeft=w+'px';
   $('hdr').style.left=w+'px';
@@ -354,33 +313,35 @@ function setAsbWidth(w){
   $('asb').querySelector('.asb-name').style.display=collapsed?'none':'';
   $('asb-tgl').textContent=collapsed?'›':'‹';
 }
-
-$('asb-tgl').onclick=()=>{
-  asbCol=!asbCol;
-  $('asb').classList.toggle('col',asbCol);
-  setAsbWidth(asbCol?56:248);
-};
-
+$('asb-tgl').onclick=()=>{asbCol=!asbCol;$('asb').classList.toggle('col',asbCol);setAsbWidth(asbCol?56:248);};
 renderAsb();
 setAsbWidth(248);
 
-/* ── Mock Data ── */
+/* ── localStorage helpers ── */
+function lsGet(key){try{const r=localStorage.getItem(key);return r?JSON.parse(r):null;}catch(e){return null;}}
+
+/* ── Mock Products (20 items) ── */
 const MOCK_PRODUCTS=[
-  {id:1,  title:'Wireless Earbuds Pro',  price:79.99, ca:99.99, type:'Electronics', vendor:'TechBrand', color:'Black',  sizes:[],             tags:['audio','wireless'], sku:'EAR-001'},
-  {id:2,  title:'Cotton T-Shirt',        price:24.99, ca:0,     type:'Apparel',     vendor:'BasicWear', color:'Red',    sizes:['S','M','L'],   tags:['basics','cotton'],  sku:'TSH-001'},
-  {id:3,  title:'Running Shoes',         price:89.99, ca:120,   type:'Footwear',    vendor:'SportStep', color:'White',  sizes:['8','9','10'],  tags:['shoes','footwear'], sku:'SHO-001'},
-  {id:4,  title:'Leather Wallet',        price:45.00, ca:0,     type:'Accessories', vendor:'LeatherCo', color:'Brown',  sizes:[],             tags:['wallet','leather'], sku:'WAL-001'},
-  {id:5,  title:'Ceramic Coffee Mug',    price:18.99, ca:0,     type:'Kitchen',     vendor:'HomePlus',  color:'White',  sizes:[],             tags:['mug','kitchen'],    sku:'MUG-001'},
-  {id:6,  title:'Denim Jacket',          price:69.99, ca:89.99, type:'Apparel',     vendor:'BasicWear', color:'Blue',   sizes:['M','L'],       tags:['jacket','denim'],   sku:'JAC-001'},
-  {id:7,  title:'Yoga Mat',             price:34.99, ca:0,     type:'Fitness',     vendor:'FitLife',   color:'Purple', sizes:[],             tags:['yoga','fitness'],   sku:'MAT-001'},
-  {id:8,  title:'Laptop Stand',         price:42.00, ca:55,    type:'Electronics', vendor:'TechBrand', color:'Silver', sizes:[],             tags:['laptop','stand'],   sku:'STD-001'},
-  {id:9,  title:'Water Bottle',         price:22.99, ca:0,     type:'Sports',      vendor:'HydroLife', color:'Black',  sizes:[],             tags:['bottle','hydro'],   sku:'BOT-001'},
-  {id:10, title:'Sunglasses',           price:55.00, ca:75,    type:'Accessories', vendor:'ShadesCo',  color:'Black',  sizes:[],             tags:['glasses','fashion'],sku:'SUN-001'},
-  {id:11, title:'Laptop Backpack',      price:65.00, ca:80,    type:'Bags',        vendor:'PackPro',   color:'Black',  sizes:[],             tags:['backpack','laptop'],sku:'BAG-001'},
-  {id:12, title:'Wireless Charger',     price:29.99, ca:39.99, type:'Electronics', vendor:'TechBrand', color:'White',  sizes:[],             tags:['charger','wireless'],sku:'CHG-001'},
-  {id:13, title:'Cotton Hoodie',        price:49.99, ca:64.99, type:'Apparel',     vendor:'BasicWear', color:'Grey',   sizes:['M','L','XL'],  tags:['hoodie','cotton'],  sku:'HOO-001'},
-  {id:14, title:'Mechanical Keyboard',  price:129.00,ca:159,   type:'Electronics', vendor:'TechBrand', color:'Black',  sizes:[],             tags:['keyboard','computer'],sku:'KEY-001'},
-  {id:15, title:'Running Shorts',       price:32.99, ca:0,     type:'Apparel',     vendor:'SportStep', color:'Blue',   sizes:['S','M','L'],   tags:['shorts','running'], sku:'SHT-001'},
+  {id:1,  title:'Wireless Earbuds Pro',  price:79.99,  ca:99.99, type:'Electronics', vendor:'TechBrand', color:'Black',  sizes:[],              tags:['audio','wireless','earbuds'],          sku:'EAR-001', salesCount:842,  createdAt:'2024-11-15', inventory:34},
+  {id:2,  title:'Cotton T-Shirt',        price:24.99,  ca:0,     type:'Apparel',     vendor:'BasicWear', color:'Red',    sizes:['S','M','L'],    tags:['basics','cotton','shirt','tee','top'],  sku:'TSH-001', salesCount:1205, createdAt:'2023-03-10', inventory:128},
+  {id:3,  title:'Running Shoes',         price:89.99,  ca:120,   type:'Footwear',    vendor:'SportStep', color:'White',  sizes:['8','9','10'],   tags:['shoes','footwear','running'],          sku:'SHO-001', salesCount:567,  createdAt:'2024-01-20', inventory:23},
+  {id:4,  title:'Leather Wallet',        price:45.00,  ca:0,     type:'Accessories', vendor:'LeatherCo', color:'Brown',  sizes:[],              tags:['wallet','leather','accessories'],      sku:'WAL-001', salesCount:334,  createdAt:'2022-08-05', inventory:67},
+  {id:5,  title:'Ceramic Coffee Mug',    price:18.99,  ca:0,     type:'Kitchen',     vendor:'HomePlus',  color:'White',  sizes:[],              tags:['mug','coffee','kitchen','ceramic'],    sku:'MUG-001', salesCount:891,  createdAt:'2023-06-15', inventory:200},
+  {id:6,  title:'Denim Jacket',          price:69.99,  ca:89.99, type:'Apparel',     vendor:'BasicWear', color:'Blue',   sizes:['M','L'],        tags:['jacket','denim','outerwear'],          sku:'JAC-001', salesCount:203,  createdAt:'2024-09-01', inventory:0},
+  {id:7,  title:'Yoga Mat',              price:34.99,  ca:49.99, type:'Fitness',     vendor:'FitLife',   color:'Purple', sizes:[],              tags:['yoga','fitness','mat','exercise'],     sku:'MAT-001', salesCount:445,  createdAt:'2023-11-20', inventory:0},
+  {id:8,  title:'Laptop Stand',          price:42.00,  ca:55,    type:'Electronics', vendor:'TechBrand', color:'Silver', sizes:[],              tags:['laptop','stand','desk','computer'],    sku:'STD-001', salesCount:178,  createdAt:'2024-03-10', inventory:15},
+  {id:9,  title:'Water Bottle',          price:22.99,  ca:0,     type:'Sports',      vendor:'HydroLife', color:'Black',  sizes:[],              tags:['bottle','water','hydro','sports'],     sku:'BOT-001', salesCount:1650, createdAt:'2022-12-01', inventory:310},
+  {id:10, title:'Sunglasses',            price:55.00,  ca:75,    type:'Accessories', vendor:'ShadesCo',  color:'Black',  sizes:[],              tags:['glasses','sunglasses','fashion'],      sku:'SUN-001', salesCount:723,  createdAt:'2024-07-04', inventory:42},
+  {id:11, title:'Laptop Backpack',       price:65.00,  ca:80,    type:'Bags',        vendor:'PackPro',   color:'Black',  sizes:[],              tags:['backpack','laptop','bag','computer'],  sku:'BAG-001', salesCount:392,  createdAt:'2023-09-15', inventory:28},
+  {id:12, title:'Wireless Charger',      price:29.99,  ca:39.99, type:'Electronics', vendor:'TechBrand', color:'White',  sizes:[],              tags:['charger','wireless','electronics'],    sku:'CHG-001', salesCount:934,  createdAt:'2024-02-14', inventory:95},
+  {id:13, title:'Cotton Hoodie',         price:49.99,  ca:64.99, type:'Apparel',     vendor:'BasicWear', color:'Grey',   sizes:['M','L','XL'],   tags:['hoodie','cotton','sweatshirt','top'],  sku:'HOO-001', salesCount:612,  createdAt:'2024-05-22', inventory:55},
+  {id:14, title:'Mechanical Keyboard',   price:129.00, ca:159,   type:'Electronics', vendor:'TechBrand', color:'Black',  sizes:[],              tags:['keyboard','mechanical','computer'],    sku:'KEY-001', salesCount:287,  createdAt:'2023-12-10', inventory:12},
+  {id:15, title:'Running Shorts',        price:32.99,  ca:0,     type:'Apparel',     vendor:'SportStep', color:'Blue',   sizes:['S','M','L'],    tags:['shorts','running','sports','athletic'],sku:'SHT-001', salesCount:489,  createdAt:'2024-08-01', inventory:78},
+  {id:16, title:'Foam Roller',           price:24.99,  ca:0,     type:'Fitness',     vendor:'FitLife',   color:'Purple', sizes:[],              tags:['foam','roller','recovery','fitness'],  sku:'FOM-001', salesCount:167,  createdAt:'2025-01-10', inventory:0},
+  {id:17, title:'Desk Lamp',             price:39.99,  ca:54.99, type:'Electronics', vendor:'TechBrand', color:'White',  sizes:[],              tags:['lamp','desk','light','office'],        sku:'LMP-001', salesCount:256,  createdAt:'2025-05-01', inventory:44},
+  {id:18, title:'Ankle Boots',           price:94.99,  ca:119,   type:'Footwear',    vendor:'SportStep', color:'Brown',  sizes:['6','7','8','9'],tags:['boots','ankle','footwear','shoes'],     sku:'BOO-001', salesCount:143,  createdAt:'2024-10-15', inventory:8},
+  {id:19, title:'Phone Case',            price:14.99,  ca:0,     type:'Accessories', vendor:'ShadesCo',  color:'Black',  sizes:[],              tags:['phone','case','accessories','cover'],  sku:'PCS-001', salesCount:1850, createdAt:'2022-06-01', inventory:500},
+  {id:20, title:'Zip-Up Fleece',         price:54.99,  ca:74.99, type:'Apparel',     vendor:'BasicWear', color:'Grey',   sizes:['S','M','L','XL'],tags:['fleece','zip','jacket','warm','top'], sku:'FLC-001', salesCount:321,  createdAt:'2025-04-01', inventory:35},
 ];
 
 const COLOR_GRAD={
@@ -399,32 +360,62 @@ const SWATCH_CSS={
 };
 const gg=c=>COLOR_GRAD[c]||'linear-gradient(135deg,#888,#aaa)';
 
-const SYNONYMS={
-  'tee':['t-shirt','shirt','cotton'],
-  't-shirt':['tee','shirt'],
-  'shirt':['tee','t-shirt','cotton'],
-  'top':['shirt','tee'],
-  'laptop':['notebook','computer','backpack'],
-  'notebook':['laptop','computer'],
-  'computer':['laptop','notebook','keyboard'],
-  'shoes':['footwear','sneakers','running'],
-  'sneakers':['shoes','footwear'],
-  'footwear':['shoes','sneakers'],
-  'earbuds':['earphones','headphones','wireless'],
-  'bottle':['water','hydro'],
-  'jacket':['denim','outerwear'],
+/* ── Settings — mutable defaults overridden by loadSettingsFromStorage ── */
+let SYNONYMS={
+  'tee':['t-shirt','shirt','cotton'],'t-shirt':['tee','shirt'],'shirt':['tee','t-shirt','cotton'],
+  'top':['shirt','tee','hoodie','fleece'],'laptop':['notebook','computer','backpack'],
+  'notebook':['laptop','computer'],'computer':['laptop','notebook','keyboard'],
+  'shoes':['footwear','sneakers','running','boots'],'sneakers':['shoes','footwear'],
+  'footwear':['shoes','sneakers','boots'],'earbuds':['earphones','headphones','wireless'],
+  'bottle':['water','hydro'],'jacket':['denim','outerwear','fleece','zip'],
   'bag':['backpack','laptop'],
 };
-
-const STOP_WORDS=new Set(['a','an','the','is','are','was','were','i','you','we','they','it','and','or','not','for','to','in','of','on','at','by','with']);
-
-const REDIRECTS=[
+let STOP_WORDS=new Set(['a','an','the','is','are','was','were','i','you','we','they','it','and','or','not','for','to','in','of','on','at','by','with']);
+let REDIRECTS=[
   {terms:['sale','deals','clearance'],url:'/collections/sale',label:'Sale Collection'},
   {terms:['shoes','footwear'],url:'/collections/footwear',label:'Footwear Collection'},
 ];
+let NO_RES_IDS=[1,3,6];
+let NO_RES_KEYWORDS=['sale','clearance','deals'];
+let ZERO_CHAR_IDS=[1,2,3,4,5,6,7,8];
+let NUMERIC_ENABLED=true;
+let SEARCH_FIELDS=new Set(['title','tags','type','vendor','sku','color']);
+let VARIANT_ENABLED=false;
+let VARIANT_SPLIT=new Set();
+let ACTIVE_EXCLUSIVE='featured';
+let SORT_OPTS_RAW=null;
+let lastQuery='';
 
-const ZERO_CHAR_IDS=[1,2,3,4,5,6,7,8];
-const NO_RES_IDS=[1,3,6];
+/* ── Settings loader ── */
+function buildSynMap(groups){
+  const map={};
+  groups.forEach(g=>{
+    g.queries.forEach(q=>{map[q]=[...(map[q]||[]),...g.synonyms,...g.queries.filter(x=>x!==q)];});
+    g.synonyms.forEach(s=>{map[s]=[...(map[s]||[]),...g.queries,...g.synonyms.filter(x=>x!==s)];});
+  });
+  return map;
+}
+
+function loadSettingsFromStorage(){
+  const sb=lsGet('findter_sortby');
+  const sch=lsGet('findter_search');
+  const syn=lsGet('findter_synonyms');
+  const rd=lsGet('findter_redirects');
+  const vr=lsGet('findter_variant');
+  if(sb){ACTIVE_EXCLUSIVE=sb.exclusiveActive||'featured';SORT_OPTS_RAW=sb.options||null;}
+  if(sch){
+    if(sch.fields&&sch.fields.length)SEARCH_FIELDS=new Set(sch.fields);
+    if(sch.stopWords&&sch.stopWords.length)STOP_WORDS=new Set(sch.stopWords);
+    if(sch.noResultProductIds)NO_RES_IDS=sch.noResultProductIds;
+    if(sch.noResultKeywords)NO_RES_KEYWORDS=sch.noResultKeywords;
+    if(sch.zeroCharProductIds&&sch.zeroCharProductIds.length)ZERO_CHAR_IDS=sch.zeroCharProductIds;
+    NUMERIC_ENABLED=sch.numericEnabled!==undefined?sch.numericEnabled:true;
+  }
+  if(syn&&syn.length)SYNONYMS=buildSynMap(syn);
+  if(rd&&rd.length)REDIRECTS=rd.map(r=>({terms:r.terms.split(',').map(t=>t.trim()).filter(Boolean),url:r.url,label:r.url}));
+  if(vr){VARIANT_ENABLED=!!vr.enabled;VARIANT_SPLIT=new Set(vr.selectedOptions||[]);}
+  return{sb,sch,syn,rd,vr};
+}
 
 /* ── Filters / Sort State ── */
 let activeFilters={types:new Set(),priceKey:null,colors:new Set(),vendors:new Set()};
@@ -440,14 +431,14 @@ const PRICE_RANGES=[
 
 /* ── Variant expansion ── */
 function getDisplayProducts(){
-  const dp=$('dp-variants');
-  if(!dp||!dp.checked)return MOCK_PRODUCTS.map(p=>({...p,variantLabel:null}));
+  if(!VARIANT_ENABLED)return MOCK_PRODUCTS.map((p,i)=>({...p,_idx:i,variantLabel:null}));
   const out=[];
-  MOCK_PRODUCTS.forEach(p=>{
-    if(p.sizes&&p.sizes.length>1){
-      p.sizes.forEach(sz=>out.push({...p,id:p.id+'_'+sz,title:p.title,variantLabel:sz,price:p.price,sizes:[sz]}));
+  MOCK_PRODUCTS.forEach((p,i)=>{
+    const canSplitSize=VARIANT_SPLIT.has('Size')&&p.sizes&&p.sizes.length>1;
+    if(canSplitSize){
+      p.sizes.forEach(sz=>out.push({...p,_idx:i,id:p.id+'_'+sz,variantLabel:sz,sizes:[sz]}));
     }else{
-      out.push({...p,variantLabel:null});
+      out.push({...p,_idx:i,variantLabel:null});
     }
   });
   return out;
@@ -459,33 +450,57 @@ function applyFilters(products){
     if(activeFilters.types.size&&!activeFilters.types.has(p.type))return false;
     if(activeFilters.colors.size&&!activeFilters.colors.has(p.color))return false;
     if(activeFilters.vendors.size&&!activeFilters.vendors.has(p.vendor))return false;
-    if(activeFilters.priceKey){
-      const r=PRICE_RANGES.find(r=>r.key===activeFilters.priceKey);
-      if(r&&!r.fn(p.price))return false;
-    }
+    if(activeFilters.priceKey){const r=PRICE_RANGES.find(r=>r.key===activeFilters.priceKey);if(r&&!r.fn(p.price))return false;}
     return true;
   });
 }
 
-/* ── Sorting ── */
+/* ── Relevance scoring ── */
+function scoreRelevance(p,q){
+  if(!q)return 0;
+  let score=0;
+  if(p.title.toLowerCase().includes(q))score+=10;
+  (p.tags||[]).forEach(t=>{if(t.includes(q))score+=5;});
+  if(p.type.toLowerCase().includes(q))score+=3;
+  if(p.vendor.toLowerCase().includes(q))score+=2;
+  return score;
+}
+
+/* ── Sorting — all 11 types ── */
 function applySort(products){
   const a=[...products];
-  if(sortKey==='price-asc')return a.sort((x,y)=>x.price-y.price);
-  if(sortKey==='price-desc')return a.sort((x,y)=>y.price-x.price);
-  if(sortKey==='a-z')return a.sort((x,y)=>x.title.localeCompare(y.title));
-  if(sortKey==='best-selling')return a.sort((x,y)=>(y.ca-y.price)-(x.ca-x.price));
-  return a;
+  const q=lastQuery.toLowerCase();
+  switch(sortKey){
+    case 'featured':   return a.sort((x,y)=>(x._idx||0)-(y._idx||0));
+    case 'best':       return a.sort((x,y)=>(y.salesCount||0)-(x.salesCount||0));
+    case 'relevant':   return q?a.sort((x,y)=>scoreRelevance(y,q)-scoreRelevance(x,q)):a.sort((x,y)=>(x._idx||0)-(y._idx||0));
+    case 'newest':     return a.sort((x,y)=>new Date(y.createdAt||'2020-01-01')-new Date(x.createdAt||'2020-01-01'));
+    case 'oldest':     return a.sort((x,y)=>new Date(x.createdAt||'2020-01-01')-new Date(y.createdAt||'2020-01-01'));
+    case 'discount':   return a.sort((x,y)=>{const dx=x.ca>x.price?(x.ca-x.price)/x.ca:-1,dy=y.ca>y.price?(y.ca-y.price)/y.ca:-1;return dy-dx;});
+    case 'az':         return a.sort((x,y)=>x.title.localeCompare(y.title));
+    case 'za':         return a.sort((x,y)=>y.title.localeCompare(x.title));
+    case 'priceasc':   return a.sort((x,y)=>x.price-y.price);
+    case 'pricedesc':  return a.sort((x,y)=>y.price-x.price);
+    case 'inventory':  return a.sort((x,y)=>(y.inventory||0)-(x.inventory||0));
+    // backward compat keys
+    case 'price-asc':  return a.sort((x,y)=>x.price-y.price);
+    case 'price-desc': return a.sort((x,y)=>y.price-x.price);
+    case 'a-z':        return a.sort((x,y)=>x.title.localeCompare(y.title));
+    case 'best-selling':return a.sort((x,y)=>(y.salesCount||0)-(x.salesCount||0));
+    default: return a;
+  }
 }
 
 /* ── Product card HTML ── */
 function pCardHtml(p){
   const sale=p.ca>0?Math.round((p.ca-p.price)/p.ca*100):0;
   const badge=sale>=5?`<span class="pbadge pbadge-sale">-${sale}%</span>`:
-               p.id<=3?`<span class="pbadge pbadge-new">New</span>`:'';
+               p._idx<3?`<span class="pbadge pbadge-new">New</span>`:'';
   const sizes=p.sizes&&p.sizes.length>0?
     `<div class="psizes">${p.sizes.map(s=>`<span class="psize">${esc(s)}</span>`).join('')}</div>`:'';
   const compare=p.ca>0?`<span class="pcompare">$${p.ca.toFixed(2)}</span>`:'';
   const varLbl=p.variantLabel?` <span style="color:var(--text2);font-weight:400">– ${esc(p.variantLabel)}</span>`:'';
+  const oos=p.inventory===0?`<p class="poos">Out of stock</p>`:'';
   return `
     <div class="pcard">
       <div class="pimg-wrap">
@@ -501,8 +516,10 @@ function pCardHtml(p){
           <span class="pprice">$${p.price.toFixed(2)}</span>
           ${compare}
         </div>
-        ${sizes}
-        <button class="padd">Add to cart</button>
+        ${sizes}${oos}
+        <button class="padd"${p.inventory===0?' disabled':''}>
+          ${p.inventory===0?'Out of Stock':'Add to cart'}
+        </button>
       </div>
     </div>`;
 }
@@ -515,11 +532,11 @@ function renderGrid(){
   const grid=$('pgrid');
   $('pcount').textContent=sorted.length+' product'+(sorted.length!==1?'s':'');
   if(!sorted.length){
-    grid.innerHTML=`<div class="no-res" style="grid-column:1/-1;text-align:center;padding:48px"><h3>No products found</h3><p>Try removing some filters.</p></div>`;
+    grid.innerHTML=`<div class="no-res"><h3>No products found</h3><p>Try removing some filters.</p></div>`;
     return;
   }
   grid.innerHTML=sorted.map(pCardHtml).join('');
-  grid.querySelectorAll('.padd').forEach(btn=>{
+  grid.querySelectorAll('.padd:not([disabled])').forEach(btn=>{
     btn.onclick=()=>{
       const c=$('cart-count');c.textContent=Number(c.textContent)+1;
       btn.textContent='Added ✓';btn.style.background='var(--new)';
@@ -529,11 +546,8 @@ function renderGrid(){
 }
 
 /* ── Filter sidebar render ── */
-function countFor(key,val){
-  return getDisplayProducts().filter(p=>p[key]===val).length;
-}
+function countFor(key,val){return getDisplayProducts().filter(p=>p[key]===val).length;}
 function renderFilters(){
-  // Type
   const types=[...new Set(MOCK_PRODUCTS.map(p=>p.type))].sort();
   $('fsb-type').innerHTML=types.map(t=>`
     <label class="fcrow">
@@ -541,21 +555,15 @@ function renderFilters(){
       <span class="fclbl">${esc(t)}</span>
       <span class="fccnt">${countFor('type',t)}</span>
     </label>`).join('');
-
-  // Price
   $('fsb-price').innerHTML=PRICE_RANGES.map(r=>`
     <label class="fcrow">
       <input type="radio" name="price-range" value="${r.key}" ${activeFilters.priceKey===r.key?'checked':''}>
       <span class="fclbl">${r.label}</span>
     </label>`).join('');
-
-  // Color
   const colors=[...new Set(MOCK_PRODUCTS.map(p=>p.color))].sort();
   $('fsb-color').innerHTML=`<div class="swatch-row">`+
     colors.map(c=>`<div class="swatch${activeFilters.colors.has(c)?' sel':''}" data-color="${esc(c)}" title="${esc(c)}" style="background:${SWATCH_CSS[c]||'#888'}"></div>`).join('')+
   `</div>`;
-
-  // Vendor
   const vendors=[...new Set(MOCK_PRODUCTS.map(p=>p.vendor))].sort();
   $('fsb-vendor').innerHTML=vendors.map(v=>`
     <label class="fcrow">
@@ -563,11 +571,9 @@ function renderFilters(){
       <span class="fclbl">${esc(v)}</span>
       <span class="fccnt">${countFor('vendor',v)}</span>
     </label>`).join('');
-
   attachFilterEvents();
   renderActiveFilterTags();
 }
-
 function attachFilterEvents(){
   document.querySelectorAll('[data-filter="type"]').forEach(chk=>{
     chk.onchange=()=>{chk.checked?activeFilters.types.add(chk.value):activeFilters.types.delete(chk.value);refreshFilters();};
@@ -576,95 +582,65 @@ function attachFilterEvents(){
     r.onchange=()=>{activeFilters.priceKey=r.checked?r.value:null;refreshFilters();};
   });
   document.querySelectorAll('.swatch').forEach(sw=>{
-    sw.onclick=()=>{
-      const c=sw.dataset.color;
-      activeFilters.colors.has(c)?activeFilters.colors.delete(c):activeFilters.colors.add(c);
-      refreshFilters();
-    };
+    sw.onclick=()=>{const c=sw.dataset.color;activeFilters.colors.has(c)?activeFilters.colors.delete(c):activeFilters.colors.add(c);refreshFilters();};
   });
   document.querySelectorAll('[data-filter="vendor"]').forEach(chk=>{
     chk.onchange=()=>{chk.checked?activeFilters.vendors.add(chk.value):activeFilters.vendors.delete(chk.value);refreshFilters();};
   });
 }
-
 function refreshFilters(){renderFilters();renderGrid();}
-
 function renderActiveFilterTags(){
   const tags=[];
   [...activeFilters.types].forEach(t=>tags.push({label:'Type: '+t,clear:()=>activeFilters.types.delete(t)}));
   if(activeFilters.priceKey){const r=PRICE_RANGES.find(r=>r.key===activeFilters.priceKey);if(r)tags.push({label:r.label,clear:()=>{activeFilters.priceKey=null;}});}
   [...activeFilters.colors].forEach(c=>tags.push({label:'Color: '+c,clear:()=>activeFilters.colors.delete(c)}));
   [...activeFilters.vendors].forEach(v=>tags.push({label:v,clear:()=>activeFilters.vendors.delete(v)}));
-  const afWrap=$('af-wrap');
-  const clearBtn=$('clear-all-btn');
+  const afWrap=$('af-wrap');const clearBtn=$('clear-all-btn');
   if(!tags.length){afWrap.innerHTML='';clearBtn.classList.add('hidden');return;}
   clearBtn.classList.remove('hidden');
-  afWrap.innerHTML=tags.map((t,i)=>
-    `<span class="af-tag">${esc(t.label)}<button data-afi="${i}" title="Remove">×</button></span>`
-  ).join('');
-  afWrap.querySelectorAll('[data-afi]').forEach(b=>{
-    b.onclick=()=>{tags[Number(b.dataset.afi)].clear();refreshFilters();};
-  });
+  afWrap.innerHTML=tags.map((t,i)=>`<span class="af-tag">${esc(t.label)}<button data-afi="${i}" title="Remove">×</button></span>`).join('');
+  afWrap.querySelectorAll('[data-afi]').forEach(b=>{b.onclick=()=>{tags[Number(b.dataset.afi)].clear();refreshFilters();};});
 }
-
-$('clear-all-btn').onclick=()=>{
-  activeFilters={types:new Set(),priceKey:null,colors:new Set(),vendors:new Set()};
-  refreshFilters();
-};
+$('clear-all-btn').onclick=()=>{activeFilters={types:new Set(),priceKey:null,colors:new Set(),vendors:new Set()};refreshFilters();};
 
 /* ── Filter section toggles ── */
 document.querySelectorAll('.fst-btn').forEach(btn=>{
-  const sec=btn.dataset.sec;
-  const body=$('fsb-'+sec);
-  btn.onclick=()=>{
-    body.classList.toggle('closed');
-    btn.querySelector('.fst-chev').style.transform=body.classList.contains('closed')?'rotate(-90deg)':'';
-  };
+  const sec=btn.dataset.sec;const body=$('fsb-'+sec);
+  btn.onclick=()=>{body.classList.toggle('closed');btn.querySelector('.fst-chev').style.transform=body.classList.contains('closed')?'rotate(-90deg)':'';};
 });
 
-/* ── Sort dropdown ── */
-const SORT_OPTIONS=[
-  {key:'featured',label:'Featured'},
-  {key:'price-asc',label:'Price: Low to High'},
-  {key:'price-desc',label:'Price: High to Low'},
-  {key:'a-z',label:'A – Z'},
-  {key:'best-selling',label:'Best Selling'},
-];
+/* ── Sort dropdown — driven by settings ── */
+function buildSortOptions(){
+  if(!SORT_OPTS_RAW){
+    return[{key:'featured',label:'Featured'},{key:'priceasc',label:'Price: Low to High'},{key:'pricedesc',label:'Price: High to Low'},{key:'az',label:'A – Z'},{key:'best',label:'Best Selling'}];
+  }
+  const opts=[];
+  const excl=SORT_OPTS_RAW.find(o=>o.id===ACTIVE_EXCLUSIVE);
+  if(excl)opts.push({key:excl.id,label:excl.label});
+  SORT_OPTS_RAW.filter(o=>!o.exclusive&&o.enabled).forEach(o=>opts.push({key:o.id,label:o.label}));
+  return opts.length?opts:[{key:'featured',label:'Featured'}];
+}
 function openSortDrop(){
   sortDropOpen=true;
   const r=$('sort-btn').getBoundingClientRect();
   const drop=$('sort-drop');
-  drop.style.top=(r.bottom+4)+'px';
-  drop.style.left='auto';
-  drop.style.right=(window.innerWidth-r.right)+'px';
-  drop.style.width='200px';
-  drop.innerHTML=SORT_OPTIONS.map(o=>`<button class="sort-opt${sortKey===o.key?' cur':''}" data-sk="${o.key}">${esc(o.label)}</button>`).join('');
+  drop.style.top=(r.bottom+4)+'px';drop.style.left='auto';
+  drop.style.right=(window.innerWidth-r.right)+'px';drop.style.width='210px';
+  const opts=buildSortOptions();
+  drop.innerHTML=opts.map(o=>`<button class="sort-opt${sortKey===o.key?' cur':''}" data-sk="${esc(o.key)}">${esc(o.label)}</button>`).join('');
   drop.querySelectorAll('[data-sk]').forEach(b=>{
     b.onclick=()=>{sortKey=b.dataset.sk;$('sort-lbl').textContent=b.textContent;closeSortDrop();renderGrid();};
   });
-  drop.classList.remove('hidden');
-  $('sort-chev').style.transform='rotate(180deg)';
+  drop.classList.remove('hidden');$('sort-chev').style.transform='rotate(180deg)';
 }
-function closeSortDrop(){
-  sortDropOpen=false;
-  $('sort-drop').classList.add('hidden');
-  $('sort-chev').style.transform='';
-}
+function closeSortDrop(){sortDropOpen=false;$('sort-drop').classList.add('hidden');$('sort-chev').style.transform='';}
 $('sort-btn').onclick=e=>{e.stopPropagation();sortDropOpen?closeSortDrop():openSortDrop();};
 document.addEventListener('click',e=>{if(sortDropOpen&&!$('sort-drop').contains(e.target))closeSortDrop();});
 
 /* ── Search overlay ── */
 let soOpen=false;
-function openSearch(){
-  soOpen=true;
-  $('so').classList.add('open');
-  setTimeout(()=>$('so-inp').focus(),80);
-  renderZeroChar();
-}
-function closeSearch(){
-  soOpen=false;
-  $('so').classList.remove('open');
-}
+function openSearch(){soOpen=true;$('so').classList.add('open');setTimeout(()=>$('so-inp').focus(),80);renderZeroChar();}
+function closeSearch(){soOpen=false;$('so').classList.remove('open');}
 $('search-btn').onclick=openSearch;
 $('so-close-btn').onclick=closeSearch;
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&soOpen)closeSearch();});
@@ -684,6 +660,7 @@ function renderZeroChar(){
 
 /* ── Numeric parsing ── */
 function parseNumeric(q){
+  if(!NUMERIC_ENABLED)return null;
   const range=q.match(/\$?(\d+(?:\.\d+)?)\s*[-–]\s*\$?(\d+(?:\.\d+)?)/);
   if(range){const lo=+range[1],hi=+range[2];return p=>p>=lo&&p<=hi;}
   const under=q.match(/under\s+\$?(\d+(?:\.\d+)?)/);
@@ -691,7 +668,7 @@ function parseNumeric(q){
   const over=q.match(/over\s+\$?(\d+(?:\.\d+)?)/);
   if(over){const lo=+over[1];return p=>p>=lo;}
   const exact=q.match(/^\$(\d+(?:\.\d+)?)$/);
-  if(exact&&$('dp-numeric').checked){const v=+exact[1];return p=>Math.abs(p-v)/v<=0.25;}
+  if(exact){const v=+exact[1];return p=>Math.abs(p-v)/v<=0.25;}
   return null;
 }
 
@@ -701,12 +678,12 @@ function doSearch(){
   const raw=$('so-inp').value;
   $('so-clear-btn').classList.toggle('hidden',!raw);
   const q=raw.trim();
+  lastQuery=q;
   if(!q){
     $('so-zero').classList.remove('hidden');
     $('so-has-results').classList.add('hidden');
     $('so-empty').classList.add('hidden');
-    renderZeroChar();
-    return;
+    renderZeroChar();return;
   }
   $('so-zero').classList.add('hidden');
   const qLow=q.toLowerCase();
@@ -717,33 +694,40 @@ function doSearch(){
     if(rd.terms.some(t=>qLow===t||qLow.split(/\s+/).includes(t))){
       $('so-rd-msg').classList.remove('hidden');
       $('so-rd-label').textContent=rd.label;
-      redirected=true;
-      break;
+      redirected=true;break;
     }
   }
   if(!redirected)$('so-rd-msg').classList.add('hidden');
 
-  // Numeric
-  const numeric=$('dp-numeric').checked?parseNumeric(qLow):null;
-
-  // Tokenize + stop words
+  // No-result keyword check
   const tokens=qLow.split(/\s+/).filter(t=>t&&!STOP_WORDS.has(t));
+  const isNoResKw=NO_RES_KEYWORDS.some(kw=>qLow===kw.toLowerCase()||tokens.includes(kw.toLowerCase()));
+
+  // Numeric
+  const numeric=parseNumeric(qLow);
+
+  // Expand synonyms
   const allTerms=new Set(tokens);
-  if($('dp-synonyms').checked){
-    tokens.forEach(t=>(SYNONYMS[t]||[]).forEach(s=>allTerms.add(s)));
-  }
+  tokens.forEach(t=>(SYNONYMS[t]||[]).forEach(s=>allTerms.add(s)));
 
   let products=getDisplayProducts();
   if(numeric){
     products=products.filter(p=>numeric(p.price));
   }else if(allTerms.size){
     products=products.filter(p=>{
-      const haystack=[p.title,p.type,p.vendor,p.color,p.sku,...(p.tags||[])].join(' ').toLowerCase();
-      return [...allTerms].some(t=>haystack.includes(t));
+      const parts=[];
+      if(SEARCH_FIELDS.has('title'))parts.push(p.title);
+      if(SEARCH_FIELDS.has('type'))parts.push(p.type);
+      if(SEARCH_FIELDS.has('vendor'))parts.push(p.vendor);
+      if(SEARCH_FIELDS.has('color'))parts.push(p.color);
+      if(SEARCH_FIELDS.has('sku'))parts.push(p.sku);
+      if(SEARCH_FIELDS.has('tags'))parts.push(...(p.tags||[]));
+      const haystack=parts.join(' ').toLowerCase();
+      return[...allTerms].some(t=>haystack.includes(t));
     });
   }
 
-  if(!products.length&&!redirected){
+  if((!products.length||isNoResKw)&&!redirected){
     $('so-has-results').classList.add('hidden');
     $('so-empty').classList.remove('hidden');
     $('so-query-lbl').textContent=q;
@@ -761,7 +745,6 @@ function doSearch(){
 
   $('so-empty').classList.add('hidden');
   $('so-has-results').classList.remove('hidden');
-
   const top=products.slice(0,8);
   $('so-list').innerHTML=top.map(p=>`
     <div class="so-row-item">
@@ -772,43 +755,33 @@ function doSearch(){
       </div>
       <span class="so-item-price">$${p.price.toFixed(2)}</span>
     </div>`).join('');
-
   const va=$('so-view-all');
   if(products.length>8){va.classList.remove('hidden');va.textContent=`View all ${products.length} results →`;}
   else va.classList.add('hidden');
 }
+$('so-clear-btn').onclick=()=>{$('so-inp').value='';lastQuery='';doSearch();$('so-inp').focus();};
 
-$('so-clear-btn').onclick=()=>{$('so-inp').value='';doSearch();$('so-inp').focus();};
-
-/* ── Demo panel toggle ── */
-let dpOpen=true;
-$('dp-tog').onclick=()=>{
-  dpOpen=!dpOpen;
-  $('dp-body').classList.toggle('hidden',!dpOpen);
-  $('dp-tog').textContent=dpOpen?'−':'+';
-};
-
-/* ── Demo panel checkboxes → re-render ── */
-$('dp-variants').onchange=()=>{renderFilters();renderGrid();};
-$('dp-synonyms').onchange=()=>{if($('so-inp').value)doSearch();};
-$('dp-numeric').onchange=()=>{if($('so-inp').value)doSearch();};
-
-/* ── Quick tests ── */
-function quickSearch(term){
-  openSearch();
-  $('so-inp').value=term;
-  doSearch();
-}
-function resetAll(){
-  activeFilters={types:new Set(),priceKey:null,colors:new Set(),vendors:new Set()};
-  sortKey='featured';
-  $('sort-lbl').textContent='Featured';
-  refreshFilters();
+/* ── Settings status badge ── */
+function renderStatusBadge(loaded){
+  const total=5;
+  const count=Object.values(loaded).filter(Boolean).length;
+  const badge=$('settings-status');const txt=$('status-txt');
+  if(count===0){badge.style.background='rgba(107,114,128,1)';txt.textContent='Using default settings';}
+  else{badge.style.background='#16a34a';txt.textContent=`Settings loaded (${count}/${total})`;}
 }
 
 /* ── Init ── */
+const _loaded=loadSettingsFromStorage();
+sortKey=ACTIVE_EXCLUSIVE;
+// Set initial sort label
+(()=>{
+  const opts=buildSortOptions();
+  const active=opts.find(o=>o.key===sortKey)||opts[0];
+  if(active)$('sort-lbl').textContent=active.label;
+})();
 renderFilters();
 renderGrid();
+renderStatusBadge(_loaded);
 </script>
 </body>
 </html>

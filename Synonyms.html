@@ -146,6 +146,12 @@ a{color:var(--lnk)}
 
 <script>
 const $=id=>document.getElementById(id);
+
+// ── localStorage helpers ──
+const LS_KEY='findter_synonyms';
+function lsLoad(){try{const r=localStorage.getItem(LS_KEY);return r?JSON.parse(r):null;}catch(e){return null;}}
+function lsSave(d){try{localStorage.setItem(LS_KEY,JSON.stringify(d));}catch(e){}}
+
 const IC={
   chevL:`<svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.78 5.97a.75.75 0 0 1 0 1.06L8.81 10l2.97 2.97a.75.75 0 1 1-1.06 1.06l-3.5-3.5a.75.75 0 0 1 0-1.06l3.5-3.5a.75.75 0 0 1 1.06 0Z" fill="currentColor"/></svg>`,
   chevR:`<svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.22 5.97a.75.75 0 0 0 0 1.06L11.19 10 8.22 12.97a.75.75 0 1 0 1.06 1.06l3.5-3.5a.75.75 0 0 0 0-1.06l-3.5-3.5a.75.75 0 0 0-1.06 0Z" fill="currentColor"/></svg>`,
@@ -188,11 +194,14 @@ function updateSb(){
 }
 $('sidebar-toggle').onclick=()=>{col=!col;updateSb();};
 
-let synonymGroups=[
+const _DEFAULT_GROUPS=[
   {id:1,queries:['t-shirt','tee'],  synonyms:['shirt','top','polo']},
   {id:2,queries:['laptop'],         synonyms:['notebook','computer']},
 ];
+let synonymGroups=_DEFAULT_GROUPS.map(g=>({...g,queries:[...g.queries],synonyms:[...g.synonyms]}));
 let editingId=null,nextId=3;
+// load from localStorage
+(()=>{const s=lsLoad();if(s&&s.length){synonymGroups=s;nextId=Math.max(...s.map(g=>g.id),0)+1;}})();
 
 function renderGroups(){
   const list=$('synonym-list');
@@ -240,9 +249,10 @@ function saveModal(){
   if(!synonyms.length){alert('Please enter at least one synonym.');return;}
   if(editingId!==null){const g=synonymGroups.find(g=>g.id===editingId);g.queries=queries;g.synonyms=synonyms;}
   else{synonymGroups.push({id:nextId++,queries,synonyms});}
+  lsSave(synonymGroups);
   closeModal();renderGroups();
 }
-function deleteGroup(id){synonymGroups=synonymGroups.filter(g=>g.id!==id);renderGroups();}
+function deleteGroup(id){synonymGroups=synonymGroups.filter(g=>g.id!==id);lsSave(synonymGroups);renderGroups();}
 
 $('add-btn').onclick=()=>openModal();
 $('modal-close').onclick=$('modal-cancel').onclick=closeModal;
