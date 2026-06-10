@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Demo Store – Powered by Findter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f6f6f7;--white:#fff;--text:#121212;--text2:#6d6d6d;--text3:#aaa;--bdr:#e0e0e0;--bdr2:#bbb;--acc:#121212;--acc-hov:#333;--sale:#b91c1c;--new:#16a34a;--r1:4px;--r2:8px;--r3:12px;--hh:60px;--sb-w:248px}
+html{font-family:'Inter',system-ui,sans-serif;font-size:14px;background:var(--bg);color:var(--text)}
+body{min-height:100vh;transition:padding-left .25s}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+/* ── Header ── */
+#hdr{position:fixed;top:0;left:var(--sb-w);right:0;z-index:50;height:var(--hh);background:var(--white);border-bottom:1px solid var(--bdr);transition:left .25s}
+.hdr-inner{max-width:1320px;margin:0 auto;height:100%;display:flex;align-items:center;justify-content:space-between;padding:0 24px;gap:24px}
+.hdr-left{display:flex;align-items:center;gap:32px}
+.hdr-logo{font-size:18px;font-weight:700;letter-spacing:-.5px}
+.hdr-nav{display:flex;gap:20px}
+.hdr-nav a{font-size:13px;font-weight:500;color:var(--text2);transition:color .1s}
+.hdr-nav a:hover,.hdr-nav a.cur{color:var(--text)}
+.hdr-right{display:flex;align-items:center;gap:4px}
+.hdr-ib{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:var(--r1);color:var(--text);transition:background .1s;position:relative}
+.hdr-ib:hover{background:#f0f0f0}
+.cart-dot{position:absolute;top:5px;right:5px;width:14px;height:14px;background:var(--acc);color:#fff;font-size:9px;font-weight:700;border-radius:50%;display:flex;align-items:center;justify-content:center}
+/* ── Search Overlay ── */
+#so{position:fixed;top:var(--hh);left:var(--sb-w);right:0;z-index:45;background:var(--white);border-bottom:1px solid var(--bdr);box-shadow:0 8px 32px rgba(0,0,0,.12);max-height:calc(90vh - var(--hh));overflow-y:auto;transform:translateY(-6px);opacity:0;pointer-events:none;transition:transform .18s,opacity .18s}
+#so.open{transform:translateY(0);opacity:1;pointer-events:all}
+.so-inner{max-width:840px;margin:0 auto;padding:20px 24px}
+.so-row{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.so-inp-wrap{flex:1;display:flex;align-items:center;gap:10px;border:1.5px solid var(--bdr2);border-radius:var(--r2);padding:9px 14px;background:var(--white);transition:border-color .1s}
+.so-inp-wrap:focus-within{border-color:var(--acc)}
+#so-inp{flex:1;font-family:inherit;font-size:16px;border:none;outline:none;color:var(--text)}
+#so-inp::placeholder{color:var(--text3)}
+.so-clear{color:var(--text3);font-size:18px;line-height:1;width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background .1s,color .1s}
+.so-clear:hover{background:#f0f0f0;color:var(--text)}
+.so-close{font-size:13px;font-weight:600;color:var(--text2);padding:7px 14px;border-radius:var(--r2);border:1px solid var(--bdr);transition:background .1s,border-color .1s;white-space:nowrap}
+.so-close:hover{background:#f0f0f0;border-color:var(--bdr2)}
+.so-sec-ttl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:12px}
+.so-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.so-card{border-radius:var(--r2);border:1px solid var(--bdr);overflow:hidden;cursor:pointer;transition:box-shadow .15s,transform .15s}
+.so-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.1);transform:translateY(-1px)}
+.so-card-img{aspect-ratio:1;overflow:hidden}
+.so-card-info{padding:8px}
+.so-card-title{font-size:12px;font-weight:600;line-height:1.35;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.so-card-price{font-size:12px;color:var(--text2);margin-top:2px}
+.so-rd{display:flex;align-items:center;gap:10px;padding:12px 14px;background:#fff7ed;border:1px solid #fed7aa;border-radius:var(--r2);margin-bottom:16px}
+.so-rd-text{font-size:13px;color:#9a3412;font-weight:500}
+.so-rd-link{text-decoration:underline;color:#9a3412;cursor:pointer}
+.so-list{display:flex;flex-direction:column}
+.so-row-item{display:flex;align-items:center;gap:12px;padding:10px 6px;border-radius:var(--r2);cursor:pointer;transition:background .1s}
+.so-row-item:hover{background:var(--bg)}
+.so-thumb{width:48px;height:48px;border-radius:var(--r1);flex-shrink:0;overflow:hidden}
+.so-item-info{flex:1;min-width:0}
+.so-item-title{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.so-item-sub{font-size:12px;color:var(--text2);margin-top:1px}
+.so-item-price{font-size:14px;font-weight:700;flex-shrink:0}
+.so-empty{text-align:center;padding:40px 0}
+.so-empty-ttl{font-size:16px;font-weight:700;margin-bottom:6px}
+.so-empty-sub{font-size:13px;color:var(--text2);margin-bottom:24px}
+/* ── Page ── */
+.pw{max-width:1320px;margin:0 auto;padding:calc(var(--hh) + 24px) 24px 48px}
+.bc{font-size:12px;color:var(--text2);margin-bottom:16px}
+.bc strong{color:var(--text)}
+.col-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.col-hdr h1{font-size:24px;font-weight:700;letter-spacing:-.5px}
+/* Sort */
+.sort-wrap{position:relative}
+#sort-btn{display:flex;align-items:center;gap:8px;padding:8px 14px;border:1px solid var(--bdr);border-radius:var(--r2);font-size:13px;font-weight:600;color:var(--text);background:var(--white);transition:border-color .1s}
+#sort-btn:hover{border-color:var(--bdr2)}
+#sort-drop{background:var(--white);border:1px solid var(--bdr);border-radius:var(--r2);box-shadow:0 8px 24px rgba(0,0,0,.15);min-width:200px;overflow:hidden;z-index:90}
+.sort-opt{display:block;width:100%;padding:10px 16px;text-align:left;font-size:13px;font-weight:500;transition:background .1s;color:var(--text);border:none;background:none;cursor:pointer;font-family:inherit}
+.sort-opt:hover{background:var(--bg)}
+.sort-opt.cur{font-weight:700}
+/* Active filters */
+#af-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;align-items:center}
+.af-tag{display:inline-flex;align-items:center;gap:4px;padding:4px 10px 4px 12px;background:var(--acc);color:#fff;border-radius:100px;font-size:12px;font-weight:600}
+.af-tag button{color:rgba(255,255,255,.7);font-size:16px;line-height:1;padding:0 0 0 2px;transition:color .1s}
+.af-tag button:hover{color:#fff}
+#af-clear{font-size:12px;color:var(--text2);text-decoration:underline;cursor:pointer;padding:4px 6px;background:none;border:none;font-family:inherit}
+/* Layout */
+.col-layout{display:flex;gap:28px;align-items:flex-start}
+/* Filter sidebar */
+.fsb{width:216px;flex-shrink:0;position:sticky;top:calc(var(--hh)+16px)}
+.fsb-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.fsb-hdr h2{font-size:15px;font-weight:700}
+.fsb-filter-sec{border-top:1px solid var(--bdr)}
+.fst-btn{width:100%;display:flex;align-items:center;justify-content:space-between;padding:13px 0;font-size:13px;font-weight:600;color:var(--text);background:none;border:none;cursor:pointer;font-family:inherit}
+.fst-chev{font-size:9px;transition:transform .2s;color:var(--text3)}
+.fst-body{padding-bottom:14px;display:flex;flex-direction:column;gap:9px}
+.fst-body.closed{display:none}
+.fcrow{display:flex;align-items:center;gap:9px;cursor:pointer}
+.fcrow input{width:15px;height:15px;accent-color:var(--acc);cursor:pointer;flex-shrink:0}
+.fclbl{font-size:13px;color:var(--text)}
+.fccnt{font-size:11px;color:var(--text3);margin-left:auto}
+.swatch-row{display:flex;flex-wrap:wrap;gap:8px}
+.swatch{width:22px;height:22px;border-radius:50%;border:2.5px solid transparent;cursor:pointer;transition:border-color .1s,transform .1s;flex-shrink:0}
+.swatch:hover,.swatch.sel{border-color:var(--acc);transform:scale(1.12)}
+/* Main area */
+.col-main{flex:1;min-width:0}
+.pcount{font-size:13px;color:var(--text2);margin-bottom:10px}
+/* Grid */
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.pcard{background:var(--white);border-radius:var(--r3);overflow:hidden;display:flex;flex-direction:column;transition:box-shadow .15s}
+.pcard:hover{box-shadow:0 4px 20px rgba(0,0,0,.1)}
+.pimg-wrap{position:relative;aspect-ratio:4/5;overflow:hidden}
+.pimg{width:100%;height:100%;display:flex;align-items:center;justify-content:center;transition:transform .3s}
+.pcard:hover .pimg{transform:scale(1.04)}
+.pbadge{position:absolute;top:10px;left:10px;color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:var(--r1)}
+.pbadge-sale{background:var(--sale)}
+.pbadge-new{background:var(--new)}
+.pinfo{padding:12px;flex:1;display:flex;flex-direction:column;gap:3px}
+.ptype{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text3)}
+.ptitle{font-size:14px;font-weight:600;line-height:1.35}
+.prow{display:flex;align-items:baseline;gap:6px;margin-top:2px}
+.pprice{font-size:14px;font-weight:700}
+.pcompare{font-size:13px;color:var(--text3);text-decoration:line-through}
+.psizes{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.psize{padding:2px 7px;border:1px solid var(--bdr);border-radius:var(--r1);font-size:11px;color:var(--text2)}
+.padd{margin-top:8px;width:100%;padding:9px;background:var(--acc);color:#fff;border-radius:var(--r2);font-size:13px;font-weight:600;transition:background .15s}
+.padd:hover{background:var(--acc-hov)}
+/* No results */
+.no-res{text-align:center;padding:48px 24px;grid-column:1/-1}
+.no-res h3{font-size:18px;font-weight:700;margin-bottom:8px}
+.no-res p{font-size:13px;color:var(--text2);margin-bottom:24px}
+/* Demo panel */
+#dp{position:fixed;bottom:24px;right:24px;width:268px;background:var(--white);border-radius:var(--r3);box-shadow:0 8px 32px rgba(0,0,0,.22);z-index:60;overflow:hidden;font-family:'Inter',sans-serif}
+.dp-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#121212;color:#fff}
+.dp-hdr-ttl{font-size:12px;font-weight:700;letter-spacing:.04em;display:flex;align-items:center;gap:8px}
+.dp-toggle-btn{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;font-size:15px;display:flex;align-items:center;justify-content:center;transition:background .1s;flex-shrink:0;line-height:1}
+.dp-toggle-btn:hover{background:rgba(255,255,255,.22)}
+#dp-body{padding:12px 14px;display:flex;flex-direction:column;gap:9px}
+.dp-row{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:500;color:var(--text);cursor:pointer;user-select:none}
+.dp-row input{accent-color:var(--acc);cursor:pointer;width:14px;height:14px}
+.dp-sep{height:1px;background:var(--bdr);margin:1px 0}
+.dp-sub{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3)}
+.dp-tests{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.dp-tb{padding:7px 4px;background:var(--bg);border:1px solid var(--bdr);border-radius:var(--r1);font-size:11px;font-weight:600;color:var(--text);transition:background .1s,border-color .1s;font-family:inherit}
+.dp-tb:hover{background:#e8e8e8;border-color:var(--bdr2)}
+/* Misc */
+.hidden{display:none!important}
+.ic{width:18px;height:18px;fill:currentColor;display:block;flex-shrink:0}
+/* ── Admin sidebar ── */
+.asb{position:fixed;top:0;left:0;bottom:0;width:248px;background:#fff;border-right:1px solid #e3e3e3;z-index:60;display:flex;flex-direction:column;transition:width .25s;overflow:hidden}
+.asb.col{width:56px}
+.asb-hd{padding:12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e3e3e3;gap:8px;flex-shrink:0;min-height:52px}
+.asb-logo{width:28px;height:28px;border-radius:6px;background:#303030;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.asb-name{font-size:13px;font-weight:650;color:#303030;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.asb-tgl{width:28px;height:28px;border:none;background:transparent;cursor:pointer;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#616161;font-size:18px;line-height:1}
+.asb-tgl:hover{background:#f7f7f7}
+.asb-body{padding:8px;display:flex;flex-direction:column;gap:2px;flex:1;overflow-y:auto}
+.asb-btn{width:100%;border:none;background:transparent;cursor:pointer;padding:6px 12px;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;font-weight:450;color:#616161;text-align:left;display:flex;align-items:center;overflow:hidden;transition:background .1s,color .1s;white-space:nowrap}
+.asb-btn:hover:not([disabled]){background:#f7f7f7;color:#303030}
+.asb-btn.cur{background:#f3f3f3!important;color:#303030!important;font-weight:650}
+.asb-btn[disabled]{color:#b5b5b5!important;cursor:not-allowed}
+.asb-lbl{overflow:hidden;text-overflow:ellipsis;flex:1}
+.asb-live{font-size:10px;font-weight:700;background:#16a34a;color:#fff;padding:2px 6px;border-radius:3px;margin-left:6px;flex-shrink:0;letter-spacing:.03em}
+</style>
+</head>
+<body>
+
+<!-- ═══ ADMIN SIDEBAR ═══ -->
+<nav id="asb" class="asb">
+  <div class="asb-hd">
+    <div class="asb-logo">Fd</div>
+    <span class="asb-name">Findter Admin</span>
+    <button id="asb-tgl" class="asb-tgl" title="Toggle sidebar">‹</button>
+  </div>
+  <div id="asb-body" class="asb-body"></div>
+</nav>
+
+<!-- ═══ HEADER ═══ -->
+<header id="hdr">
+  <div class="hdr-inner">
+    <div class="hdr-left">
+      <span class="hdr-logo">Demo Store</span>
+      <nav class="hdr-nav">
+        <a href="#">Home</a>
+        <a href="#" class="cur">Collections</a>
+        <a href="#">About</a>
+      </nav>
+    </div>
+    <div class="hdr-right">
+      <button id="search-btn" class="hdr-ib" title="Search">
+        <svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M13.74 12.68a6.5 6.5 0 1 1 1.06-1.06l3.26 3.27a.75.75 0 1 1-1.06 1.06l-3.26-3.27Zm.76-5.18a5 5 0 1 1-10 0 5 5 0 0 1 10 0Z" fill="currentColor"/></svg>
+      </button>
+      <button class="hdr-ib" title="Cart">
+        <svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.5 3.75a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 .74.63l.89 5.37H4.62l.89-5.37A.75.75 0 0 1 5.5 3.75ZM3 10.25h14l-1.18 6.5A.75.75 0 0 1 15.07 17H4.93a.75.75 0 0 1-.74-.63L3 10.25Z" fill="currentColor"/></svg>
+        <span class="cart-dot" id="cart-count">2</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ SEARCH OVERLAY ═══ -->
+<div id="so">
+  <div class="so-inner">
+    <div class="so-row">
+      <div class="so-inp-wrap">
+        <svg class="ic" style="color:var(--text3);flex-shrink:0" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M13.74 12.68a6.5 6.5 0 1 1 1.06-1.06l3.26 3.27a.75.75 0 1 1-1.06 1.06l-3.26-3.27Zm.76-5.18a5 5 0 1 1-10 0 5 5 0 0 1 10 0Z" fill="currentColor"/></svg>
+        <input id="so-inp" placeholder="Search products, brands, and more…" autocomplete="off" spellcheck="false">
+        <button id="so-clear-btn" class="so-clear hidden" title="Clear">×</button>
+      </div>
+      <button id="so-close-btn" class="so-close">Close</button>
+    </div>
+
+    <!-- Zero char: trending -->
+    <div id="so-zero">
+      <p class="so-sec-ttl">Trending Products</p>
+      <div class="so-grid" id="so-zc-grid"></div>
+    </div>
+
+    <!-- Has query results -->
+    <div id="so-has-results" class="hidden">
+      <div id="so-rd-msg" class="so-rd hidden">
+        <svg class="ic" style="color:#f97316;flex-shrink:0" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.69L11.72 6.53a.75.75 0 0 1 1.06-1.06l4 4a.75.75 0 0 1 0 1.06l-4 4a.75.75 0 1 1-1.06-1.06l2.72-2.72H3.75A.75.75 0 0 1 3 10Z" fill="currentColor"/></svg>
+        <span class="so-rd-text">Redirecting to <span id="so-rd-label" class="so-rd-link"></span> →</span>
+      </div>
+      <div class="so-list" id="so-list"></div>
+      <p id="so-view-all" class="hidden" style="text-align:center;padding:10px 0;font-size:13px;color:var(--text2)"></p>
+    </div>
+
+    <!-- No results -->
+    <div id="so-empty" class="hidden">
+      <div class="so-empty">
+        <p class="so-empty-ttl">No results for "<span id="so-query-lbl"></span>"</p>
+        <p class="so-empty-sub">Try a different search term or browse collections below.</p>
+      </div>
+      <p class="so-sec-ttl">You might also like</p>
+      <div class="so-grid" id="so-sug-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<div class="pw">
+  <nav class="bc">Home / <strong>All Products</strong></nav>
+
+  <div class="col-hdr">
+    <h1 id="col-h1">All Products</h1>
+    <div class="sort-wrap">
+      <button id="sort-btn">
+        <span>Sort by: </span>
+        <span id="sort-lbl">Featured</span>
+        <svg style="width:12px;height:12px;fill:currentColor;transition:transform .15s" id="sort-chev" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" fill="currentColor"/></svg>
+      </button>
+      <div id="sort-drop" class="hidden" style="position:fixed"></div>
+    </div>
+  </div>
+
+  <div id="af-wrap"></div>
+
+  <div class="col-layout">
+    <!-- FILTER SIDEBAR -->
+    <aside class="fsb">
+      <div class="fsb-hdr">
+        <h2>Filters</h2>
+        <button id="clear-all-btn" class="hidden" style="font-size:12px;color:var(--text2);text-decoration:underline">Clear all</button>
+      </div>
+      <div class="fsb-filter-sec">
+        <button class="fst-btn" data-sec="type">Product Type <span class="fst-chev">▾</span></button>
+        <div class="fst-body" id="fsb-type"></div>
+      </div>
+      <div class="fsb-filter-sec">
+        <button class="fst-btn" data-sec="price">Price <span class="fst-chev">▾</span></button>
+        <div class="fst-body" id="fsb-price"></div>
+      </div>
+      <div class="fsb-filter-sec">
+        <button class="fst-btn" data-sec="color">Color <span class="fst-chev">▾</span></button>
+        <div class="fst-body" id="fsb-color"></div>
+      </div>
+      <div class="fsb-filter-sec">
+        <button class="fst-btn" data-sec="vendor">Vendor <span class="fst-chev">▾</span></button>
+        <div class="fst-body" id="fsb-vendor"></div>
+      </div>
+    </aside>
+
+    <!-- PRODUCT AREA -->
+    <main class="col-main">
+      <p class="pcount" id="pcount">15 products</p>
+      <div class="pgrid" id="pgrid"></div>
+    </main>
+  </div>
+</div>
+
+<!-- ═══ DEMO PANEL ═══ -->
+<div id="dp">
+  <div class="dp-hdr">
+    <span class="dp-hdr-ttl">
+      <svg style="width:14px;height:14px;fill:currentColor;flex-shrink:0" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.078 2.25c-.917 0-1.699.663-1.85 1.567L9.05 4.889c-.02.12-.115.26-.297.348a7.493 7.493 0 0 0-.986.57c-.166.115-.334.126-.45.083L6.3 5.508a1.875 1.875 0 0 0-2.282.819l-.922 1.597a1.875 1.875 0 0 0 .432 2.385l.84.692c.095.078.17.229.154.43a7.598 7.598 0 0 0 0 1.139c.015.2-.059.352-.153.43l-.841.692a1.875 1.875 0 0 0-.432 2.385l.922 1.597a1.875 1.875 0 0 0 2.282.818l1.019-.382c.115-.043.283-.031.45.082.312.214.641.405.985.57.182.088.277.228.297.35l.178 1.071c.151.904.933 1.567 1.85 1.567h1.844c.916 0 1.699-.663 1.85-1.567l.178-1.072c.02-.12.114-.26.297-.349.344-.165.673-.356.985-.57.167-.114.335-.125.45-.082l1.02.382a1.875 1.875 0 0 0 2.28-.819l.923-1.597a1.875 1.875 0 0 0-.432-2.385l-.84-.692c-.095-.078-.17-.229-.154-.43a7.614 7.614 0 0 0 0-1.139c-.016-.2.059-.352.153-.43l.84-.692c.708-.582.891-1.59.433-2.385l-.922-1.597a1.875 1.875 0 0 0-2.282-.818l-1.02.382c-.114.043-.282.031-.449-.083a7.49 7.49 0 0 0-.985-.57c-.183-.087-.277-.227-.297-.348l-.179-1.072a1.875 1.875 0 0 0-1.85-1.567h-1.843ZM12 15.75a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5Z" fill="currentColor"/></svg>
+      Demo Controls
+    </span>
+    <button class="dp-toggle-btn" id="dp-tog">−</button>
+  </div>
+  <div id="dp-body">
+    <label class="dp-row"><input type="checkbox" id="dp-variants"> Show variants as separate products</label>
+    <label class="dp-row"><input type="checkbox" id="dp-synonyms" checked> Expand synonyms in search</label>
+    <label class="dp-row"><input type="checkbox" id="dp-numeric" checked> Enable numeric search</label>
+    <div class="dp-sep"></div>
+    <p class="dp-sub">Quick tests</p>
+    <div class="dp-tests">
+      <button class="dp-tb" onclick="quickSearch('tee')">Search "tee"</button>
+      <button class="dp-tb" onclick="quickSearch('laptop')">Search "laptop"</button>
+      <button class="dp-tb" onclick="quickSearch('$30-$60')">$30–$60 range</button>
+      <button class="dp-tb" onclick="quickSearch('sale')">Redirect: sale</button>
+      <button class="dp-tb" onclick="quickSearch('asdfxyz')">No results</button>
+      <button class="dp-tb" onclick="resetAll()">Reset all</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $=id=>document.getElementById(id);
+
+/* ── Admin sidebar ── */
+const ASB_NAV=[
+  {id:'filter',label:'Filter'},{id:'search',label:'Search'},
+  {id:'metafield',label:'Metafield'},
+  {id:'grid',label:'Filter & Product Grid Design'},{id:'settings',label:'Settings'},
+  {id:'analytics',label:'Analytics'},{id:'advanced',label:'Advanced Features'},
+  {id:'storefront',label:'Storefront Preview',live:true},
+];
+const ASB_ENABLED=new Set(['settings','metafield','search','storefront']);
+let asbCol=false;
+
+function renderAsb(){
+  $('asb-body').innerHTML=ASB_NAV.map(n=>{
+    const en=ASB_ENABLED.has(n.id),act=n.id==='storefront';
+    return `<button data-an="${esc(n.id)}" ${en?'':'disabled'} class="asb-btn${act?' cur':''}" ${act?'style="cursor:default"':''}>
+      <span class="asb-lbl">${esc(n.label)}</span>${n.live?'<span class="asb-live">LIVE</span>':''}
+    </button>`;
+  }).join('');
+  $('asb-body').querySelectorAll('[data-an]').forEach(b=>{
+    if(!ASB_ENABLED.has(b.dataset.an)||b.dataset.an==='storefront')return;
+    b.onclick=()=>{
+      const v=b.dataset.an;
+      if(v==='settings')location.href='index.html';
+      else if(v==='metafield')location.href='Metafield.html';
+      else if(v==='search')location.href='Search.html';
+    };
+  });
+}
+
+function setAsbWidth(w){
+  document.body.style.paddingLeft=w+'px';
+  $('hdr').style.left=w+'px';
+  $('so').style.left=w+'px';
+  const collapsed=w<100;
+  $('asb-body').querySelectorAll('.asb-lbl,.asb-live').forEach(el=>el.style.display=collapsed?'none':'');
+  $('asb').querySelector('.asb-name').style.display=collapsed?'none':'';
+  $('asb-tgl').textContent=collapsed?'›':'‹';
+}
+
+$('asb-tgl').onclick=()=>{
+  asbCol=!asbCol;
+  $('asb').classList.toggle('col',asbCol);
+  setAsbWidth(asbCol?56:248);
+};
+
+renderAsb();
+setAsbWidth(248);
+
+/* ── Mock Data ── */
+const MOCK_PRODUCTS=[
+  {id:1,  title:'Wireless Earbuds Pro',  price:79.99, ca:99.99, type:'Electronics', vendor:'TechBrand', color:'Black',  sizes:[],             tags:['audio','wireless'], sku:'EAR-001'},
+  {id:2,  title:'Cotton T-Shirt',        price:24.99, ca:0,     type:'Apparel',     vendor:'BasicWear', color:'Red',    sizes:['S','M','L'],   tags:['basics','cotton'],  sku:'TSH-001'},
+  {id:3,  title:'Running Shoes',         price:89.99, ca:120,   type:'Footwear',    vendor:'SportStep', color:'White',  sizes:['8','9','10'],  tags:['shoes','footwear'], sku:'SHO-001'},
+  {id:4,  title:'Leather Wallet',        price:45.00, ca:0,     type:'Accessories', vendor:'LeatherCo', color:'Brown',  sizes:[],             tags:['wallet','leather'], sku:'WAL-001'},
+  {id:5,  title:'Ceramic Coffee Mug',    price:18.99, ca:0,     type:'Kitchen',     vendor:'HomePlus',  color:'White',  sizes:[],             tags:['mug','kitchen'],    sku:'MUG-001'},
+  {id:6,  title:'Denim Jacket',          price:69.99, ca:89.99, type:'Apparel',     vendor:'BasicWear', color:'Blue',   sizes:['M','L'],       tags:['jacket','denim'],   sku:'JAC-001'},
+  {id:7,  title:'Yoga Mat',             price:34.99, ca:0,     type:'Fitness',     vendor:'FitLife',   color:'Purple', sizes:[],             tags:['yoga','fitness'],   sku:'MAT-001'},
+  {id:8,  title:'Laptop Stand',         price:42.00, ca:55,    type:'Electronics', vendor:'TechBrand', color:'Silver', sizes:[],             tags:['laptop','stand'],   sku:'STD-001'},
+  {id:9,  title:'Water Bottle',         price:22.99, ca:0,     type:'Sports',      vendor:'HydroLife', color:'Black',  sizes:[],             tags:['bottle','hydro'],   sku:'BOT-001'},
+  {id:10, title:'Sunglasses',           price:55.00, ca:75,    type:'Accessories', vendor:'ShadesCo',  color:'Black',  sizes:[],             tags:['glasses','fashion'],sku:'SUN-001'},
+  {id:11, title:'Laptop Backpack',      price:65.00, ca:80,    type:'Bags',        vendor:'PackPro',   color:'Black',  sizes:[],             tags:['backpack','laptop'],sku:'BAG-001'},
+  {id:12, title:'Wireless Charger',     price:29.99, ca:39.99, type:'Electronics', vendor:'TechBrand', color:'White',  sizes:[],             tags:['charger','wireless'],sku:'CHG-001'},
+  {id:13, title:'Cotton Hoodie',        price:49.99, ca:64.99, type:'Apparel',     vendor:'BasicWear', color:'Grey',   sizes:['M','L','XL'],  tags:['hoodie','cotton'],  sku:'HOO-001'},
+  {id:14, title:'Mechanical Keyboard',  price:129.00,ca:159,   type:'Electronics', vendor:'TechBrand', color:'Black',  sizes:[],             tags:['keyboard','computer'],sku:'KEY-001'},
+  {id:15, title:'Running Shorts',       price:32.99, ca:0,     type:'Apparel',     vendor:'SportStep', color:'Blue',   sizes:['S','M','L'],   tags:['shorts','running'], sku:'SHT-001'},
+];
+
+const COLOR_GRAD={
+  Black:'linear-gradient(135deg,#2a2a2a 0%,#4a4a4a 100%)',
+  White:'linear-gradient(135deg,#ddd 0%,#f5f5f5 100%)',
+  Blue:'linear-gradient(135deg,#3b6cb7 0%,#6496d8 100%)',
+  Red:'linear-gradient(135deg,#b93030 0%,#d86060 100%)',
+  Grey:'linear-gradient(135deg,#7a7a7a 0%,#a8a8a8 100%)',
+  Purple:'linear-gradient(135deg,#6a3ab0 0%,#9060d0 100%)',
+  Brown:'linear-gradient(135deg,#7a4f2c 0%,#9e6b47 100%)',
+  Silver:'linear-gradient(135deg,#8a8a8a 0%,#c0c0c0 100%)',
+};
+const SWATCH_CSS={
+  Black:'#1a1a1a',White:'#f0f0f0',Blue:'#4a7fcb',Red:'#cb4a4a',
+  Grey:'#909090',Purple:'#7a4acb',Brown:'#8b5e3c',Silver:'#b0b0b0',
+};
+const gg=c=>COLOR_GRAD[c]||'linear-gradient(135deg,#888,#aaa)';
+
+const SYNONYMS={
+  'tee':['t-shirt','shirt','cotton'],
+  't-shirt':['tee','shirt'],
+  'shirt':['tee','t-shirt','cotton'],
+  'top':['shirt','tee'],
+  'laptop':['notebook','computer','backpack'],
+  'notebook':['laptop','computer'],
+  'computer':['laptop','notebook','keyboard'],
+  'shoes':['footwear','sneakers','running'],
+  'sneakers':['shoes','footwear'],
+  'footwear':['shoes','sneakers'],
+  'earbuds':['earphones','headphones','wireless'],
+  'bottle':['water','hydro'],
+  'jacket':['denim','outerwear'],
+  'bag':['backpack','laptop'],
+};
+
+const STOP_WORDS=new Set(['a','an','the','is','are','was','were','i','you','we','they','it','and','or','not','for','to','in','of','on','at','by','with']);
+
+const REDIRECTS=[
+  {terms:['sale','deals','clearance'],url:'/collections/sale',label:'Sale Collection'},
+  {terms:['shoes','footwear'],url:'/collections/footwear',label:'Footwear Collection'},
+];
+
+const ZERO_CHAR_IDS=[1,2,3,4,5,6,7,8];
+const NO_RES_IDS=[1,3,6];
+
+/* ── Filters / Sort State ── */
+let activeFilters={types:new Set(),priceKey:null,colors:new Set(),vendors:new Set()};
+let sortKey='featured';
+let sortDropOpen=false;
+
+const PRICE_RANGES=[
+  {key:'u30',label:'Under $30',fn:p=>p<30},
+  {key:'30-60',label:'$30 – $60',fn:p=>p>=30&&p<=60},
+  {key:'60-100',label:'$60 – $100',fn:p=>p>60&&p<=100},
+  {key:'o100',label:'Over $100',fn:p=>p>100},
+];
+
+/* ── Variant expansion ── */
+function getDisplayProducts(){
+  const dp=$('dp-variants');
+  if(!dp||!dp.checked)return MOCK_PRODUCTS.map(p=>({...p,variantLabel:null}));
+  const out=[];
+  MOCK_PRODUCTS.forEach(p=>{
+    if(p.sizes&&p.sizes.length>1){
+      p.sizes.forEach(sz=>out.push({...p,id:p.id+'_'+sz,title:p.title,variantLabel:sz,price:p.price,sizes:[sz]}));
+    }else{
+      out.push({...p,variantLabel:null});
+    }
+  });
+  return out;
+}
+
+/* ── Filter application ── */
+function applyFilters(products){
+  return products.filter(p=>{
+    if(activeFilters.types.size&&!activeFilters.types.has(p.type))return false;
+    if(activeFilters.colors.size&&!activeFilters.colors.has(p.color))return false;
+    if(activeFilters.vendors.size&&!activeFilters.vendors.has(p.vendor))return false;
+    if(activeFilters.priceKey){
+      const r=PRICE_RANGES.find(r=>r.key===activeFilters.priceKey);
+      if(r&&!r.fn(p.price))return false;
+    }
+    return true;
+  });
+}
+
+/* ── Sorting ── */
+function applySort(products){
+  const a=[...products];
+  if(sortKey==='price-asc')return a.sort((x,y)=>x.price-y.price);
+  if(sortKey==='price-desc')return a.sort((x,y)=>y.price-x.price);
+  if(sortKey==='a-z')return a.sort((x,y)=>x.title.localeCompare(y.title));
+  if(sortKey==='best-selling')return a.sort((x,y)=>(y.ca-y.price)-(x.ca-x.price));
+  return a;
+}
+
+/* ── Product card HTML ── */
+function pCardHtml(p){
+  const sale=p.ca>0?Math.round((p.ca-p.price)/p.ca*100):0;
+  const badge=sale>=5?`<span class="pbadge pbadge-sale">-${sale}%</span>`:
+               p.id<=3?`<span class="pbadge pbadge-new">New</span>`:'';
+  const sizes=p.sizes&&p.sizes.length>0?
+    `<div class="psizes">${p.sizes.map(s=>`<span class="psize">${esc(s)}</span>`).join('')}</div>`:'';
+  const compare=p.ca>0?`<span class="pcompare">$${p.ca.toFixed(2)}</span>`:'';
+  const varLbl=p.variantLabel?` <span style="color:var(--text2);font-weight:400">– ${esc(p.variantLabel)}</span>`:'';
+  return `
+    <div class="pcard">
+      <div class="pimg-wrap">
+        <div class="pimg" style="background:${gg(p.color)}">
+          <svg style="width:52px;height:52px;opacity:.18;fill:#fff" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 4.75A2.75 2.75 0 0 1 8.75 2h2.5A2.75 2.75 0 0 1 14 4.75V5h2.25c.414 0 .75.336.75.75v12c0 .414-.336.75-.75.75H3.75A.75.75 0 0 1 3 17.75v-12C3 5.336 3.336 5 3.75 5H6v-.25Zm2.75-1.25c-.69 0-1.25.56-1.25 1.25V5h5v-.25c0-.69-.56-1.25-1.25-1.25h-2.5ZM4.5 6.5v10h11v-10H4.5Z" fill="currentColor"/></svg>
+        </div>
+        ${badge}
+      </div>
+      <div class="pinfo">
+        <p class="ptype">${esc(p.type)}</p>
+        <p class="ptitle">${esc(p.title)}${varLbl}</p>
+        <div class="prow">
+          <span class="pprice">$${p.price.toFixed(2)}</span>
+          ${compare}
+        </div>
+        ${sizes}
+        <button class="padd">Add to cart</button>
+      </div>
+    </div>`;
+}
+
+/* ── Render grid ── */
+function renderGrid(){
+  const base=getDisplayProducts();
+  const filtered=applyFilters(base);
+  const sorted=applySort(filtered);
+  const grid=$('pgrid');
+  $('pcount').textContent=sorted.length+' product'+(sorted.length!==1?'s':'');
+  if(!sorted.length){
+    grid.innerHTML=`<div class="no-res" style="grid-column:1/-1;text-align:center;padding:48px"><h3>No products found</h3><p>Try removing some filters.</p></div>`;
+    return;
+  }
+  grid.innerHTML=sorted.map(pCardHtml).join('');
+  grid.querySelectorAll('.padd').forEach(btn=>{
+    btn.onclick=()=>{
+      const c=$('cart-count');c.textContent=Number(c.textContent)+1;
+      btn.textContent='Added ✓';btn.style.background='var(--new)';
+      setTimeout(()=>{btn.textContent='Add to cart';btn.style.background='';},1400);
+    };
+  });
+}
+
+/* ── Filter sidebar render ── */
+function countFor(key,val){
+  return getDisplayProducts().filter(p=>p[key]===val).length;
+}
+function renderFilters(){
+  // Type
+  const types=[...new Set(MOCK_PRODUCTS.map(p=>p.type))].sort();
+  $('fsb-type').innerHTML=types.map(t=>`
+    <label class="fcrow">
+      <input type="checkbox" data-filter="type" value="${esc(t)}" ${activeFilters.types.has(t)?'checked':''}>
+      <span class="fclbl">${esc(t)}</span>
+      <span class="fccnt">${countFor('type',t)}</span>
+    </label>`).join('');
+
+  // Price
+  $('fsb-price').innerHTML=PRICE_RANGES.map(r=>`
+    <label class="fcrow">
+      <input type="radio" name="price-range" value="${r.key}" ${activeFilters.priceKey===r.key?'checked':''}>
+      <span class="fclbl">${r.label}</span>
+    </label>`).join('');
+
+  // Color
+  const colors=[...new Set(MOCK_PRODUCTS.map(p=>p.color))].sort();
+  $('fsb-color').innerHTML=`<div class="swatch-row">`+
+    colors.map(c=>`<div class="swatch${activeFilters.colors.has(c)?' sel':''}" data-color="${esc(c)}" title="${esc(c)}" style="background:${SWATCH_CSS[c]||'#888'}"></div>`).join('')+
+  `</div>`;
+
+  // Vendor
+  const vendors=[...new Set(MOCK_PRODUCTS.map(p=>p.vendor))].sort();
+  $('fsb-vendor').innerHTML=vendors.map(v=>`
+    <label class="fcrow">
+      <input type="checkbox" data-filter="vendor" value="${esc(v)}" ${activeFilters.vendors.has(v)?'checked':''}>
+      <span class="fclbl">${esc(v)}</span>
+      <span class="fccnt">${countFor('vendor',v)}</span>
+    </label>`).join('');
+
+  attachFilterEvents();
+  renderActiveFilterTags();
+}
+
+function attachFilterEvents(){
+  document.querySelectorAll('[data-filter="type"]').forEach(chk=>{
+    chk.onchange=()=>{chk.checked?activeFilters.types.add(chk.value):activeFilters.types.delete(chk.value);refreshFilters();};
+  });
+  document.querySelectorAll('[name="price-range"]').forEach(r=>{
+    r.onchange=()=>{activeFilters.priceKey=r.checked?r.value:null;refreshFilters();};
+  });
+  document.querySelectorAll('.swatch').forEach(sw=>{
+    sw.onclick=()=>{
+      const c=sw.dataset.color;
+      activeFilters.colors.has(c)?activeFilters.colors.delete(c):activeFilters.colors.add(c);
+      refreshFilters();
+    };
+  });
+  document.querySelectorAll('[data-filter="vendor"]').forEach(chk=>{
+    chk.onchange=()=>{chk.checked?activeFilters.vendors.add(chk.value):activeFilters.vendors.delete(chk.value);refreshFilters();};
+  });
+}
+
+function refreshFilters(){renderFilters();renderGrid();}
+
+function renderActiveFilterTags(){
+  const tags=[];
+  [...activeFilters.types].forEach(t=>tags.push({label:'Type: '+t,clear:()=>activeFilters.types.delete(t)}));
+  if(activeFilters.priceKey){const r=PRICE_RANGES.find(r=>r.key===activeFilters.priceKey);if(r)tags.push({label:r.label,clear:()=>{activeFilters.priceKey=null;}});}
+  [...activeFilters.colors].forEach(c=>tags.push({label:'Color: '+c,clear:()=>activeFilters.colors.delete(c)}));
+  [...activeFilters.vendors].forEach(v=>tags.push({label:v,clear:()=>activeFilters.vendors.delete(v)}));
+  const afWrap=$('af-wrap');
+  const clearBtn=$('clear-all-btn');
+  if(!tags.length){afWrap.innerHTML='';clearBtn.classList.add('hidden');return;}
+  clearBtn.classList.remove('hidden');
+  afWrap.innerHTML=tags.map((t,i)=>
+    `<span class="af-tag">${esc(t.label)}<button data-afi="${i}" title="Remove">×</button></span>`
+  ).join('');
+  afWrap.querySelectorAll('[data-afi]').forEach(b=>{
+    b.onclick=()=>{tags[Number(b.dataset.afi)].clear();refreshFilters();};
+  });
+}
+
+$('clear-all-btn').onclick=()=>{
+  activeFilters={types:new Set(),priceKey:null,colors:new Set(),vendors:new Set()};
+  refreshFilters();
+};
+
+/* ── Filter section toggles ── */
+document.querySelectorAll('.fst-btn').forEach(btn=>{
+  const sec=btn.dataset.sec;
+  const body=$('fsb-'+sec);
+  btn.onclick=()=>{
+    body.classList.toggle('closed');
+    btn.querySelector('.fst-chev').style.transform=body.classList.contains('closed')?'rotate(-90deg)':'';
+  };
+});
+
+/* ── Sort dropdown ── */
+const SORT_OPTIONS=[
+  {key:'featured',label:'Featured'},
+  {key:'price-asc',label:'Price: Low to High'},
+  {key:'price-desc',label:'Price: High to Low'},
+  {key:'a-z',label:'A – Z'},
+  {key:'best-selling',label:'Best Selling'},
+];
+function openSortDrop(){
+  sortDropOpen=true;
+  const r=$('sort-btn').getBoundingClientRect();
+  const drop=$('sort-drop');
+  drop.style.top=(r.bottom+4)+'px';
+  drop.style.left='auto';
+  drop.style.right=(window.innerWidth-r.right)+'px';
+  drop.style.width='200px';
+  drop.innerHTML=SORT_OPTIONS.map(o=>`<button class="sort-opt${sortKey===o.key?' cur':''}" data-sk="${o.key}">${esc(o.label)}</button>`).join('');
+  drop.querySelectorAll('[data-sk]').forEach(b=>{
+    b.onclick=()=>{sortKey=b.dataset.sk;$('sort-lbl').textContent=b.textContent;closeSortDrop();renderGrid();};
+  });
+  drop.classList.remove('hidden');
+  $('sort-chev').style.transform='rotate(180deg)';
+}
+function closeSortDrop(){
+  sortDropOpen=false;
+  $('sort-drop').classList.add('hidden');
+  $('sort-chev').style.transform='';
+}
+$('sort-btn').onclick=e=>{e.stopPropagation();sortDropOpen?closeSortDrop():openSortDrop();};
+document.addEventListener('click',e=>{if(sortDropOpen&&!$('sort-drop').contains(e.target))closeSortDrop();});
+
+/* ── Search overlay ── */
+let soOpen=false;
+function openSearch(){
+  soOpen=true;
+  $('so').classList.add('open');
+  setTimeout(()=>$('so-inp').focus(),80);
+  renderZeroChar();
+}
+function closeSearch(){
+  soOpen=false;
+  $('so').classList.remove('open');
+}
+$('search-btn').onclick=openSearch;
+$('so-close-btn').onclick=closeSearch;
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&soOpen)closeSearch();});
+
+/* ── Zero char ── */
+function renderZeroChar(){
+  const prods=ZERO_CHAR_IDS.map(id=>MOCK_PRODUCTS.find(p=>p.id===id)).filter(Boolean);
+  $('so-zc-grid').innerHTML=prods.map(p=>`
+    <div class="so-card">
+      <div class="so-card-img" style="background:${gg(p.color)}"></div>
+      <div class="so-card-info">
+        <p class="so-card-title">${esc(p.title)}</p>
+        <p class="so-card-price">$${p.price.toFixed(2)}</p>
+      </div>
+    </div>`).join('');
+}
+
+/* ── Numeric parsing ── */
+function parseNumeric(q){
+  const range=q.match(/\$?(\d+(?:\.\d+)?)\s*[-–]\s*\$?(\d+(?:\.\d+)?)/);
+  if(range){const lo=+range[1],hi=+range[2];return p=>p>=lo&&p<=hi;}
+  const under=q.match(/under\s+\$?(\d+(?:\.\d+)?)/);
+  if(under){const hi=+under[1];return p=>p<=hi;}
+  const over=q.match(/over\s+\$?(\d+(?:\.\d+)?)/);
+  if(over){const lo=+over[1];return p=>p>=lo;}
+  const exact=q.match(/^\$(\d+(?:\.\d+)?)$/);
+  if(exact&&$('dp-numeric').checked){const v=+exact[1];return p=>Math.abs(p-v)/v<=0.25;}
+  return null;
+}
+
+/* ── Live search ── */
+$('so-inp').addEventListener('input',doSearch);
+function doSearch(){
+  const raw=$('so-inp').value;
+  $('so-clear-btn').classList.toggle('hidden',!raw);
+  const q=raw.trim();
+  if(!q){
+    $('so-zero').classList.remove('hidden');
+    $('so-has-results').classList.add('hidden');
+    $('so-empty').classList.add('hidden');
+    renderZeroChar();
+    return;
+  }
+  $('so-zero').classList.add('hidden');
+  const qLow=q.toLowerCase();
+
+  // Redirect check
+  let redirected=false;
+  for(const rd of REDIRECTS){
+    if(rd.terms.some(t=>qLow===t||qLow.split(/\s+/).includes(t))){
+      $('so-rd-msg').classList.remove('hidden');
+      $('so-rd-label').textContent=rd.label;
+      redirected=true;
+      break;
+    }
+  }
+  if(!redirected)$('so-rd-msg').classList.add('hidden');
+
+  // Numeric
+  const numeric=$('dp-numeric').checked?parseNumeric(qLow):null;
+
+  // Tokenize + stop words
+  const tokens=qLow.split(/\s+/).filter(t=>t&&!STOP_WORDS.has(t));
+  const allTerms=new Set(tokens);
+  if($('dp-synonyms').checked){
+    tokens.forEach(t=>(SYNONYMS[t]||[]).forEach(s=>allTerms.add(s)));
+  }
+
+  let products=getDisplayProducts();
+  if(numeric){
+    products=products.filter(p=>numeric(p.price));
+  }else if(allTerms.size){
+    products=products.filter(p=>{
+      const haystack=[p.title,p.type,p.vendor,p.color,p.sku,...(p.tags||[])].join(' ').toLowerCase();
+      return [...allTerms].some(t=>haystack.includes(t));
+    });
+  }
+
+  if(!products.length&&!redirected){
+    $('so-has-results').classList.add('hidden');
+    $('so-empty').classList.remove('hidden');
+    $('so-query-lbl').textContent=q;
+    const sug=NO_RES_IDS.map(id=>MOCK_PRODUCTS.find(p=>p.id===id)).filter(Boolean);
+    $('so-sug-grid').innerHTML=sug.map(p=>`
+      <div class="so-card">
+        <div class="so-card-img" style="background:${gg(p.color)}"></div>
+        <div class="so-card-info">
+          <p class="so-card-title">${esc(p.title)}</p>
+          <p class="so-card-price">$${p.price.toFixed(2)}</p>
+        </div>
+      </div>`).join('');
+    return;
+  }
+
+  $('so-empty').classList.add('hidden');
+  $('so-has-results').classList.remove('hidden');
+
+  const top=products.slice(0,8);
+  $('so-list').innerHTML=top.map(p=>`
+    <div class="so-row-item">
+      <div class="so-thumb" style="background:${gg(p.color)}"></div>
+      <div class="so-item-info">
+        <p class="so-item-title">${esc(p.title)}${p.variantLabel?' <span style="color:var(--text2);font-weight:400">– '+esc(p.variantLabel)+'</span>':''}</p>
+        <p class="so-item-sub">${esc(p.type)} · ${esc(p.vendor)}</p>
+      </div>
+      <span class="so-item-price">$${p.price.toFixed(2)}</span>
+    </div>`).join('');
+
+  const va=$('so-view-all');
+  if(products.length>8){va.classList.remove('hidden');va.textContent=`View all ${products.length} results →`;}
+  else va.classList.add('hidden');
+}
+
+$('so-clear-btn').onclick=()=>{$('so-inp').value='';doSearch();$('so-inp').focus();};
+
+/* ── Demo panel toggle ── */
+let dpOpen=true;
+$('dp-tog').onclick=()=>{
+  dpOpen=!dpOpen;
+  $('dp-body').classList.toggle('hidden',!dpOpen);
+  $('dp-tog').textContent=dpOpen?'−':'+';
+};
+
+/* ── Demo panel checkboxes → re-render ── */
+$('dp-variants').onchange=()=>{renderFilters();renderGrid();};
+$('dp-synonyms').onchange=()=>{if($('so-inp').value)doSearch();};
+$('dp-numeric').onchange=()=>{if($('so-inp').value)doSearch();};
+
+/* ── Quick tests ── */
+function quickSearch(term){
+  openSearch();
+  $('so-inp').value=term;
+  doSearch();
+}
+function resetAll(){
+  activeFilters={types:new Set(),priceKey:null,colors:new Set(),vendors:new Set()};
+  sortKey='featured';
+  $('sort-lbl').textContent='Featured';
+  refreshFilters();
+}
+
+/* ── Init ── */
+renderFilters();
+renderGrid();
+</script>
+</body>
+</html>

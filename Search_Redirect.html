@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Search Redirect – Findter Filter &amp; Search</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--ff:'Inter',-apple-system,BlinkMacSystemFont,'San Francisco','Segoe UI',sans-serif;
+--bg:rgba(241,241,241,1);--sf:#fff;--sf-hov:rgba(247,247,247,1);--sf-act:rgba(243,243,243,1);
+--fill:#303030;--fill-hov:#1a1a1a;--fill-t:rgba(0,0,0,.02);
+--text:rgba(48,48,48,1);--text2:rgba(97,97,97,1);--textd:rgba(181,181,181,1);--lnk:rgba(0,91,211,1);--crit:rgba(181,38,11,1);
+--bdr:rgba(227,227,227,1);--bdr-foc:rgba(0,91,211,1);
+--r1:4px;--r2:8px;--r3:12px;
+--sh1:0px 1px 0px 0px rgba(26,26,26,.07);
+--sh3:0px 4px 6px -2px rgba(26,26,26,.2);
+--shbtn:0px -1px 0px 0px #b5b5b5 inset,0px 0px 0px 1px rgba(0,0,0,.1) inset,0px .5px 0px 1.5px #fff inset;
+--shbtn-hov:0px 1px 0px 0px #ebebeb inset,-1px 0px 0px 0px #ebebeb inset,1px 0px 0px 0px #ebebeb inset,0px -1px 0px 0px #ccc inset;
+--shbtnp:0px -1px 0px 1px rgba(0,0,0,.8) inset,0px 0px 0px 1px rgba(48,48,48,1) inset,0px .5px 0px 1.5px rgba(255,255,255,.25) inset;
+--shbtnp-hov:0px 1px 0px 0px rgba(255,255,255,.24) inset,1px 0px 0px 0px rgba(255,255,255,.2) inset,-1px 0px 0px 0px rgba(255,255,255,.2) inset,0px -1px 0px 0px #000 inset;
+}
+html,body{font-family:var(--ff);background:var(--bg);color:var(--text);font-size:13px;line-height:1.5;min-height:100vh}
+a{color:var(--lnk)}
+.lay{display:flex;min-height:100vh}
+.sb{width:248px;background:var(--sf);border-right:1px solid var(--bdr);display:flex;flex-direction:column;flex-shrink:0;transition:width .25s;min-height:100vh}
+.sb.col{width:56px}
+.sb-hd{padding:12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bdr);gap:8px;overflow:hidden}
+.sb-logo{width:28px;height:28px;border-radius:6px;background:var(--fill);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-title{font-size:13px;font-weight:650;color:var(--text);flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.sb-tgl{width:28px;height:28px;border:none;background:transparent;cursor:pointer;border-radius:var(--r1);display:flex;align-items:center;justify-content:center;color:var(--text2);flex-shrink:0}
+.sb-tgl:hover{background:var(--sf-hov)}
+.sb-nav{padding:8px;display:flex;flex-direction:column;gap:2px;flex:1}
+.nav-btn{width:100%;border:none;background:transparent;cursor:pointer;padding:6px 12px;border-radius:var(--r2);font-family:var(--ff);font-size:13px;font-weight:450;color:var(--text2);text-align:left;display:flex;align-items:center;overflow:hidden;transition:background .1s,color .1s;white-space:nowrap}
+.nav-btn:hover:not([disabled]){background:var(--sf-hov);color:var(--text)}
+.nav-btn.act{background:var(--sf-act)!important;color:var(--text)!important;font-weight:650}
+.nav-btn[disabled]{color:var(--textd)!important;cursor:not-allowed}
+.nav-lbl{overflow:hidden;text-overflow:ellipsis}
+.main{flex:1;overflow-x:hidden}
+.pg{max-width:960px;margin:0 auto;padding:24px}
+.ic{width:16px;height:16px;fill:currentColor;display:block;flex-shrink:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:6px 16px;height:32px;border-radius:var(--r2);font-family:var(--ff);font-size:13px;font-weight:550;cursor:pointer;border:none;white-space:nowrap;transition:box-shadow .1s,background .1s}
+.btn-p{background:var(--fill);color:#fff;box-shadow:var(--shbtnp)}
+.btn-p:hover{background:var(--fill-hov);box-shadow:var(--shbtnp-hov)}
+.btn-s{background:var(--sf);color:var(--text);box-shadow:var(--shbtn)}
+.btn-s:hover{box-shadow:var(--shbtn-hov)}
+.btn-crit{background:var(--crit);color:#fff;box-shadow:var(--shbtnp)}
+.back-a{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border-radius:var(--r2);text-decoration:none;border:1px solid var(--bdr);background:var(--sf);color:var(--text2);box-shadow:var(--sh1);flex-shrink:0;transition:background .1s}
+.back-a:hover{background:var(--sf-hov)}
+.card{background:var(--sf);border-radius:var(--r2);box-shadow:var(--sh3);overflow:hidden}
+.inp{width:100%;padding:7px 12px;border:1px solid var(--bdr);border-radius:var(--r2);font-family:var(--ff);font-size:13px;color:var(--text);outline:none;background:var(--sf);transition:border-color .1s,box-shadow .1s}
+.inp:focus{border-color:var(--bdr-foc);box-shadow:0 0 0 3px rgba(0,91,211,.2)}
+.flbl{font-size:13px;font-weight:550;color:var(--text);margin-bottom:4px;display:block}
+.fhint{font-size:12px;color:var(--text2);margin-top:3px}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:var(--r1);background:var(--sf-act);font-size:12px;font-weight:550;color:var(--text)}
+.ibtn{width:28px;height:28px;border:none;background:transparent;cursor:pointer;border-radius:var(--r1);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .1s}
+.ibtn-del{color:var(--crit)}.ibtn-del:hover{background:rgba(181,38,11,.08)}
+.ibtn-ed{color:var(--text2)}.ibtn-ed:hover{background:var(--sf-hov)}
+/* table */
+.tw{width:100%;border-collapse:collapse}
+.tw th{padding:9px 16px;font-size:12px;font-weight:650;color:var(--text2);text-align:left;border-bottom:1px solid var(--bdr);white-space:nowrap}
+.tw td{padding:10px 16px;vertical-align:middle;border-bottom:1px solid var(--bdr);font-size:13px}
+.tw tbody tr:last-child td{border-bottom:none}
+.tw tbody tr{cursor:default;transition:background .1s}
+.tw tbody tr:hover{background:var(--sf-hov)}
+/* modal */
+.mo-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center}
+.mo-ov.open{display:flex}
+.mo{background:var(--sf);border-radius:var(--r3);box-shadow:0 20px 40px rgba(0,0,0,.3);width:100%;max-width:440px;overflow:hidden}
+.mo-hd{padding:16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bdr)}
+.mo-ttl{font-size:14px;font-weight:650}
+.mo-bd{padding:16px;display:flex;flex-direction:column;gap:14px}
+.mo-ft{padding:12px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--bdr)}
+.frow{display:flex;gap:8px}.fbe{justify-content:space-between;align-items:center}
+.mt3{margin-top:12px}.mt4{margin-top:16px}.mt5{margin-top:20px}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="lay">
+  <aside class="sb" id="sidebar">
+    <div class="sb-hd">
+      <div class="sb-logo">Fd</div>
+      <span class="sb-title nav-lbl">Findter Filter &amp; Search</span>
+      <button class="sb-tgl" id="sidebar-toggle" title="Toggle sidebar">
+        <span id="toggle-icon"><svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.78 5.97a.75.75 0 0 1 0 1.06L8.81 10l2.97 2.97a.75.75 0 1 1-1.06 1.06l-3.5-3.5a.75.75 0 0 1 0-1.06l3.5-3.5a.75.75 0 0 1 1.06 0Z" fill="currentColor"/></svg></span>
+      </button>
+    </div>
+    <div class="sb-nav" id="nav"></div>
+  </aside>
+  <main class="main">
+    <div class="pg">
+
+      <!-- Page header -->
+      <div style="display:flex;align-items:center;gap:12px">
+        <a href="index.html" class="back-a" title="Back to Settings">
+          <svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M17 10a.75.75 0 0 1-.75.75H5.56l2.72 2.72a.75.75 0 1 1-1.06 1.06l-4-4a.75.75 0 0 1 0-1.06l4-4a.75.75 0 0 1 1.06 1.06L5.56 9.25H16.25A.75.75 0 0 1 17 10Z" fill="currentColor"/></svg>
+        </a>
+        <div>
+          <h1 style="font-size:1.25rem;font-weight:650;line-height:1.3">Search Redirect</h1>
+          <p style="font-size:13px;color:var(--text2);margin-top:2px">Redirect shoppers to a specific page when they search for certain keywords.</p>
+        </div>
+      </div>
+
+      <!-- Action bar -->
+      <div class="frow fbe mt5">
+        <span id="rd-count" class="hidden" style="font-size:13px;color:var(--text2)"></span>
+        <button id="add-redirect-btn" class="btn btn-p">
+          <svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M17 10a.75.75 0 0 1-.75.75h-5.5v5.5a.75.75 0 0 1-1.5 0v-5.5h-5.5a.75.75 0 0 1 0-1.5h5.5v-5.5a.75.75 0 0 1 1.5 0v5.5h5.5A.75.75 0 0 1 17 10Z" fill="currentColor"/></svg>
+          Add Search Redirect
+        </button>
+      </div>
+
+      <!-- Main card -->
+      <div class="card mt3" id="rd-card">
+        <!-- empty state or table rendered by JS -->
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Modal -->
+<div class="mo-ov" id="rd-modal">
+  <div class="mo">
+    <div class="mo-hd">
+      <span class="mo-ttl" id="rd-modal-title">Add Search Redirect</span>
+      <button class="ibtn ibtn-ed" id="rd-modal-close" title="Close">
+        <svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.97 4.97a.75.75 0 0 1 1.06 0L10 8.94l3.97-3.97a.75.75 0 1 1 1.06 1.06L11.06 10l3.97 3.97a.75.75 0 1 1-1.06 1.06L10 11.06l-3.97 3.97a.75.75 0 0 1-1.06-1.06L8.94 10 4.97 6.03a.75.75 0 0 1 0-1.06Z" fill="currentColor"/></svg>
+      </button>
+    </div>
+    <div class="mo-bd">
+      <div>
+        <label class="flbl" for="rd-terms">Search terms</label>
+        <input class="inp" id="rd-terms" type="text" placeholder="e.g. sale, discount, offers" autocomplete="off">
+        <p class="fhint">Separate multiple keywords with commas. Match is exact.</p>
+      </div>
+      <div>
+        <label class="flbl" for="rd-url">Redirect to</label>
+        <input class="inp" id="rd-url" type="text" placeholder="https://... or /collections/sale" autocomplete="off">
+        <p class="fhint">Full URL or a relative path on your store.</p>
+      </div>
+    </div>
+    <div class="mo-ft">
+      <button class="btn btn-s" id="rd-modal-cancel">Cancel</button>
+      <button class="btn btn-p" id="rd-modal-save">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const IC={
+  chevL:`<svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.78 5.97a.75.75 0 0 1 0 1.06L8.81 10l2.97 2.97a.75.75 0 1 1-1.06 1.06l-3.5-3.5a.75.75 0 0 1 0-1.06l3.5-3.5a.75.75 0 0 1 1.06 0Z" fill="currentColor"/></svg>`,
+  chevR:`<svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.22 5.97a.75.75 0 0 0 0 1.06L11.19 10 8.22 12.97a.75.75 0 1 0 1.06 1.06l3.5-3.5a.75.75 0 0 0 0-1.06l-3.5-3.5a.75.75 0 0 0-1.06 0Z" fill="currentColor"/></svg>`,
+  del:`<svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.25 3.5A.75.75 0 0 1 9 2.75h2a.75.75 0 0 1 .75.75v.25H15a.75.75 0 0 1 0 1.5h-.25v9.75A1.75 1.75 0 0 1 13 16.75H7A1.75 1.75 0 0 1 5.25 15V5.25H5a.75.75 0 0 1 0-1.5h3.25V3.5Zm1 1.25H6.75V15c0 .138.112.25.25.25h6a.25.25 0 0 0 .25-.25V4.75H9.25Zm-1.5 3a.75.75 0 0 1 1.5 0v5.5a.75.75 0 0 1-1.5 0v-5.5Zm3.5 0a.75.75 0 0 1 1.5 0v5.5a.75.75 0 0 1-1.5 0v-5.5Z" fill="currentColor"/></svg>`,
+  ed:`<svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.73 3.27a2.5 2.5 0 0 0-3.53 0l-9.5 9.5A1.75 1.75 0 0 0 3.25 14v2.75c0 .414.336.75.75.75H6.75A1.75 1.75 0 0 0 7.99 17.07l9.5-9.5a2.5 2.5 0 0 0 0-3.53l-.76-.77Zm-2.47 1.06a1 1 0 0 1 1.41 0l.77.77a1 1 0 0 1 0 1.41L15 7.94l-2.18-2.18 1.44-1.43ZM11.75 6.81 13.93 9l-6.19 6.18a.25.25 0 0 1-.18.07H4.75v-2.81c0-.066.026-.13.07-.176L11.75 6.81Z" fill="currentColor"/></svg>`,
+  link:`<svg style="width:40px;height:40px;fill:var(--textd)" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6.9 3.75a3.4 3.4 0 0 0-2.4 5.8l.9.9a.75.75 0 1 1-1.06 1.06l-.9-.9a4.9 4.9 0 0 1 6.93-6.93l.9.9a.75.75 0 1 1-1.06 1.06l-.9-.9A3.39 3.39 0 0 0 6.9 3.75Zm6.2 0c-.87 0-1.7.34-2.32.97l-.9.9A.75.75 0 0 1 8.82 4.56l.9-.9A4.9 4.9 0 0 1 16.65 10.5l-.9.9a.75.75 0 1 1-1.06-1.06l.9-.9A3.4 3.4 0 0 0 13.1 3.75ZM7.22 12.72a.75.75 0 0 1 0-1.06l3.5-3.5a.75.75 0 1 1 1.06 1.06l-3.5 3.5a.75.75 0 0 1-1.06 0Z" fill="currentColor"/></svg>`,
+};
+const NAV=[
+  {id:'filter',label:'Filter'},{id:'search',label:'Search'},
+  {id:'metafield',label:'Metafield'},
+  {id:'grid',label:'Filter & Product Grid Design'},{id:'settings',label:'Settings'},
+  {id:'analytics',label:'Analytics'},{id:'advanced',label:'Advanced Features'},
+  {id:'storefront',label:'Storefront Preview'},
+];
+const ENABLED=new Set(['settings','metafield','search','storefront']);
+const ACTIVE='settings';
+let col=false;
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function renderNav(){
+  $('nav').innerHTML=NAV.map(n=>{
+    const en=ENABLED.has(n.id),act=n.id===ACTIVE;
+    return `<button data-nav="${n.id}" ${en?'':'disabled'} class="nav-btn${act?' act':''}" title="${n.label}"><span class="nav-lbl">${escapeHtml(n.label)}</span></button>`;
+  }).join('');
+  $('nav').querySelectorAll('[data-nav]').forEach(b=>{
+    if(ENABLED.has(b.dataset.nav))b.onclick=()=>{
+      const v=b.dataset.nav;
+      if(v==='settings')location.href='index.html';
+      else if(v==='metafield')location.href='Metafield.html';
+      else if(v==='search')location.href='Search.html';
+      else if(v==='storefront')location.href='StoreFront.html';
+    };
+  });
+  updateSb();
+}
+function updateSb(){
+  $('sidebar').classList.toggle('col',col);
+  $('sidebar').querySelectorAll('.nav-lbl').forEach(el=>el.classList.toggle('hidden',col));
+  document.querySelector('.sb-title').classList.toggle('hidden',col);
+  $('toggle-icon').innerHTML=col?IC.chevR:IC.chevL;
+}
+$('sidebar-toggle').onclick=()=>{col=!col;updateSb();};
+
+/* ---- Redirects state ---- */
+let redirects=[
+  {id:1,terms:'sale, deals',url:'/collections/sale'},
+  {id:2,terms:'shoes, footwear',url:'/collections/footwear'},
+];
+let editingId=null;
+let nextId=3;
+
+function renderTable(){
+  const card=$('rd-card');
+  const count=$('rd-count');
+  if(!redirects.length){
+    count.classList.add('hidden');
+    card.innerHTML=`
+      <div style="padding:56px 16px;display:flex;flex-direction:column;align-items:center;gap:8px">
+        ${IC.link}
+        <p style="font-weight:550;color:var(--text2);margin-top:4px">No redirect rules yet</p>
+        <p style="font-size:12px;color:var(--textd);text-align:center">Add a redirect to send shoppers directly to a page<br>when they search for specific keywords.</p>
+      </div>`;
+    return;
+  }
+  count.classList.remove('hidden');
+  count.textContent=`${redirects.length} redirect rule${redirects.length!==1?'s':''}`;
+  card.innerHTML=`
+    <table class="tw">
+      <thead>
+        <tr>
+          <th>Search Terms</th>
+          <th>Redirect URL</th>
+          <th style="width:72px"></th>
+        </tr>
+      </thead>
+      <tbody>
+        ${redirects.map(r=>`
+          <tr data-id="${r.id}">
+            <td style="max-width:240px">
+              <div style="display:flex;flex-wrap:wrap;gap:4px">
+                ${r.terms.split(',').map(t=>t.trim()).filter(Boolean).map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join('')}
+              </div>
+            </td>
+            <td style="max-width:280px">
+              <a href="${escapeHtml(r.url)}" target="_blank" rel="noopener"
+                 style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:260px;color:var(--lnk)">${escapeHtml(r.url)}</a>
+            </td>
+            <td>
+              <div style="display:flex;gap:2px;justify-content:flex-end">
+                <button class="ibtn ibtn-ed" data-edit="${r.id}" title="Edit">${IC.ed}</button>
+                <button class="ibtn ibtn-del" data-del="${r.id}" title="Delete">${IC.del}</button>
+              </div>
+            </td>
+          </tr>`).join('')}
+      </tbody>
+    </table>`;
+  card.querySelectorAll('[data-del]').forEach(b=>{
+    b.onclick=e=>{e.stopPropagation();const id=Number(b.dataset.del);redirects=redirects.filter(r=>r.id!==id);renderTable();};
+  });
+  card.querySelectorAll('[data-edit]').forEach(b=>{
+    b.onclick=e=>{e.stopPropagation();openModal(Number(b.dataset.edit));};
+  });
+}
+
+/* ---- Modal ---- */
+function openModal(id=null){
+  editingId=id;
+  $('rd-modal-title').textContent=id===null?'Add Search Redirect':'Edit Search Redirect';
+  if(id!==null){
+    const r=redirects.find(r=>r.id===id);
+    $('rd-terms').value=r.terms;
+    $('rd-url').value=r.url;
+  }else{
+    $('rd-terms').value='';
+    $('rd-url').value='';
+  }
+  $('rd-modal').classList.add('open');
+  setTimeout(()=>$('rd-terms').focus(),50);
+}
+function closeModal(){$('rd-modal').classList.remove('open');editingId=null;}
+function saveModal(){
+  const terms=$('rd-terms').value.trim();
+  const url=$('rd-url').value.trim();
+  if(!terms){$('rd-terms').focus();return;}
+  if(!url){$('rd-url').focus();return;}
+  if(editingId!==null){
+    const r=redirects.find(r=>r.id===editingId);
+    r.terms=terms;r.url=url;
+  }else{
+    redirects.push({id:nextId++,terms,url});
+  }
+  closeModal();renderTable();
+}
+
+$('add-redirect-btn').onclick=()=>openModal(null);
+$('rd-modal-close').onclick=closeModal;
+$('rd-modal-cancel').onclick=closeModal;
+$('rd-modal-save').onclick=saveModal;
+$('rd-modal').addEventListener('click',e=>{if(e.target===$('rd-modal'))closeModal();});
+[$('rd-terms'),$('rd-url')].forEach(inp=>{
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')saveModal();if(e.key==='Escape')closeModal();});
+});
+
+renderNav();
+renderTable();
+</script>
+</body>
+</html>

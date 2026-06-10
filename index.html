@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Findter Filter &amp; Search</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--ff:'Inter',-apple-system,BlinkMacSystemFont,'San Francisco','Segoe UI',sans-serif;
+--bg:rgba(241,241,241,1);--sf:#fff;--sf-hov:rgba(247,247,247,1);--sf-act:rgba(243,243,243,1);
+--fill:#303030;--fill-hov:#1a1a1a;--fill-t:rgba(0,0,0,.02);
+--text:rgba(48,48,48,1);--text2:rgba(97,97,97,1);--textd:rgba(181,181,181,1);--lnk:rgba(0,91,211,1);
+--bdr:rgba(227,227,227,1);--bdr-foc:rgba(0,91,211,1);--crit:rgba(181,38,11,1);
+--r1:4px;--r2:8px;--r3:12px;
+--sh1:0px 1px 0px 0px rgba(26,26,26,.07);
+--sh3:0px 4px 6px -2px rgba(26,26,26,.2);
+--shbtn:0px -1px 0px 0px #b5b5b5 inset,0px 0px 0px 1px rgba(0,0,0,.1) inset,0px .5px 0px 1.5px #fff inset;
+--shbtn-hov:0px 1px 0px 0px #ebebeb inset,-1px 0px 0px 0px #ebebeb inset,1px 0px 0px 0px #ebebeb inset,0px -1px 0px 0px #ccc inset;
+--shbtnp:0px -1px 0px 1px rgba(0,0,0,.8) inset,0px 0px 0px 1px rgba(48,48,48,1) inset,0px .5px 0px 1.5px rgba(255,255,255,.25) inset;
+--shbtnp-hov:0px 1px 0px 0px rgba(255,255,255,.24) inset,1px 0px 0px 0px rgba(255,255,255,.2) inset,-1px 0px 0px 0px rgba(255,255,255,.2) inset,0px -1px 0px 0px #000 inset;
+}
+html,body{font-family:var(--ff);background:var(--bg);color:var(--text);font-size:13px;line-height:1.5;min-height:100vh}
+a{color:var(--lnk)}
+.lay{display:flex;min-height:100vh}
+.sb{width:248px;background:var(--sf);border-right:1px solid var(--bdr);display:flex;flex-direction:column;flex-shrink:0;transition:width .25s;min-height:100vh}
+.sb.col{width:56px}
+.sb-hd{padding:12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bdr);gap:8px;overflow:hidden}
+.sb-logo{width:28px;height:28px;border-radius:6px;background:var(--fill);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-name{font-size:13px;font-weight:650;color:var(--text);flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.sb-tgl{width:28px;height:28px;border:none;background:transparent;cursor:pointer;border-radius:var(--r1);display:flex;align-items:center;justify-content:center;color:var(--text2);flex-shrink:0}
+.sb-tgl:hover{background:var(--sf-hov)}
+.sb-nav{padding:8px;display:flex;flex-direction:column;gap:2px;flex:1}
+.nav-btn{width:100%;border:none;background:transparent;cursor:pointer;padding:6px 12px;border-radius:var(--r2);font-family:var(--ff);font-size:13px;font-weight:450;color:var(--text2);text-align:left;display:flex;align-items:center;overflow:hidden;transition:background .1s,color .1s;white-space:nowrap}
+.nav-btn:hover:not([disabled]){background:var(--sf-hov);color:var(--text)}
+.nav-btn.act{background:var(--sf-act)!important;color:var(--text)!important;font-weight:650}
+.nav-btn[disabled]{color:var(--textd)!important;cursor:not-allowed}
+.nav-lbl{overflow:hidden;text-overflow:ellipsis}
+.main{flex:1;overflow-x:hidden}
+.pg{max-width:960px;margin:0 auto;padding:24px}
+.pg-ttl{font-size:1.25rem;font-weight:650;line-height:1.3}
+.pg-sub{font-size:13px;color:var(--text2);margin-top:4px}
+.ic{width:16px;height:16px;fill:currentColor;display:block;flex-shrink:0}
+.ic-sm{width:12px;height:12px;fill:currentColor;display:block;flex-shrink:0}
+.sc{display:block;text-decoration:none;background:var(--sf);border-radius:var(--r2);box-shadow:var(--sh3);padding:16px;transition:box-shadow .15s}
+.sc:hover{box-shadow:var(--sh3),0 0 0 2px rgba(0,0,0,.12)}
+.sc-ttl{font-size:13px;font-weight:650;display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.sc-sub{font-size:12px;color:var(--text2);line-height:1.5}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.mt5{margin-top:20px}.mt6{margin-top:24px}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="lay">
+  <aside class="sb" id="sidebar">
+    <div class="sb-hd">
+      <div class="sb-logo">Fd</div>
+      <span class="sb-name nav-lbl">Findter Filter &amp; Search</span>
+      <button class="sb-tgl" id="sidebar-toggle" title="Toggle sidebar">
+        <span id="toggle-icon"><svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.78 5.97a.75.75 0 0 1 0 1.06L8.81 10l2.97 2.97a.75.75 0 1 1-1.06 1.06l-3.5-3.5a.75.75 0 0 1 0-1.06l3.5-3.5a.75.75 0 0 1 1.06 0Z" fill="currentColor"/></svg></span>
+      </button>
+    </div>
+    <div class="sb-nav" id="nav"></div>
+  </aside>
+  <main class="main">
+    <div class="pg">
+      <h1 class="pg-ttl">Settings</h1>
+      <p class="pg-sub">Configure how Findter behaves across your store.</p>
+      <div id="settings-cards" class="g3 mt6"></div>
+    </div>
+  </main>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const IC={
+  arrR:`<svg class="ic-sm" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.69L11.72 6.53a.75.75 0 0 1 1.06-1.06l4 4a.75.75 0 0 1 0 1.06l-4 4a.75.75 0 1 1-1.06-1.06l2.72-2.72H3.75A.75.75 0 0 1 3 10Z" fill="currentColor"/></svg>`,
+  chevL:`<svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.78 5.97a.75.75 0 0 1 0 1.06L8.81 10l2.97 2.97a.75.75 0 1 1-1.06 1.06l-3.5-3.5a.75.75 0 0 1 0-1.06l3.5-3.5a.75.75 0 0 1 1.06 0Z" fill="currentColor"/></svg>`,
+  chevR:`<svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.22 5.97a.75.75 0 0 0 0 1.06L11.19 10 8.22 12.97a.75.75 0 1 0 1.06 1.06l3.5-3.5a.75.75 0 0 0 0-1.06l-3.5-3.5a.75.75 0 0 0-1.06 0Z" fill="currentColor"/></svg>`,
+};
+const NAV=[
+  {id:'filter',label:'Filter'},{id:'search',label:'Search'},
+  {id:'metafield',label:'Metafield'},
+  {id:'grid',label:'Filter & Product Grid Design'},{id:'settings',label:'Settings'},
+  {id:'analytics',label:'Analytics'},{id:'advanced',label:'Advanced Features'},
+  {id:'storefront',label:'Storefront Preview'},
+];
+const ENABLED=new Set(['settings','metafield','search','storefront']);
+const ACTIVE='settings';
+let col=false;
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function renderNav(){
+  $('nav').innerHTML=NAV.map(n=>{
+    const en=ENABLED.has(n.id),act=n.id===ACTIVE;
+    return `<button data-nav="${n.id}" ${en?'':'disabled'} class="nav-btn${act?' act':''}" title="${n.label}"><span class="nav-lbl">${escapeHtml(n.label)}</span></button>`;
+  }).join('');
+  $('nav').querySelectorAll('[data-nav]').forEach(b=>{
+    if(ENABLED.has(b.dataset.nav))b.onclick=()=>{
+      const v=b.dataset.nav;
+      if(v==='settings')location.href='index.html';
+      else if(v==='metafield')location.href='Metafield.html';
+      else if(v==='search')location.href='Search.html';
+      else if(v==='storefront')location.href='StoreFront.html';
+    };
+  });
+  updateSb();
+}
+function updateSb(){
+  $('sidebar').classList.toggle('col',col);
+  $('sidebar').querySelectorAll('.nav-lbl').forEach(el=>el.classList.toggle('hidden',col));
+  document.querySelector('.sb-name').classList.toggle('hidden',col);
+  $('toggle-icon').innerHTML=col?IC.chevR:IC.chevL;
+}
+$('sidebar-toggle').onclick=()=>{col=!col;updateSb();};
+const CARDS=[
+  {title:'Sort By',                           sub:'Configure the sort options shoppers see on collection pages.',        href:'Sort_by.html'},
+  {title:'Translating',                       sub:'Manage translations for filter labels and messages.',                href:'Translate.html'},
+  {title:'Synonyms',                          sub:'Define synonym groups to improve search matching.',                  href:'Synonyms.html'},
+  {title:'Show variants as separate product', sub:'Display each product variant as an individual item in collections.', href:'Variant.html'},
+  {title:'Search Redirect',                   sub:'Redirect customers to specific URLs when they search for keywords.', href:'Search_Redirect.html'},
+];
+function renderCards(){
+  $('settings-cards').innerHTML=CARDS.map(c=>`
+    <a href="${c.href}" class="sc">
+      <div class="sc-ttl">${escapeHtml(c.title)} ${IC.arrR}</div>
+      <p class="sc-sub">${escapeHtml(c.sub)}</p>
+    </a>`).join('');
+}
+renderNav();renderCards();
+</script>
+</body>
+</html>

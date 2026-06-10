@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Search – Findter Filter &amp; Search</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--ff:'Inter',-apple-system,BlinkMacSystemFont,'San Francisco','Segoe UI',sans-serif;
+--bg:rgba(241,241,241,1);--sf:#fff;--sf-hov:rgba(247,247,247,1);--sf-act:rgba(243,243,243,1);
+--fill:#303030;--fill-hov:#1a1a1a;
+--text:rgba(48,48,48,1);--text2:rgba(97,97,97,1);--textd:rgba(181,181,181,1);--lnk:rgba(0,91,211,1);
+--bdr:rgba(227,227,227,1);--bdr-foc:rgba(0,91,211,1);
+--r1:4px;--r2:8px;--r3:12px;
+--sh1:0px 1px 0px 0px rgba(26,26,26,.07);
+--sh3:0px 4px 6px -2px rgba(26,26,26,.2);
+--shbtn:0px -1px 0px 0px #b5b5b5 inset,0px 0px 0px 1px rgba(0,0,0,.1) inset,0px .5px 0px 1.5px #fff inset;
+--shbtn-hov:0px 1px 0px 0px #ebebeb inset,-1px 0px 0px 0px #ebebeb inset,1px 0px 0px 0px #ebebeb inset,0px -1px 0px 0px #ccc inset;
+--shbtnp:0px -1px 0px 1px rgba(0,0,0,.8) inset,0px 0px 0px 1px rgba(48,48,48,1) inset,0px .5px 0px 1.5px rgba(255,255,255,.25) inset;
+--shbtnp-hov:0px 1px 0px 0px rgba(255,255,255,.24) inset,1px 0px 0px 0px rgba(255,255,255,.2) inset,-1px 0px 0px 0px rgba(255,255,255,.2) inset,0px -1px 0px 0px #000 inset;
+}
+html,body{font-family:var(--ff);background:var(--bg);color:var(--text);font-size:13px;line-height:1.5;min-height:100vh}
+a{color:var(--lnk)}
+.lay{display:flex;min-height:100vh}
+.sb{width:248px;background:var(--sf);border-right:1px solid var(--bdr);display:flex;flex-direction:column;flex-shrink:0;transition:width .25s;min-height:100vh}
+.sb.col{width:56px}
+.sb-hd{padding:12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bdr);gap:8px;overflow:hidden}
+.sb-logo{width:28px;height:28px;border-radius:6px;background:var(--fill);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-title{font-size:13px;font-weight:650;color:var(--text);flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.sb-tgl{width:28px;height:28px;border:none;background:transparent;cursor:pointer;border-radius:var(--r1);display:flex;align-items:center;justify-content:center;color:var(--text2);flex-shrink:0}
+.sb-tgl:hover{background:var(--sf-hov)}
+.sb-nav{padding:8px;display:flex;flex-direction:column;gap:2px;flex:1}
+.nav-btn{width:100%;border:none;background:transparent;cursor:pointer;padding:6px 12px;border-radius:var(--r2);font-family:var(--ff);font-size:13px;font-weight:450;color:var(--text2);text-align:left;display:flex;align-items:center;overflow:hidden;transition:background .1s,color .1s;white-space:nowrap}
+.nav-btn:hover:not([disabled]){background:var(--sf-hov);color:var(--text)}
+.nav-btn.act{background:var(--sf-act)!important;color:var(--text)!important;font-weight:650}
+.nav-btn[disabled]{color:var(--textd)!important;cursor:not-allowed}
+.nav-lbl{overflow:hidden;text-overflow:ellipsis}
+.main{flex:1;overflow-x:hidden}
+.pg{max-width:960px;margin:0 auto;padding:24px}
+.ic{width:16px;height:16px;fill:currentColor;display:block;flex-shrink:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:6px 16px;height:32px;border-radius:var(--r2);font-family:var(--ff);font-size:13px;font-weight:550;cursor:pointer;border:none;white-space:nowrap;transition:box-shadow .1s,background .1s}
+.btn-p{background:var(--fill);color:#fff;box-shadow:var(--shbtnp)}
+.btn-p:hover{background:var(--fill-hov);box-shadow:var(--shbtnp-hov)}
+.btn-p:disabled{background:rgba(140,140,140,1);cursor:not-allowed;box-shadow:none}
+.btn-s{background:var(--sf);color:var(--text);box-shadow:var(--shbtn)}
+.btn-s:hover{box-shadow:var(--shbtn-hov)}
+.btn-sm{height:28px;padding:4px 12px;font-size:12px}
+.tab-bar{display:flex;gap:4px;border:1px solid var(--bdr);border-radius:var(--r2);padding:3px;background:var(--sf);width:fit-content}
+.tab-btn{padding:5px 14px;border:none;background:transparent;border-radius:6px;font-family:var(--ff);font-size:13px;font-weight:550;color:var(--text2);cursor:pointer;transition:background .1s,color .1s}
+.tab-btn.act{background:var(--sf-act);color:var(--text);box-shadow:var(--sh1)}
+.bnr{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;background:rgba(232,241,252,1);border-radius:var(--r2);font-size:13px;color:var(--text)}
+.bnr a{color:var(--lnk)}
+/* card — overflow:visible so dropdowns aren't clipped */
+.card{background:var(--sf);border-radius:var(--r2);box-shadow:var(--sh3);overflow:visible}
+.card-hd{padding:14px 16px;border-bottom:1px solid var(--bdr);border-radius:var(--r2) var(--r2) 0 0}
+.card-hd-ttl{font-size:13px;font-weight:650}
+.card-hd-sub{font-size:12px;color:var(--text2);margin-top:2px}
+.card-bd{padding:16px;display:flex;flex-direction:column;gap:14px}
+.tgl{position:relative;display:inline-block;width:44px;height:24px;border:none;padding:0;cursor:pointer;border-radius:12px;outline:none;appearance:none;-webkit-appearance:none;transition:background .2s;flex-shrink:0;vertical-align:middle}
+.tgl:focus-visible{box-shadow:0 0 0 3px rgba(0,91,211,.25)}
+.tgl.on{background:var(--fill)}.tgl.off{background:rgba(204,204,204,1)}
+.tgl-th{display:block;position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.3);transition:transform .2s;pointer-events:none}
+.tgl.on .tgl-th{transform:translateX(20px)}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:var(--r1);background:var(--sf-act);font-size:12px;font-weight:550;color:var(--text)}
+.tag-x{background:none;border:none;cursor:pointer;color:var(--textd);margin-left:4px;font-size:15px;line-height:1;padding:0;transition:color .1s}
+.tag-x:hover{color:var(--text2)}
+.inp{width:100%;padding:7px 12px;border:1px solid var(--bdr);border-radius:var(--r2);font-family:var(--ff);font-size:13px;color:var(--text);outline:none;background:var(--sf);transition:border-color .1s,box-shadow .1s}
+.inp:focus{border-color:var(--bdr-foc);box-shadow:0 0 0 3px rgba(0,91,211,.2)}
+.inp-sm{height:32px;padding:5px 10px;font-size:12px}
+.flbl{font-size:13px;font-weight:550;color:var(--text);margin-bottom:4px;display:block}
+.fhint{font-size:12px;color:var(--text2);margin-top:3px}
+/* product picker trigger */
+.srch{display:flex;align-items:center;gap:8px;border:1px solid var(--bdr);border-radius:var(--r2);padding:7px 12px;background:var(--sf);transition:border-color .1s,box-shadow .1s;cursor:pointer}
+.srch:focus-within{border-color:var(--bdr-foc);box-shadow:0 0 0 3px rgba(0,91,211,.2)}
+.srch input{flex:1;border:none;outline:none;background:transparent;font-family:var(--ff);font-size:13px;color:var(--text)}
+.srch input::placeholder{color:var(--textd)}
+/* product row */
+.prod-row{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border:1px solid var(--bdr);border-radius:var(--r1);font-size:13px;background:var(--sf)}
+.eg-box{background:var(--sf-act);border-radius:var(--r1);padding:10px 14px;display:flex;flex-direction:column;gap:6px}
+.eg-item{font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px}
+.ibtn{width:28px;height:28px;border:none;background:transparent;cursor:pointer;border-radius:var(--r1);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--text2);transition:background .1s,color .1s}
+.ibtn:hover{background:var(--sf-hov)}
+.ibtn-del{color:rgba(181,38,11,1)}.ibtn-del:hover{background:rgba(181,38,11,.08)}
+.frow{display:flex;gap:8px}.fend{justify-content:flex-end}.fbc{justify-content:space-between;align-items:center}
+.mt3{margin-top:12px}.mt4{margin-top:16px}.mt5{margin-top:20px}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="lay">
+  <aside class="sb" id="sidebar">
+    <div class="sb-hd">
+      <div class="sb-logo">Fd</div>
+      <span class="sb-title nav-lbl">Findter Filter &amp; Search</span>
+      <button class="sb-tgl" id="sidebar-toggle" title="Toggle sidebar">
+        <span id="toggle-icon"><svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.78 5.97a.75.75 0 0 1 0 1.06L8.81 10l2.97 2.97a.75.75 0 1 1-1.06 1.06l-3.5-3.5a.75.75 0 0 1 0-1.06l3.5-3.5a.75.75 0 0 1 1.06 0Z" fill="currentColor"/></svg></span>
+      </button>
+    </div>
+    <div class="sb-nav" id="nav"></div>
+  </aside>
+
+  <main class="main">
+    <div class="pg">
+      <h1 style="font-size:1.25rem;font-weight:650;line-height:1.3">Search</h1>
+      <p style="font-size:13px;color:var(--text2);margin-top:4px">Search Guidelines <a href="#">here</a>.</p>
+
+      <div class="tab-bar mt4">
+        <button class="tab-btn act" data-tab="settings">Search Settings</button>
+        <button class="tab-btn" data-tab="booster">Search Booster</button>
+      </div>
+
+      <!-- SEARCH SETTINGS TAB -->
+      <div id="tab-settings">
+        <div class="bnr mt4">
+          <svg class="ic" style="flex-shrink:0;color:rgba(0,91,211,1);margin-top:1px" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm0-11a.75.75 0 0 1 .75.75v4.5a.75.75 0 0 1-1.5 0v-4.5A.75.75 0 0 1 10 7Zm0-2.5a.875.875 0 1 1 0 1.75.875.875 0 0 1 0-1.75Z" fill="currentColor"/></svg>
+          <span>Looking for a custom search solution? Request a solution tailored to your needs. <a href="#">Contact us</a> or <a href="#">Book a call with us</a>.</span>
+        </div>
+
+        <!-- Card 1: Search Field -->
+        <div class="card mt4">
+          <div class="card-hd">
+            <p class="card-hd-ttl">Search field</p>
+            <p class="card-hd-sub">Search fields determine which relevant attributes are considered when shoppers type in a query.</p>
+          </div>
+          <div id="field-list"></div>
+        </div>
+
+        <!-- Card 2: No Results Suggestions -->
+        <div class="card mt4">
+          <div class="card-hd">
+            <p class="card-hd-ttl">No Results Suggestions</p>
+            <p class="card-hd-sub">Show helpful content when a search returns no results.</p>
+          </div>
+          <div class="card-bd">
+            <div>
+              <p class="flbl">Keywords</p>
+              <p class="fhint" style="margin-top:0;margin-bottom:8px">Shoppers searching these terms will trigger the suggestions below.</p>
+              <div id="kw-tags" style="display:flex;flex-wrap:wrap;gap:4px;min-height:0"></div>
+              <div class="frow mt3" style="gap:6px">
+                <input id="kw-inp" class="inp inp-sm" style="flex:1" type="text" placeholder="Type a keyword and press Enter" autocomplete="off">
+                <button id="kw-add" class="btn btn-s btn-sm">Add</button>
+              </div>
+            </div>
+
+            <div style="border-top:1px solid var(--bdr);padding-top:14px">
+              <div class="fbc" style="margin-bottom:4px">
+                <p class="flbl" style="margin-bottom:0">Product Suggestions</p>
+                <span id="nr-prod-count" style="font-size:12px;color:var(--text2)">0/5</span>
+              </div>
+              <p class="fhint" style="margin-top:0;margin-bottom:10px">Up to 5 products shown when no results are found.</p>
+              <div id="nr-prod-list" style="display:flex;flex-direction:column;gap:6px"></div>
+              <div id="nr-picker-wrap" class="mt3">
+                <div class="srch" id="nr-picker-trigger">
+                  <svg class="ic" style="color:var(--textd);flex-shrink:0" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M13.74 12.68a6.5 6.5 0 1 1 1.06-1.06l3.26 3.27a.75.75 0 1 1-1.06 1.06l-3.26-3.27Zm.76-5.18a5 5 0 1 1-10 0 5 5 0 0 1 10 0Z" fill="currentColor"/></svg>
+                  <input id="nr-picker-inp" type="text" placeholder="Search products to add…" autocomplete="off">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: Stop Words -->
+        <div class="card mt4">
+          <div class="card-hd">
+            <p class="card-hd-ttl">Stop Words</p>
+            <p class="card-hd-sub">Ignore filler words to improve search matching speed.</p>
+          </div>
+          <div class="card-bd">
+            <div id="sw-tags" style="display:flex;flex-wrap:wrap;gap:4px"></div>
+            <div class="frow" style="gap:6px">
+              <input id="sw-inp" class="inp inp-sm" style="flex:1" type="text" placeholder="Add a stop word…" autocomplete="off">
+              <button id="sw-add" class="btn btn-s btn-sm">Add</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4: Numeric Search -->
+        <div class="card mt4">
+          <div class="card-hd">
+            <p class="card-hd-ttl">Numeric Search</p>
+            <p class="card-hd-sub">Match exact values and numeric ranges in search queries.</p>
+          </div>
+          <div class="card-bd">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:16px">
+              <div>
+                <p style="font-weight:550;font-size:13px">Enable numeric search</p>
+                <p class="fhint">Allow shoppers to search using numbers, prices, and ranges.</p>
+              </div>
+              <button type="button" id="tgl-numeric" class="tgl on"><span class="tgl-th"></span></button>
+            </div>
+            <div id="numeric-examples">
+              <p style="font-size:12px;font-weight:550;color:var(--text2);margin-bottom:8px">Examples</p>
+              <div class="eg-box">
+                <div class="eg-item">
+                  <svg class="ic" style="color:var(--textd);flex-shrink:0" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.69L11.72 6.53a.75.75 0 0 1 1.06-1.06l4 4a.75.75 0 0 1 0 1.06l-4 4a.75.75 0 1 1-1.06-1.06l2.72-2.72H3.75A.75.75 0 0 1 3 10Z" fill="currentColor"/></svg>
+                  <span>dress $70–$100</span>
+                </div>
+                <div class="eg-item">
+                  <svg class="ic" style="color:var(--textd);flex-shrink:0" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.69L11.72 6.53a.75.75 0 0 1 1.06-1.06l4 4a.75.75 0 0 1 0 1.06l-4 4a.75.75 0 1 1-1.06-1.06l2.72-2.72H3.75A.75.75 0 0 1 3 10Z" fill="currentColor"/></svg>
+                  <span>sale 50%</span>
+                </div>
+                <div class="eg-item">
+                  <svg class="ic" style="color:var(--textd);flex-shrink:0" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.69L11.72 6.53a.75.75 0 0 1 1.06-1.06l4 4a.75.75 0 0 1 0 1.06l-4 4a.75.75 0 1 1-1.06-1.06l2.72-2.72H3.75A.75.75 0 0 1 3 10Z" fill="currentColor"/></svg>
+                  <span>screen 27 inch</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 5: Zero Character Suggestions -->
+        <div class="card mt4">
+          <div class="card-hd">
+            <p class="card-hd-ttl">Zero Character Suggestions</p>
+            <p class="card-hd-sub">Products shown when a shopper opens search without typing anything.</p>
+          </div>
+          <div class="card-bd">
+            <div class="fbc">
+              <p class="flbl" style="margin-bottom:0">Products</p>
+              <span id="zc-count" style="font-size:12px;color:var(--text2)">0/10</span>
+            </div>
+            <div id="zc-prod-list" style="display:flex;flex-direction:column;gap:6px"></div>
+            <div id="zc-picker-wrap">
+              <div class="srch" id="zc-picker-trigger">
+                <svg class="ic" style="color:var(--textd);flex-shrink:0" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M13.74 12.68a6.5 6.5 0 1 1 1.06-1.06l3.26 3.27a.75.75 0 1 1-1.06 1.06l-3.26-3.27Zm.76-5.18a5 5 0 1 1-10 0 5 5 0 0 1 10 0Z" fill="currentColor"/></svg>
+                <input id="zc-picker-inp" type="text" placeholder="Search products to add…" autocomplete="off">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Save / Cancel -->
+        <div class="frow fend mt5">
+          <button id="cancel-search" class="btn btn-s">Cancel</button>
+          <button id="save-search" class="btn btn-p">Save</button>
+        </div>
+      </div>
+
+      <!-- SEARCH BOOSTER TAB -->
+      <div id="tab-booster" class="hidden">
+        <div class="card mt4">
+          <div class="card-bd" style="align-items:center;padding:40px 16px;text-align:center">
+            <svg style="width:36px;height:36px;fill:var(--textd)" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 3a.75.75 0 0 1 .75.75v.75h.75a.75.75 0 0 1 0 1.5H10v.75a.75.75 0 0 1-1.5 0V6H7.75a.75.75 0 0 1 0-1.5H8.5v-.75A.75.75 0 0 1 10 3ZM4.5 10a.75.75 0 0 1 .75.75v.75h.75a.75.75 0 0 1 0 1.5H5.25v.75a.75.75 0 0 1-1.5 0v-.75H3a.75.75 0 0 1 0-1.5h.75v-.75A.75.75 0 0 1 4.5 10ZM14 13a1 1 0 1 0 0 2 1 1 0 0 0 0-2Zm-9.5-7a1 1 0 1 0 0 2 1 1 0 0 0 0-2ZM5.5 3.5a.5.5 0 1 0 0 1 .5.5 0 0 0 0-1Zm9 9a.5.5 0 1 0 0 1 .5.5 0 0 0 0-1Z" fill="currentColor"/></svg>
+            <p style="font-size:13px;font-weight:550;color:var(--text2);margin-top:12px">Search Booster — Coming soon</p>
+            <p style="font-size:12px;color:var(--textd);margin-top:4px">Boost specific products or collections in search results.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const IC={
+  chevL:`<svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.78 5.97a.75.75 0 0 1 0 1.06L8.81 10l2.97 2.97a.75.75 0 1 1-1.06 1.06l-3.5-3.5a.75.75 0 0 1 0-1.06l3.5-3.5a.75.75 0 0 1 1.06 0Z" fill="currentColor"/></svg>`,
+  chevR:`<svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.22 5.97a.75.75 0 0 0 0 1.06L11.19 10 8.22 12.97a.75.75 0 1 0 1.06 1.06l3.5-3.5a.75.75 0 0 0 0-1.06l-3.5-3.5a.75.75 0 0 0-1.06 0Z" fill="currentColor"/></svg>`,
+  del:`<svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.25 3.5A.75.75 0 0 1 9 2.75h2a.75.75 0 0 1 .75.75v.25H15a.75.75 0 0 1 0 1.5h-.25v9.75A1.75 1.75 0 0 1 13 16.75H7A1.75 1.75 0 0 1 5.25 15V5.25H5a.75.75 0 0 1 0-1.5h3.25V3.5Zm1 1.25H6.75V15c0 .138.112.25.25.25h6a.25.25 0 0 0 .25-.25V4.75H9.25Zm-1.5 3a.75.75 0 0 1 1.5 0v5.5a.75.75 0 0 1-1.5 0v-5.5Zm3.5 0a.75.75 0 0 1 1.5 0v5.5a.75.75 0 0 1-1.5 0v-5.5Z" fill="currentColor"/></svg>`,
+  chk:`<svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M15.78 5.97a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L3.97 10.72a.75.75 0 0 1 1.06-1.06l3 3 6.69-6.69a.75.75 0 0 1 1.06 0Z" fill="currentColor"/></svg>`,
+};
+const NAV=[
+  {id:'filter',label:'Filter'},{id:'search',label:'Search'},
+  {id:'metafield',label:'Metafield'},
+  {id:'grid',label:'Filter & Product Grid Design'},{id:'settings',label:'Settings'},
+  {id:'analytics',label:'Analytics'},{id:'advanced',label:'Advanced Features'},
+  {id:'storefront',label:'Storefront Preview'},
+];
+const ENABLED=new Set(['settings','metafield','search','storefront']);
+const ACTIVE='search';
+let col=false;
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function renderNav(){
+  $('nav').innerHTML=NAV.map(n=>{
+    const en=ENABLED.has(n.id),act=n.id===ACTIVE;
+    return `<button data-nav="${n.id}" ${en?'':'disabled'} class="nav-btn${act?' act':''}" title="${n.label}"><span class="nav-lbl">${escapeHtml(n.label)}</span></button>`;
+  }).join('');
+  $('nav').querySelectorAll('[data-nav]').forEach(b=>{
+    if(ENABLED.has(b.dataset.nav))b.onclick=()=>{
+      const v=b.dataset.nav;
+      if(v==='settings')location.href='index.html';
+      else if(v==='metafield')location.href='Metafield.html';
+      else if(v==='storefront')location.href='StoreFront.html';
+    };
+  });
+  updateSb();
+}
+function updateSb(){
+  $('sidebar').classList.toggle('col',col);
+  $('sidebar').querySelectorAll('.nav-lbl').forEach(el=>el.classList.toggle('hidden',col));
+  document.querySelector('.sb-title').classList.toggle('hidden',col);
+  $('toggle-icon').innerHTML=col?IC.chevR:IC.chevL;
+}
+$('sidebar-toggle').onclick=()=>{col=!col;updateSb();};
+
+/* ---- Tabs ---- */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('act'));
+    btn.classList.add('act');
+    $('tab-settings').classList.toggle('hidden',btn.dataset.tab!=='settings');
+    $('tab-booster').classList.toggle('hidden',btn.dataset.tab!=='booster');
+  };
+});
+
+/* ---- Mock Products ---- */
+const MOCK_PRODUCTS=[
+  {id:1, title:'Wireless Earbuds Pro',  price:79.99, compareAt:99.99, type:'Electronics', vendor:'TechBrand', color:'Black'},
+  {id:2, title:'Cotton T-Shirt',        price:24.99, compareAt:0,     type:'Apparel',     vendor:'BasicWear', color:'Red'},
+  {id:3, title:'Running Shoes',         price:89.99, compareAt:120,   type:'Footwear',    vendor:'SportStep', color:'White'},
+  {id:4, title:'Leather Wallet',        price:45.00, compareAt:0,     type:'Accessories', vendor:'LeatherCo', color:'Brown'},
+  {id:5, title:'Ceramic Coffee Mug',    price:18.99, compareAt:0,     type:'Kitchen',     vendor:'HomePlus',  color:'White'},
+  {id:6, title:'Denim Jacket',          price:69.99, compareAt:89.99, type:'Apparel',     vendor:'BasicWear', color:'Blue'},
+  {id:7, title:'Yoga Mat',             price:34.99, compareAt:0,     type:'Fitness',     vendor:'FitLife',   color:'Purple'},
+  {id:8, title:'Laptop Stand',         price:42.00, compareAt:55,    type:'Electronics', vendor:'TechBrand', color:'Silver'},
+  {id:9, title:'Water Bottle',         price:22.99, compareAt:0,     type:'Sports',      vendor:'HydroLife', color:'Black'},
+  {id:10,title:'Sunglasses',           price:55.00, compareAt:75,    type:'Accessories', vendor:'ShadesCo',  color:'Black'},
+  {id:11,title:'Laptop Backpack',      price:65.00, compareAt:80,    type:'Bags',        vendor:'PackPro',   color:'Black'},
+  {id:12,title:'Wireless Charger',     price:29.99, compareAt:39.99, type:'Electronics', vendor:'TechBrand', color:'White'},
+  {id:13,title:'Cotton Hoodie',        price:49.99, compareAt:64.99, type:'Apparel',     vendor:'BasicWear', color:'Grey'},
+  {id:14,title:'Mechanical Keyboard',  price:129.00,compareAt:159,   type:'Electronics', vendor:'TechBrand', color:'Black'},
+  {id:15,title:'Running Shorts',       price:32.99, compareAt:0,     type:'Apparel',     vendor:'SportStep', color:'Blue'},
+];
+const COLOR_GRAD={
+  Black:'linear-gradient(135deg,#2d2d2d,#555)',
+  White:'linear-gradient(135deg,#e0e0e0,#f5f5f5)',
+  Blue:'linear-gradient(135deg,#4a7fcb,#6a9fe0)',
+  Red:'linear-gradient(135deg,#cb4a4a,#e07070)',
+  Grey:'linear-gradient(135deg,#8a8a8a,#b0b0b0)',
+  Purple:'linear-gradient(135deg,#7a4acb,#9a6adf)',
+  Brown:'linear-gradient(135deg,#8b5e3c,#a67c5b)',
+  Silver:'linear-gradient(135deg,#9a9a9a,#c8c8c8)',
+};
+const getGrad=c=>COLOR_GRAD[c]||'linear-gradient(135deg,#888,#aaa)';
+
+/* ---- Floating picker dropdown ---- */
+let activeDrop=null,activeTrigger=null;
+function closeDrop(){if(activeDrop){activeDrop.remove();activeDrop=activeTrigger=null;}}
+document.addEventListener('click',e=>{
+  if(!activeDrop)return;
+  if(activeDrop.contains(e.target)||(activeTrigger&&activeTrigger.contains(e.target)))return;
+  closeDrop();
+});
+
+function openPickerDrop(triggerEl,excluded,maxReached,onAdd){
+  closeDrop();
+  if(maxReached)return;
+  const r=triggerEl.getBoundingClientRect();
+  const query=triggerEl.querySelector('input').value.toLowerCase();
+  const items=MOCK_PRODUCTS.filter(p=>!excluded.includes(p.id)&&(
+    p.title.toLowerCase().includes(query)||p.type.toLowerCase().includes(query)||p.vendor.toLowerCase().includes(query)
+  ));
+  const drop=document.createElement('div');
+  drop.style.cssText=`position:fixed;top:${r.bottom+2}px;left:${r.left}px;width:${r.width}px;`+
+    `background:#fff;border:1px solid rgba(227,227,227,1);border-radius:8px;`+
+    `box-shadow:0 8px 24px rgba(26,26,26,.2);z-index:9999;max-height:240px;overflow-y:auto;font-family:'Inter',sans-serif`;
+  drop.innerHTML=items.length
+    ?items.map(p=>`
+      <div data-pid="${p.id}" style="display:flex;align-items:center;gap:10px;padding:8px 12px;cursor:pointer;border-bottom:1px solid rgba(227,227,227,1)">
+        <div style="width:30px;height:30px;border-radius:4px;background:${getGrad(p.color)};flex-shrink:0"></div>
+        <div style="flex:1;min-width:0">
+          <p style="font-size:13px;font-weight:550;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:rgba(48,48,48,1)">${escapeHtml(p.title)}</p>
+          <p style="font-size:11px;color:rgba(97,97,97,1)">${escapeHtml(p.type)} &middot; $${p.price.toFixed(2)}</p>
+        </div>
+      </div>`).join('')
+    :`<p style="padding:12px 14px;font-size:13px;color:rgba(181,181,181,1)">No products found</p>`;
+  drop.querySelectorAll('[data-pid]').forEach(el=>{
+    el.addEventListener('mouseenter',()=>el.style.background='rgba(247,247,247,1)');
+    el.addEventListener('mouseleave',()=>el.style.background='');
+    el.onclick=()=>{onAdd(Number(el.dataset.pid));closeDrop();};
+  });
+  document.body.appendChild(drop);
+  activeDrop=drop;activeTrigger=triggerEl;
+}
+
+/* ---- Search Fields ---- */
+const FIELDS=[
+  {key:'title',label:'Title'},{key:'sku',label:'SKU'},{key:'desc',label:'Product Description'},
+  {key:'coltitle',label:'Collection Title'},{key:'category',label:'Category'},
+  {key:'variants',label:'Product Variants'},{key:'tags',label:'Product Tags'},
+  {key:'type',label:'Product Type'},{key:'vendor',label:'Vendor'},
+];
+let searchFields=new Set(FIELDS.map(f=>f.key));
+function renderFields(){
+  $('field-list').innerHTML=FIELDS.map((f,i)=>`
+    <label style="display:flex;align-items:center;gap:12px;padding:10px 16px;${i<FIELDS.length-1?'border-bottom:1px solid var(--bdr)':''}cursor:pointer;font-size:13px;user-select:none">
+      <input type="checkbox" data-field="${f.key}" ${searchFields.has(f.key)?'checked':''}
+             style="width:16px;height:16px;accent-color:var(--fill);cursor:pointer;flex-shrink:0">
+      ${escapeHtml(f.label)}
+    </label>`).join('');
+  $('field-list').querySelectorAll('[data-field]').forEach(chk=>{
+    chk.onchange=()=>{chk.checked?searchFields.add(chk.dataset.field):searchFields.delete(chk.dataset.field);};
+  });
+}
+
+/* ---- Keywords ---- */
+let noResultKeywords=['sale','clearance','deals'];
+function renderKwTags(){
+  const el=$('kw-tags');
+  el.innerHTML=noResultKeywords.length
+    ?noResultKeywords.map((kw,i)=>`<span class="tag">${escapeHtml(kw)}<button class="tag-x" data-ki="${i}" title="Remove">×</button></span>`).join('')
+    :`<span style="font-size:12px;color:var(--textd)">No keywords added yet.</span>`;
+  el.querySelectorAll('[data-ki]').forEach(b=>{
+    b.onclick=()=>{noResultKeywords.splice(Number(b.dataset.ki),1);renderKwTags();};
+  });
+}
+function addKw(){
+  const v=$('kw-inp').value.trim();
+  if(!v||noResultKeywords.includes(v))return;
+  noResultKeywords.push(v);$('kw-inp').value='';renderKwTags();
+}
+$('kw-add').onclick=addKw;
+$('kw-inp').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addKw();}});
+
+/* ---- No Results Products (max 5) ---- */
+let noResultProducts=[1,2,3];
+function renderNrProds(){
+  const items=noResultProducts.map(id=>MOCK_PRODUCTS.find(p=>p.id===id)).filter(Boolean);
+  $('nr-prod-count').textContent=`${items.length}/5`;
+  $('nr-prod-list').innerHTML=items.map((p,i)=>`
+    <div class="prod-row">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:24px;height:24px;border-radius:3px;background:${getGrad(p.color)};flex-shrink:0"></div>
+        <span style="font-weight:550">${escapeHtml(p.title)}</span>
+        <span style="font-size:11px;color:var(--text2)">$${p.price.toFixed(2)}</span>
+      </div>
+      <button class="ibtn ibtn-del" data-nri="${i}" title="Remove">${IC.del}</button>
+    </div>`).join('');
+  $('nr-prod-list').querySelectorAll('[data-nri]').forEach(b=>{
+    b.onclick=()=>{noResultProducts.splice(Number(b.dataset.nri),1);renderNrProds();};
+  });
+  const pickerInp=$('nr-picker-inp');
+  if(items.length>=5){pickerInp.placeholder='Maximum 5 products added';pickerInp.disabled=true;}
+  else{pickerInp.placeholder='Search products to add…';pickerInp.disabled=false;}
+}
+$('nr-picker-inp').addEventListener('focus',()=>openPickerDrop($('nr-picker-trigger'),noResultProducts,noResultProducts.length>=5,id=>{
+  if(noResultProducts.length<5&&!noResultProducts.includes(id)){noResultProducts.push(id);$('nr-picker-inp').value='';renderNrProds();}
+}));
+$('nr-picker-inp').addEventListener('input',()=>openPickerDrop($('nr-picker-trigger'),noResultProducts,noResultProducts.length>=5,id=>{
+  if(noResultProducts.length<5&&!noResultProducts.includes(id)){noResultProducts.push(id);$('nr-picker-inp').value='';renderNrProds();}
+}));
+
+/* ---- Stop Words ---- */
+let stopWords=['a','an','the','is','are','was','were','i','you','we','they','it','and','or','not'];
+function renderSwTags(){
+  $('sw-tags').innerHTML=stopWords.map((w,i)=>`<span class="tag">${escapeHtml(w)}<button class="tag-x" data-swi="${i}" title="Remove">×</button></span>`).join('');
+  $('sw-tags').querySelectorAll('[data-swi]').forEach(b=>{
+    b.onclick=()=>{stopWords.splice(Number(b.dataset.swi),1);renderSwTags();};
+  });
+}
+function addSw(){
+  const v=$('sw-inp').value.trim().toLowerCase();
+  if(!v||stopWords.includes(v))return;
+  stopWords.push(v);$('sw-inp').value='';renderSwTags();
+}
+$('sw-add').onclick=addSw;
+$('sw-inp').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addSw();}});
+
+/* ---- Numeric Search ---- */
+const tglNum=$('tgl-numeric');
+tglNum.onclick=()=>{
+  tglNum.classList.toggle('on');tglNum.classList.toggle('off');
+  $('numeric-examples').classList.toggle('hidden',tglNum.classList.contains('off'));
+};
+
+/* ---- Zero Char Products (max 10) ---- */
+let zeroCharProducts=[1,2,3,4,5,6,7,8];
+function renderZcProds(){
+  const items=zeroCharProducts.map(id=>MOCK_PRODUCTS.find(p=>p.id===id)).filter(Boolean);
+  $('zc-count').textContent=`${items.length}/10`;
+  $('zc-prod-list').innerHTML=items.map((p,i)=>`
+    <div class="prod-row">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:24px;height:24px;border-radius:3px;background:${getGrad(p.color)};flex-shrink:0"></div>
+        <span style="font-weight:550">${escapeHtml(p.title)}</span>
+        <span style="font-size:11px;color:var(--text2)">$${p.price.toFixed(2)}</span>
+      </div>
+      <button class="ibtn ibtn-del" data-zci="${i}" title="Remove">${IC.del}</button>
+    </div>`).join('');
+  $('zc-prod-list').querySelectorAll('[data-zci]').forEach(b=>{
+    b.onclick=()=>{zeroCharProducts.splice(Number(b.dataset.zci),1);renderZcProds();};
+  });
+  const pickerInp=$('zc-picker-inp');
+  if(items.length>=10){pickerInp.placeholder='Maximum 10 products added';pickerInp.disabled=true;}
+  else{pickerInp.placeholder='Search products to add…';pickerInp.disabled=false;}
+}
+$('zc-picker-inp').addEventListener('focus',()=>openPickerDrop($('zc-picker-trigger'),zeroCharProducts,zeroCharProducts.length>=10,id=>{
+  if(zeroCharProducts.length<10&&!zeroCharProducts.includes(id)){zeroCharProducts.push(id);$('zc-picker-inp').value='';renderZcProds();}
+}));
+$('zc-picker-inp').addEventListener('input',()=>openPickerDrop($('zc-picker-trigger'),zeroCharProducts,zeroCharProducts.length>=10,id=>{
+  if(zeroCharProducts.length<10&&!zeroCharProducts.includes(id)){zeroCharProducts.push(id);$('zc-picker-inp').value='';renderZcProds();}
+}));
+
+/* ---- Snapshot / Restore ---- */
+function snapshot(){
+  return{
+    searchFields:new Set(searchFields),
+    noResultKeywords:[...noResultKeywords],
+    noResultProducts:[...noResultProducts],
+    stopWords:[...stopWords],
+    numericEnabled:tglNum.classList.contains('on'),
+    zeroCharProducts:[...zeroCharProducts],
+  };
+}
+function restore(s){
+  searchFields=new Set(s.searchFields);renderFields();
+  noResultKeywords=[...s.noResultKeywords];renderKwTags();
+  noResultProducts=[...s.noResultProducts];renderNrProds();
+  stopWords=[...s.stopWords];renderSwTags();
+  tglNum.classList.toggle('on',s.numericEnabled);
+  tglNum.classList.toggle('off',!s.numericEnabled);
+  $('numeric-examples').classList.toggle('hidden',!s.numericEnabled);
+  zeroCharProducts=[...s.zeroCharProducts];renderZcProds();
+}
+let saved=snapshot();
+$('save-search').onclick=()=>{
+  saved=snapshot();
+  const btn=$('save-search');btn.innerHTML=IC.chk+' Saved';
+  setTimeout(()=>{btn.innerHTML='Save';},1500);
+};
+$('cancel-search').onclick=()=>restore(saved);
+
+/* ---- Init ---- */
+renderNav();renderFields();renderKwTags();renderNrProds();renderSwTags();renderZcProds();
+</script>
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Translate – Findter Filter &amp; Search</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--ff:'Inter',-apple-system,BlinkMacSystemFont,'San Francisco','Segoe UI',sans-serif;
+--bg:rgba(241,241,241,1);--sf:#fff;--sf-hov:rgba(247,247,247,1);--sf-act:rgba(243,243,243,1);
+--fill:#303030;--fill-hov:#1a1a1a;--fill-t:rgba(0,0,0,.02);
+--text:rgba(48,48,48,1);--text2:rgba(97,97,97,1);--textd:rgba(181,181,181,1);--lnk:rgba(0,91,211,1);
+--bdr:rgba(227,227,227,1);--bdr-foc:rgba(0,91,211,1);--crit:rgba(181,38,11,1);
+--r1:4px;--r2:8px;--r3:12px;
+--sh1:0px 1px 0px 0px rgba(26,26,26,.07);
+--sh3:0px 4px 6px -2px rgba(26,26,26,.2);
+--shbtn:0px -1px 0px 0px #b5b5b5 inset,0px 0px 0px 1px rgba(0,0,0,.1) inset,0px .5px 0px 1.5px #fff inset;
+--shbtn-hov:0px 1px 0px 0px #ebebeb inset,-1px 0px 0px 0px #ebebeb inset,1px 0px 0px 0px #ebebeb inset,0px -1px 0px 0px #ccc inset;
+--shbtnp:0px -1px 0px 1px rgba(0,0,0,.8) inset,0px 0px 0px 1px rgba(48,48,48,1) inset,0px .5px 0px 1.5px rgba(255,255,255,.25) inset;
+--shbtnp-hov:0px 1px 0px 0px rgba(255,255,255,.24) inset,1px 0px 0px 0px rgba(255,255,255,.2) inset,-1px 0px 0px 0px rgba(255,255,255,.2) inset,0px -1px 0px 0px #000 inset;
+}
+html,body{font-family:var(--ff);background:var(--bg);color:var(--text);font-size:13px;line-height:1.5;min-height:100vh}
+a{color:var(--lnk)}
+.lay{display:flex;min-height:100vh}
+.sb{width:248px;background:var(--sf);border-right:1px solid var(--bdr);display:flex;flex-direction:column;flex-shrink:0;transition:width .25s;min-height:100vh}
+.sb.col{width:56px}
+.sb-hd{padding:12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bdr);gap:8px;overflow:hidden}
+.sb-logo{width:28px;height:28px;border-radius:6px;background:var(--fill);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-title{font-size:13px;font-weight:650;color:var(--text);flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.sb-tgl{width:28px;height:28px;border:none;background:transparent;cursor:pointer;border-radius:var(--r1);display:flex;align-items:center;justify-content:center;color:var(--text2);flex-shrink:0}
+.sb-tgl:hover{background:var(--sf-hov)}
+.sb-nav{padding:8px;display:flex;flex-direction:column;gap:2px;flex:1}
+.nav-btn{width:100%;border:none;background:transparent;cursor:pointer;padding:6px 12px;border-radius:var(--r2);font-family:var(--ff);font-size:13px;font-weight:450;color:var(--text2);text-align:left;display:flex;align-items:center;overflow:hidden;transition:background .1s,color .1s;white-space:nowrap}
+.nav-btn:hover:not([disabled]){background:var(--sf-hov);color:var(--text)}
+.nav-btn.act{background:var(--sf-act)!important;color:var(--text)!important;font-weight:650}
+.nav-btn[disabled]{color:var(--textd)!important;cursor:not-allowed}
+.nav-lbl{overflow:hidden;text-overflow:ellipsis}
+.main{flex:1;overflow-x:hidden}
+.pg{max-width:960px;margin:0 auto;padding:24px}
+.ic{width:16px;height:16px;fill:currentColor;display:block;flex-shrink:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:6px 16px;height:32px;border-radius:var(--r2);font-family:var(--ff);font-size:13px;font-weight:550;cursor:pointer;border:none;white-space:nowrap;transition:box-shadow .1s,background .1s}
+.btn-p{background:var(--fill);color:#fff;box-shadow:var(--shbtnp)}
+.btn-p:hover{background:var(--fill-hov);box-shadow:var(--shbtnp-hov)}
+.btn-s{background:var(--sf);color:var(--text);box-shadow:var(--shbtn)}
+.btn-s:hover{box-shadow:var(--shbtn-hov)}
+.back-a{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border-radius:var(--r2);text-decoration:none;border:1px solid var(--bdr);background:var(--sf);color:var(--text2);box-shadow:var(--sh1);flex-shrink:0;transition:background .1s}
+.back-a:hover{background:var(--sf-hov)}
+.card{background:var(--sf);border-radius:var(--r2);box-shadow:var(--sh3);overflow:hidden}
+.inp{width:100%;border:1px solid var(--bdr);border-radius:var(--r2);padding:7px 12px;font-family:var(--ff);font-size:13px;color:var(--text);background:var(--sf);outline:none;transition:border-color .1s,box-shadow .1s}
+.inp::placeholder{color:var(--textd)}
+.inp:focus{border-color:var(--bdr-foc);box-shadow:0 0 0 3px rgba(0,91,211,.2)}
+.tabs{display:flex;overflow-x:auto;border-bottom:1px solid var(--bdr);padding:0 16px;gap:4px}
+.tab{padding:10px 12px;font-size:13px;font-weight:450;color:var(--text2);border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:color .1s;font-family:var(--ff)}
+.tab:hover{color:var(--text)}.tab.act{color:var(--text);font-weight:650;border-bottom-color:var(--fill)}
+.hidden{display:none!important}
+.mt3{margin-top:12px}.mt4{margin-top:16px}.mt5{margin-top:20px}
+.frow{display:flex;gap:8px}.fend{justify-content:flex-end}
+</style>
+</head>
+<body>
+<div class="lay">
+  <aside class="sb" id="sidebar">
+    <div class="sb-hd">
+      <div class="sb-logo">Fd</div>
+      <span class="sb-title nav-lbl">Findter Filter &amp; Search</span>
+      <button class="sb-tgl" id="sidebar-toggle" title="Toggle sidebar">
+        <span id="toggle-icon"><svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.78 5.97a.75.75 0 0 1 0 1.06L8.81 10l2.97 2.97a.75.75 0 1 1-1.06 1.06l-3.5-3.5a.75.75 0 0 1 0-1.06l3.5-3.5a.75.75 0 0 1 1.06 0Z" fill="currentColor"/></svg></span>
+      </button>
+    </div>
+    <div class="sb-nav" id="nav"></div>
+  </aside>
+  <main class="main">
+    <div class="pg">
+      <div style="display:flex;align-items:center;gap:12px">
+        <a href="index.html" class="back-a" title="Back to Settings">
+          <svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M17 10a.75.75 0 0 1-.75.75H5.56l2.72 2.72a.75.75 0 1 1-1.06 1.06l-4-4a.75.75 0 0 1 0-1.06l4-4a.75.75 0 0 1 1.06 1.06L5.56 9.25H16.25A.75.75 0 0 1 17 10Z" fill="currentColor"/></svg>
+        </a>
+        <div>
+          <h1 style="font-size:1.25rem;font-weight:650;line-height:1.3">Translate</h1>
+          <p style="font-size:13px;color:var(--text2);margin-top:2px">Customize the text labels shown to shoppers in your store.</p>
+        </div>
+      </div>
+
+      <div class="card mt5">
+        <div class="tabs" id="subtab-bar"></div>
+        <div id="fields-area"></div>
+      </div>
+
+      <div class="frow fend mt4">
+        <button id="cancel-translate" class="btn btn-s">Cancel</button>
+        <button id="save-translate" class="btn btn-p">Save</button>
+      </div>
+    </div>
+  </main>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const IC={
+  chevL:`<svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.78 5.97a.75.75 0 0 1 0 1.06L8.81 10l2.97 2.97a.75.75 0 1 1-1.06 1.06l-3.5-3.5a.75.75 0 0 1 0-1.06l3.5-3.5a.75.75 0 0 1 1.06 0Z" fill="currentColor"/></svg>`,
+  chevR:`<svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.22 5.97a.75.75 0 0 0 0 1.06L11.19 10 8.22 12.97a.75.75 0 1 0 1.06 1.06l3.5-3.5a.75.75 0 0 0 0-1.06l-3.5-3.5a.75.75 0 0 0-1.06 0Z" fill="currentColor"/></svg>`,
+  chk:`<svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M15.78 5.97a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L3.97 10.72a.75.75 0 0 1 1.06-1.06l3 3 6.69-6.69a.75.75 0 0 1 1.06 0Z" fill="currentColor"/></svg>`,
+};
+const NAV=[
+  {id:'filter',label:'Filter'},{id:'search',label:'Search'},
+  {id:'metafield',label:'Metafield'},
+  {id:'grid',label:'Filter & Product Grid Design'},{id:'settings',label:'Settings'},
+  {id:'analytics',label:'Analytics'},{id:'advanced',label:'Advanced Features'},
+  {id:'storefront',label:'Storefront Preview'},
+];
+const ENABLED=new Set(['settings','metafield','search','storefront']);
+const ACTIVE='settings';
+let col=false;
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function renderNav(){
+  $('nav').innerHTML=NAV.map(n=>{
+    const en=ENABLED.has(n.id),act=n.id===ACTIVE;
+    return `<button data-nav="${n.id}" ${en?'':'disabled'} class="nav-btn${act?' act':''}" title="${n.label}"><span class="nav-lbl">${escapeHtml(n.label)}</span></button>`;
+  }).join('');
+  $('nav').querySelectorAll('[data-nav]').forEach(b=>{
+    if(ENABLED.has(b.dataset.nav))b.onclick=()=>{
+      const v=b.dataset.nav;
+      if(v==='settings')location.href='index.html';
+      else if(v==='metafield')location.href='Metafield.html';
+      else if(v==='search')location.href='Search.html';
+      else if(v==='storefront')location.href='StoreFront.html';
+    };
+  });
+  updateSb();
+}
+function updateSb(){
+  $('sidebar').classList.toggle('col',col);
+  $('sidebar').querySelectorAll('.nav-lbl').forEach(el=>el.classList.toggle('hidden',col));
+  document.querySelector('.sb-title').classList.toggle('hidden',col);
+  $('toggle-icon').innerHTML=col?IC.chevR:IC.chevL;
+}
+$('sidebar-toggle').onclick=()=>{col=!col;updateSb();};
+
+const SUBTABS=[
+  {id:'product',label:'Product'},
+  {id:'search', label:'Search'},
+  {id:'filter', label:'Filter'},
+  {id:'sort',   label:'Sort'},
+  {id:'ymm',    label:'Year Make Model Widget'},
+];
+const FIELDS={
+  product:[
+    {key:'add_to_cart',  label:'Add to cart'},{key:'sold_out',    label:'Sold out'},
+    {key:'out_of_stock', label:'Out of stock'},{key:'sale',        label:'Sale'},
+    {key:'new',          label:'New'},         {key:'quick_view',  label:'Quick view'},
+    {key:'view_details', label:'View details'},{key:'from',        label:'From'},
+    {key:'compare_at',   label:'Compare at'},  {key:'only_x_left', label:'Only X left'},
+    {key:'free_shipping',label:'Free shipping'},
+  ],
+  search:[
+    {key:'search_placeholder',label:'Search (placeholder)'},{key:'no_results',   label:'No results found'},
+    {key:'results_for',       label:'Search results for'}, {key:'did_you_mean',  label:'Did you mean?'},
+    {key:'view_all',          label:'View all results'},    {key:'products',      label:'Products'},
+    {key:'collections',       label:'Collections'},         {key:'pages',         label:'Pages'},
+    {key:'clear_search',      label:'Clear search'},        {key:'suggestions',   label:'Suggestions'},
+  ],
+  filter:[
+    {key:'filters',     label:'Filters'},      {key:'filter',      label:'Filter'},
+    {key:'clear_all',   label:'Clear all'},     {key:'apply',       label:'Apply'},
+    {key:'show_results',label:'Show results'},  {key:'price',       label:'Price'},
+    {key:'from',        label:'From'},          {key:'to',          label:'To'},
+    {key:'in_stock',    label:'In stock'},      {key:'available',   label:'Available'},
+    {key:'more',        label:'More'},          {key:'less',        label:'Less'},
+    {key:'selected',    label:'Selected'},      {key:'remove',      label:'Remove'},
+  ],
+  sort:[
+    {key:'sort_by',     label:'Sort by'},       {key:'featured',    label:'Featured'},
+    {key:'best_selling',label:'Best Selling'},   {key:'newest',      label:'Newest'},
+    {key:'oldest',      label:'Oldest'},         {key:'discount',    label:'% Discount'},
+    {key:'az',          label:'Alphabetical: A-Z'},{key:'za',        label:'Alphabetical: Z-A'},
+    {key:'price_asc',   label:'Price: Low to High'},{key:'price_desc',label:'Price: High to Low'},
+    {key:'inventory',   label:'Stock Availability'},
+  ],
+  ymm:[
+    {key:'year',          label:'Year'},          {key:'make',          label:'Make'},
+    {key:'model',         label:'Model'},          {key:'select_year',   label:'Select Year'},
+    {key:'select_make',   label:'Select Make'},    {key:'select_model',  label:'Select Model'},
+    {key:'find_parts',    label:'Find parts'},     {key:'reset',         label:'Reset'},
+    {key:'fits',          label:'Fits your vehicle'},{key:'does_not_fit',label:'Does not fit'},
+    {key:'select_vehicle',label:'Select a vehicle'},{key:'change_vehicle',label:'Change vehicle'},
+  ],
+};
+
+let activeSubtab='product';
+function emptyTranslations(){
+  const t={};
+  for(const tab of SUBTABS){t[tab.id]={};for(const f of FIELDS[tab.id])t[tab.id][f.key]='';}
+  return t;
+}
+let workingTranslations=emptyTranslations();
+let savedTranslations=emptyTranslations();
+
+function renderSubtabs(){
+  $('subtab-bar').innerHTML=SUBTABS.map(t=>`<button data-tab="${t.id}" class="tab${t.id===activeSubtab?' act':''}">${escapeHtml(t.label)}</button>`).join('');
+  $('subtab-bar').querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{flushFields();activeSubtab=b.dataset.tab;renderSubtabs();renderFields();});
+}
+function renderFields(){
+  const fields=FIELDS[activeSubtab];
+  const vals=workingTranslations[activeSubtab];
+  $('fields-area').innerHTML=fields.map(f=>`
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--bdr)">
+      <span style="width:192px;flex-shrink:0;font-weight:550;font-size:13px">${escapeHtml(f.label)}</span>
+      <svg style="width:16px;height:16px;fill:var(--textd);flex-shrink:0" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.69L11.72 6.53a.75.75 0 0 1 1.06-1.06l4 4a.75.75 0 0 1 0 1.06l-4 4a.75.75 0 1 1-1.06-1.06l2.72-2.72H3.75A.75.75 0 0 1 3 10Z" fill="currentColor"/></svg>
+      <input data-key="${f.key}" type="text" value="${escapeHtml(vals[f.key]||'')}" placeholder="Translation…" class="inp" style="flex:1">
+    </div>`).join('');
+  const rows=$('fields-area').children;
+  if(rows.length)rows[rows.length-1].style.borderBottom='none';
+}
+function flushFields(){
+  $('fields-area').querySelectorAll('[data-key]').forEach(inp=>{workingTranslations[activeSubtab][inp.dataset.key]=inp.value;});
+}
+
+$('save-translate').onclick=()=>{
+  flushFields();savedTranslations=JSON.parse(JSON.stringify(workingTranslations));
+  const btn=$('save-translate');btn.innerHTML=IC.chk+' Saved';
+  setTimeout(()=>{btn.innerHTML='Save';},1500);
+};
+$('cancel-translate').onclick=()=>{workingTranslations=JSON.parse(JSON.stringify(savedTranslations));renderFields();};
+
+renderNav();renderSubtabs();renderFields();
+</script>
+</body>
+</html>

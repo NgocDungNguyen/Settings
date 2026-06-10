@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Metafield – Findter Filter &amp; Search</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--ff:'Inter',-apple-system,BlinkMacSystemFont,'San Francisco','Segoe UI',sans-serif;
+--bg:rgba(241,241,241,1);--sf:#fff;--sf-hov:rgba(247,247,247,1);--sf-act:rgba(243,243,243,1);
+--fill:#303030;--fill-hov:#1a1a1a;--fill-t:rgba(0,0,0,.02);
+--text:rgba(48,48,48,1);--text2:rgba(97,97,97,1);--textd:rgba(181,181,181,1);--lnk:rgba(0,91,211,1);
+--bdr:rgba(227,227,227,1);--bdr-foc:rgba(0,91,211,1);--crit:rgba(181,38,11,1);
+--r1:4px;--r2:8px;--r3:12px;
+--sh1:0px 1px 0px 0px rgba(26,26,26,.07);
+--sh3:0px 4px 6px -2px rgba(26,26,26,.2);
+--shbtn:0px -1px 0px 0px #b5b5b5 inset,0px 0px 0px 1px rgba(0,0,0,.1) inset,0px .5px 0px 1.5px #fff inset;
+--shbtn-hov:0px 1px 0px 0px #ebebeb inset,-1px 0px 0px 0px #ebebeb inset,1px 0px 0px 0px #ebebeb inset,0px -1px 0px 0px #ccc inset;
+--shbtnp:0px -1px 0px 1px rgba(0,0,0,.8) inset,0px 0px 0px 1px rgba(48,48,48,1) inset,0px .5px 0px 1.5px rgba(255,255,255,.25) inset;
+--shbtnp-hov:0px 1px 0px 0px rgba(255,255,255,.24) inset,1px 0px 0px 0px rgba(255,255,255,.2) inset,-1px 0px 0px 0px rgba(255,255,255,.2) inset,0px -1px 0px 0px #000 inset;
+}
+html,body{font-family:var(--ff);background:var(--bg);color:var(--text);font-size:13px;line-height:1.5;min-height:100vh}
+a{color:var(--lnk)}
+.lay{display:flex;min-height:100vh}
+.sb{width:248px;background:var(--sf);border-right:1px solid var(--bdr);display:flex;flex-direction:column;flex-shrink:0;transition:width .25s;min-height:100vh}
+.sb.col{width:56px}
+.sb-hd{padding:12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bdr);gap:8px;overflow:hidden}
+.sb-logo{width:28px;height:28px;border-radius:6px;background:var(--fill);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-title{font-size:13px;font-weight:650;color:var(--text);flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.sb-tgl{width:28px;height:28px;border:none;background:transparent;cursor:pointer;border-radius:var(--r1);display:flex;align-items:center;justify-content:center;color:var(--text2);flex-shrink:0}
+.sb-tgl:hover{background:var(--sf-hov)}
+.sb-nav{padding:8px;display:flex;flex-direction:column;gap:2px;flex:1}
+.nav-btn{width:100%;border:none;background:transparent;cursor:pointer;padding:6px 12px;border-radius:var(--r2);font-family:var(--ff);font-size:13px;font-weight:450;color:var(--text2);text-align:left;display:flex;align-items:center;overflow:hidden;transition:background .1s,color .1s;white-space:nowrap}
+.nav-btn:hover:not([disabled]){background:var(--sf-hov);color:var(--text)}
+.nav-btn.act{background:var(--sf-act)!important;color:var(--text)!important;font-weight:650}
+.nav-btn[disabled]{color:var(--textd)!important;cursor:not-allowed}
+.nav-lbl{overflow:hidden;text-overflow:ellipsis}
+.main{flex:1;overflow-x:hidden}
+.pg{max-width:960px;margin:0 auto;padding:24px}
+.ic{width:16px;height:16px;fill:currentColor;display:block;flex-shrink:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:6px 16px;height:32px;border-radius:var(--r2);font-family:var(--ff);font-size:13px;font-weight:550;cursor:pointer;border:none;white-space:nowrap;transition:box-shadow .1s,background .1s}
+.btn-p{background:var(--fill);color:#fff;box-shadow:var(--shbtnp)}
+.btn-p:hover{background:var(--fill-hov);box-shadow:var(--shbtnp-hov)}
+.btn-s{background:var(--sf);color:var(--text);box-shadow:var(--shbtn)}
+.btn-s:hover{box-shadow:var(--shbtn-hov)}
+.ibtn{width:32px;height:32px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:var(--r2);cursor:pointer;border:1px solid var(--bdr);background:var(--sf);color:var(--text2);box-shadow:var(--sh1);transition:background .1s,color .1s,border-color .1s;flex-shrink:0}
+.ibtn:hover{background:var(--sf-hov)}
+.ibtn-del:hover{background:rgba(181,38,11,.06);color:var(--crit);border-color:rgba(181,38,11,.3)}
+.srch{display:flex;align-items:center;gap:8px;border:1px solid var(--bdr);border-radius:var(--r2);padding:7px 12px;background:var(--sf);transition:border-color .1s,box-shadow .1s}
+.srch:focus-within{border-color:var(--bdr-foc);box-shadow:0 0 0 3px rgba(0,91,211,.2)}
+.srch input{flex:1;border:none;outline:none;background:transparent;font-family:var(--ff);font-size:13px;color:var(--text)}
+.srch input::placeholder{color:var(--textd)}
+.inp{width:100%;border:1px solid var(--bdr);border-radius:var(--r2);padding:7px 12px;font-family:var(--ff);font-size:13px;color:var(--text);background:var(--sf);outline:none;transition:border-color .1s,box-shadow .1s}
+.inp::placeholder{color:var(--textd)}
+.inp:focus{border-color:var(--bdr-foc);box-shadow:0 0 0 3px rgba(0,91,211,.2)}
+.flbl{font-size:13px;font-weight:550;color:var(--text);display:block;margin-bottom:4px}
+.tw{background:var(--sf);border-radius:var(--r2);box-shadow:var(--sh3);overflow:hidden}
+.dt{width:100%;border-collapse:collapse;font-size:13px}
+.dt thead tr{background:var(--fill-t);border-bottom:1px solid var(--bdr)}
+.dt thead th{padding:10px 16px;text-align:left;font-size:11px;font-weight:650;text-transform:uppercase;letter-spacing:.06em;color:var(--text2)}
+.dt tbody tr{border-bottom:1px solid var(--bdr)}
+.dt tbody tr:last-child{border-bottom:none}
+.dt tbody tr:hover{background:var(--sf-hov)}
+.dt td{padding:12px 16px;vertical-align:middle}
+.chklbl{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--text)}
+.chklbl input{width:16px;height:16px;border-radius:3px;accent-color:var(--fill);cursor:pointer;flex-shrink:0}
+.bdg-f{display:inline-flex;align-items:center;padding:2px 8px;border-radius:var(--r1);font-size:12px;font-weight:550;background:#ddeeff;color:#005bd3;white-space:nowrap}
+.bdg-s{display:inline-flex;align-items:center;padding:2px 8px;border-radius:var(--r1);font-size:12px;font-weight:550;background:#d5f0e6;color:#006e52;white-space:nowrap}
+.bdg-so{display:inline-flex;align-items:center;padding:2px 8px;border-radius:var(--r1);font-size:12px;font-weight:550;background:#ede8fc;color:#5b2ab0;white-space:nowrap}
+.ov{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:16px}
+.mo{background:var(--sf);border-radius:var(--r3);box-shadow:0 4px 24px rgba(0,0,0,.3);width:100%;max-width:380px;overflow:hidden;animation:mIn .15s ease-out}
+@keyframes mIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.mo-hd{padding:16px 20px;border-bottom:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:center}
+.mo-ttl{font-size:14px;font-weight:650}
+.mo-bd{padding:20px;display:flex;flex-direction:column;gap:12px}
+.mo-ft{padding:12px 20px;border-top:1px solid var(--bdr);background:var(--fill-t);display:flex;justify-content:flex-end;gap:8px}
+.hidden{display:none!important}
+.mt3{margin-top:12px}.mt4{margin-top:16px}.mt5{margin-top:20px}
+.frow{display:flex;gap:8px}.fend{justify-content:flex-end}
+</style>
+</head>
+<body>
+<div class="lay">
+  <aside class="sb" id="sidebar">
+    <div class="sb-hd">
+      <div class="sb-logo">Fd</div>
+      <span class="sb-title nav-lbl">Findter Filter &amp; Search</span>
+      <button class="sb-tgl" id="sidebar-toggle" title="Toggle sidebar">
+        <span id="toggle-icon"><svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.78 5.97a.75.75 0 0 1 0 1.06L8.81 10l2.97 2.97a.75.75 0 1 1-1.06 1.06l-3.5-3.5a.75.75 0 0 1 0-1.06l3.5-3.5a.75.75 0 0 1 1.06 0Z" fill="currentColor"/></svg></span>
+      </button>
+    </div>
+    <div class="sb-nav" id="nav"></div>
+  </aside>
+  <main class="main">
+    <div class="pg">
+      <h1 style="font-size:1.25rem;font-weight:650;line-height:1.3">Metafield</h1>
+      <p style="font-size:13px;color:var(--text2);margin-top:4px">
+        Metafield Guidelines <a href="#">here</a>.
+        For additional metafields, please <a href="#">contact us</a>.
+      </p>
+
+      <div class="tw mt5">
+        <!-- card inner header + search -->
+        <div style="padding:16px 16px 12px">
+          <p style="font-size:13px;font-weight:650;margin-bottom:12px">Metafield</p>
+          <div class="srch">
+            <svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M13.74 12.68a6.5 6.5 0 1 1 1.06-1.06l3.26 3.27a.75.75 0 1 1-1.06 1.06l-3.26-3.27Zm.76-5.18a5 5 0 1 1-10 0 5 5 0 0 1 10 0Z" fill="currentColor"/></svg>
+            <input id="mf-search" type="text" placeholder="Search for metafield">
+          </div>
+        </div>
+        <!-- table -->
+        <table class="dt" style="border-top:1px solid var(--bdr)">
+          <thead><tr>
+            <th>Title</th>
+            <th style="width:160px">Type</th>
+            <th style="width:220px">Apply to</th>
+            <th style="width:80px;text-align:center">Action</th>
+          </tr></thead>
+          <tbody id="mf-tbody"></tbody>
+        </table>
+        <!-- footer count -->
+        <div style="padding:10px 16px;background:var(--fill-t);border-top:1px solid var(--bdr)">
+          <span id="mf-count" style="font-size:13px;font-weight:550;color:var(--text)"></span>
+        </div>
+      </div>
+
+      <div class="frow fend mt4">
+        <button id="save-mf" class="btn btn-p">Save</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Apply modal -->
+<div id="apply-modal" class="ov hidden">
+  <div class="mo">
+    <div class="mo-hd">
+      <span class="mo-ttl" id="apply-modal-name"></span>
+      <button id="apply-modal-close" class="ibtn" style="border:none;box-shadow:none;background:transparent">
+        <svg class="ic" viewBox="0 0 20 20"><path d="m11.06 10 3.22-3.22a.75.75 0 0 0-1.06-1.06L10 8.94 6.78 5.72a.75.75 0 0 0-1.06 1.06L8.94 10l-3.22 3.22a.75.75 0 1 0 1.06 1.06L10 11.06l3.22 3.22a.75.75 0 1 0 1.06-1.06L11.06 10Z" fill="currentColor"/></svg>
+      </button>
+    </div>
+    <div class="mo-bd">
+      <p style="font-size:13px;font-weight:650">Apply to</p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <label class="chklbl"><input type="checkbox" id="chk-filter"> Filter</label>
+        <label class="chklbl"><input type="checkbox" id="chk-search"> Search</label>
+        <label class="chklbl"><input type="checkbox" id="chk-sort">   Sort</label>
+      </div>
+    </div>
+    <div class="mo-ft">
+      <button id="apply-modal-cancel" class="btn btn-s">Cancel</button>
+      <button id="apply-modal-save" class="btn btn-p">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const IC={
+  chevL:`<svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.78 5.97a.75.75 0 0 1 0 1.06L8.81 10l2.97 2.97a.75.75 0 1 1-1.06 1.06l-3.5-3.5a.75.75 0 0 1 0-1.06l3.5-3.5a.75.75 0 0 1 1.06 0Z" fill="currentColor"/></svg>`,
+  chevR:`<svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.22 5.97a.75.75 0 0 0 0 1.06L11.19 10 8.22 12.97a.75.75 0 1 0 1.06 1.06l3.5-3.5a.75.75 0 0 0 0-1.06l-3.5-3.5a.75.75 0 0 0-1.06 0Z" fill="currentColor"/></svg>`,
+  del:`<svg class="ic" viewBox="0 0 20 20"><path d="M14 4h3a1 1 0 0 1 0 2h-1v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6H3a1 1 0 0 1 0-2h3V2.5A1.5 1.5 0 0 1 7.5 1h5A1.5 1.5 0 0 1 14 2.5V4ZM8.5 2.5v1.5h3V2.5h-3ZM6 6v10h8V6H6Zm2 2.5a.5.5 0 0 1 1 0v5a.5.5 0 0 1-1 0v-5Zm3 0a.5.5 0 0 1 1 0v5a.5.5 0 0 1-1 0v-5Z" fill="currentColor"/></svg>`,
+  chk:`<svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M15.78 5.97a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L3.97 10.72a.75.75 0 0 1 1.06-1.06l3 3 6.69-6.69a.75.75 0 0 1 1.06 0Z" fill="currentColor"/></svg>`,
+};
+const NAV=[
+  {id:'filter',label:'Filter'},{id:'search',label:'Search'},
+  {id:'metafield',label:'Metafield'},
+  {id:'grid',label:'Filter & Product Grid Design'},{id:'settings',label:'Settings'},
+  {id:'analytics',label:'Analytics'},{id:'advanced',label:'Advanced Features'},
+  {id:'storefront',label:'Storefront Preview'},
+];
+const ENABLED=new Set(['settings','metafield','search','storefront']);
+const ACTIVE='metafield';
+let col=false;
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function renderNav(){
+  $('nav').innerHTML=NAV.map(n=>{
+    const en=ENABLED.has(n.id),act=n.id===ACTIVE;
+    return `<button data-nav="${n.id}" ${en?'':'disabled'} class="nav-btn${act?' act':''}" title="${n.label}"><span class="nav-lbl">${escapeHtml(n.label)}</span></button>`;
+  }).join('');
+  $('nav').querySelectorAll('[data-nav]').forEach(b=>{
+    if(ENABLED.has(b.dataset.nav))b.onclick=()=>{
+      const v=b.dataset.nav;
+      if(v==='settings')location.href='index.html';
+      else if(v==='search')location.href='Search.html';
+      else if(v==='storefront')location.href='StoreFront.html';
+    };
+  });
+  updateSb();
+}
+function updateSb(){
+  $('sidebar').classList.toggle('col',col);
+  $('sidebar').querySelectorAll('.nav-lbl').forEach(el=>el.classList.toggle('hidden',col));
+  document.querySelector('.sb-title').classList.toggle('hidden',col);
+  $('toggle-icon').innerHTML=col?IC.chevR:IC.chevL;
+}
+$('sidebar-toggle').onclick=()=>{col=!col;updateSb();};
+
+const MAX_METAFIELDS=10;
+let metafields=[
+  {id:1,title:'Color',         type:'Metaobject List',applyTo:[]},
+  {id:2,title:'Specifications',type:'Metaobject',     applyTo:[]},
+  {id:3,title:'HOLA',          type:'Metaobject List',applyTo:[]},
+  {id:4,title:'SpecA1',        type:'Metaobject',     applyTo:[]},
+  {id:5,title:'Color mtf',     type:'Color List',     applyTo:[]},
+];
+let savedMetafields=JSON.parse(JSON.stringify(metafields));
+let applyingId=null;
+
+const BADGE={
+  Filter:`<span class="bdg-f">Filter</span>`,
+  Search:`<span class="bdg-s">Search</span>`,
+  Sort:  `<span class="bdg-so">Sort</span>`,
+};
+
+function renderTable(){
+  const q=$('mf-search').value.trim().toLowerCase();
+  const visible=q?metafields.filter(m=>m.title.toLowerCase().includes(q)):metafields;
+  $('mf-tbody').innerHTML=visible.map(m=>{
+    const applyCell=m.applyTo.length===0
+      ?`<button data-apply="${m.id}" class="btn btn-s" style="height:28px;padding:4px 12px;font-size:12px">Apply</button>`
+      :`<div style="display:flex;flex-wrap:wrap;gap:4px;cursor:pointer" data-apply="${m.id}">${m.applyTo.map(o=>BADGE[o]).join('')}</div>`;
+    return `<tr>
+      <td>${escapeHtml(m.title)}</td>
+      <td style="color:var(--text2)">${escapeHtml(m.type)}</td>
+      <td>${applyCell}</td>
+      <td style="text-align:center"><button data-delete="${m.id}" class="ibtn ibtn-del" style="margin:0 auto" title="Remove">${IC.del}</button></td>
+    </tr>`;
+  }).join('');
+  $('mf-tbody').querySelectorAll('[data-apply]').forEach(el=>el.onclick=()=>openApplyModal(+el.dataset.apply));
+  $('mf-tbody').querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>deleteMetafield(+b.dataset.delete));
+  $('mf-count').textContent=`${metafields.length}/${MAX_METAFIELDS} selected`;
+}
+
+function openApplyModal(id){
+  applyingId=id;
+  const m=metafields.find(m=>m.id===id);
+  $('apply-modal-name').textContent=m.title;
+  $('chk-filter').checked=m.applyTo.includes('Filter');
+  $('chk-search').checked=m.applyTo.includes('Search');
+  $('chk-sort').checked  =m.applyTo.includes('Sort');
+  $('apply-modal').classList.remove('hidden');
+}
+function closeApplyModal(){$('apply-modal').classList.add('hidden');applyingId=null;}
+function saveApplyModal(){
+  const m=metafields.find(m=>m.id===applyingId);
+  m.applyTo=['Filter','Search','Sort'].filter(o=>$(`chk-${o.toLowerCase()}`).checked);
+  closeApplyModal();renderTable();
+}
+function deleteMetafield(id){metafields=metafields.filter(m=>m.id!==id);renderTable();}
+
+$('apply-modal-close').onclick=$('apply-modal-cancel').onclick=closeApplyModal;
+$('apply-modal-save').onclick=saveApplyModal;
+$('apply-modal').addEventListener('click',e=>{if(e.target.id==='apply-modal')closeApplyModal();});
+$('mf-search').oninput=()=>renderTable();
+
+$('save-mf').onclick=()=>{
+  savedMetafields=JSON.parse(JSON.stringify(metafields));
+  const btn=$('save-mf');btn.innerHTML=IC.chk+' Saved';
+  setTimeout(()=>{btn.innerHTML='Save';},1500);
+};
+
+renderNav();renderTable();
+</script>
+</body>
+</html>
