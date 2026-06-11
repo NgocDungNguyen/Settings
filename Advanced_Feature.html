@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Filter & Product Grid Design - Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; background-color: #f6f6f7; color: #202223; }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .card-square { aspect-ratio: 1 / 1; width: 100%; transform-origin: top center; transition: transform 0.3s ease; }
+    .editing [contenteditable="true"] { outline: 2px dashed #008060; outline-offset: 2px; border-radius: 4px; background: rgba(0, 128, 96, 0.05); }
+    
+    .feature-card-wrapper { transition: all 0.3s ease; display: flex; justify-content: center; }
+
+    /* Modal Styling */
+    .modal-backdrop { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(12px); }
+    .modal-container { background: white; color: #111213; border: 1px solid rgba(0, 0, 0, 0.1); box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25); }
+    .modal-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(0, 0, 0, 0.05); }
+    
+    .close-modal-btn { background: #000; color: #fff; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+    .close-modal-btn:hover { transform: scale(1.1); background: #333; }
+    
+    /* Carousel styles */
+    .carousel-track { display: flex; transition: transform 0.5s ease-in-out; }
+    .app-card-overlay { background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, transparent 100%); opacity: 0; transition: opacity 0.3s ease; }
+    .app-card:hover .app-card-tag-badge { opacity: 0; }
+    .app-card:hover .app-card-overlay { opacity: 1; }
+    .app-card .app-card-main-title { transition: opacity 0.3s ease; }
+    .app-card:hover .app-card-main-title { opacity: 0; }
+    .app-card-3 { display: flex; align-items: center; gap: 1.5rem; background: white; border: 1px solid #dfe3e8; border-radius: 1rem; padding: 1.5rem; width: 100%; transition: all 0.3s ease; }
+    .app-card-3 .logo-box { width: 180px; height: 180px; border-radius: 1.25rem; flex-shrink: 0; overflow: hidden; background: #f4f4f4; }
+    .app-card-3 .content-box { flex: 1; padding-left: 0.5rem; }
+    .app-card-3 .tag { background: #f0f1ff; color: #5c6ac4; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; display: inline-block; margin-bottom: 0.5rem; }
+    .app-card-3 .view-btn { display: inline-flex; align-items: center; gap: 0.5rem; background: #5c6ac4; color: white; padding: 0.5rem 1.25rem; border-radius: 0.5rem; font-size: 13px; font-weight: 600; margin-top: 1rem; transition: background 0.2s; }
+    .app-card-3 .view-btn:hover { background: #4e5ba2; }
+    
+    .view-toggle-btn.active { background: #008060; color: white; border-color: #008060; }
+    .card-zoom:hover { transform: translateY(-8px) scale(1.02); z-index: 40; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+    .expand-badge { opacity: 0; transform: translate(-50%, -40%); transition: all 0.3s ease; pointer-events: none; }
+    .group:hover .expand-badge { opacity: 1; transform: translate(-50%, -50%); }
+    .tooltip-box { display: none; opacity: 0; transition: opacity 0.2s ease; position: absolute; bottom: calc(100% + 12px); left: 50%; transform: translateX(-50%); width: 240px; z-index: 100; pointer-events: none; }
+    .group\/tooltip:hover .tooltip-box { display: block; opacity: 1; pointer-events: auto; }
+    .editing .tooltip-box.active { display: block !important; opacity: 1 !important; pointer-events: auto !important; }
+    .editing .group\/tooltip:hover .tooltip-box { display: none; }
+    .editing .group\/tooltip .tooltip-box.active { display: block; }
+    
+    /* Chatbox Styling */
+    #chat-widget { position: fixed; bottom: 24px; right: 24px; z-index: 200; font-family: 'Inter', sans-serif; }
+    #chat-bubble { width: 56px; height: 56px; border-radius: 50%; background: #008060; color: white; display: flex; items-center: center; justify-content: center; cursor: pointer; shadow: 0 4px 12px rgba(0,0,0,0.15); transition: transform 0.2s; }
+    #chat-bubble:hover { transform: scale(1.1); }
+    #chat-window { width: 320px; height: 400px; background: white; border-radius: 16px; shadow: 0 12px 40px rgba(0,0,0,0.15); border: 1px solid #e1e3e5; display: none; flex-direction: column; overflow: hidden; }
+    #chat-window.active { display: flex; }
+    .chat-header { background: #008060; color: white; padding: 16px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+    #chat-messages { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+    .message { padding: 8px 12px; border-radius: 12px; font-size: 13px; max-width: 85%; }
+    .message-received { background: #f1f2f3; align-self: flex-start; color: #202223; }
+    .message-sent { background: #008060; align-self: flex-end; color: white; }
+  </style>
+</head>
+<body class="min-h-screen flex">
+
+  <!-- Chat Widget -->
+  <div id="chat-widget">
+    <div id="chat-window">
+      <div class="chat-header">
+        <span>Support Chat</span>
+        <button onclick="toggleChat()"><i class="fas fa-times"></i></button>
+      </div>
+      <div id="chat-messages">
+        <div class="message message-received">Hi! How can we help you today?</div>
+      </div>
+      <div class="p-3 border-t bg-gray-50 flex gap-2">
+        <input type="text" placeholder="Type a message..." class="flex-1 border rounded-lg px-3 py-2 text-sm outline-none">
+        <button class="text-[#008060]"><i class="fas fa-paper-plane"></i></button>
+      </div>
+    </div>
+    <div id="chat-bubble" class="mt-3 flex items-center justify-center shadow-lg" onclick="toggleChat()">
+      <i class="fas fa-comment-alt text-xl"></i>
+    </div>
+  </div>
+
+  <aside class="hidden lg:flex w-64 shrink-0 bg-[#f1f2f3] border-r border-[#e1e3e5] flex-col">
+    <div class="h-14 border-b border-[#e1e3e5] flex items-center px-5 font-semibold text-[#111213]">
+      <i class="fas fa-filter mr-2 text-[#008060]"></i>
+      <span class="truncate">Filter & Product Grid Design</span>
+    </div>
+    <nav class="p-4 space-y-1 text-sm text-[#303030]">
+      <div class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/60 cursor-pointer">
+        <i class="fas fa-home w-4"></i> Home
+      </div>
+      <div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-white font-semibold shadow-sm border border-[#e1e3e5]">
+        <i class="fas fa-star w-4 text-[#008060]"></i> Advanced Features
+      </div>
+    </nav>
+  </aside>
+
+  <main class="flex-1 flex flex-col h-screen overflow-hidden">
+    <header class="h-14 bg-white border-b border-[#e1e3e5] flex items-center px-6 justify-end shrink-0 gap-4">
+      <div class="flex items-center gap-2 border-r border-gray-200 pr-4">
+        <label class="text-[10px] uppercase font-bold text-gray-400">View Mode:</label>
+        <div class="flex bg-[#f1f2f3] p-1 rounded-lg border border-[#dfe3e8]">
+          <button id="view3Btn" class="view-toggle-btn px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all">3 Apps</button>
+          <button id="view5Btn" class="view-toggle-btn active px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all">> 3 Apps (Full)</button>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <label class="text-[10px] uppercase font-bold text-gray-400">Card Scale:</label>
+        <div class="relative">
+          <input type="number" id="scaleInput" value="100" min="80" max="100" class="w-16 h-8 pl-2 pr-5 border rounded text-xs font-bold" placeholder="100">
+          <span class="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-gray-400">%</span>
+        </div>
+      </div>
+      <div class="flex gap-2 border-l border-gray-200 pl-4">
+        <button id="editBtn" class="px-4 h-9 rounded-md border border-[#dfe3e8] bg-white text-sm font-medium hover:bg-gray-50 transition-colors">Edit</button>
+        <button id="saveBtn" class="hidden px-4 h-9 rounded-md bg-[#008060] text-white text-sm font-medium hover:bg-[#006e52] transition-colors">Save Changes</button>
+      </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-6 md:p-8 space-y-10" id="scrollContainer">
+      
+      <div class="max-w-6xl mx-auto space-y-3">
+        <h1 class="font-bold text-2xl text-[#111213]" id="pageTitle" contenteditable="false">Advanced Features</h1>
+      </div>
+
+      <div class="max-w-6xl mx-auto">
+        <div id="featureGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+        
+        <div class="mt-12 flex justify-center">
+          <div class="bg-white border border-[#dfe3e8] rounded-xl px-10 py-4 shadow-sm inline-block max-w-4xl whitespace-nowrap">
+            <p id="featureRequestText" class="text-base font-bold text-[#111213]" contenteditable="false">
+              Cannot find what you need here? <a href="javascript:void(0)" onclick="openChatWith('Hi, I have a custom feature request')" class="text-blue-600 hover:underline cursor-pointer ml-1">Contact us now</a> to request a custom feature.
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-8 flex justify-center">
+          <button id="addCardBtn" class="hidden px-6 py-3 border-2 border-dashed border-[#dfe3e8] rounded-xl text-[#6d7175] font-medium hover:border-[#008060] hover:text-[#008060] transition-all">
+            <i class="fas fa-plus mr-2"></i> Add New Feature Card
+          </button>
+        </div>
+      </div>
+
+      <div class="max-w-6xl mx-auto py-12 border-t border-[#e1e3e5]">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+          <div>
+            <h2 class="text-2xl font-bold text-[#111213]" contenteditable="false" id="recAppsTitle">Recommend Apps</h2>
+            <p class="text-sm text-[#6d7175] mt-1" contenteditable="false" id="recAppsSub">Enhance your store's functionality with our curated selection of top-tier companion apps.</p>
+          </div>
+          <div class="flex items-center gap-4">
+            <button id="addAppBtn" class="hidden px-4 py-2 border border-dashed border-[#008060] rounded-lg text-[#008060] text-xs font-bold hover:bg-[#008060]/5 transition-all">
+              <i class="fas fa-plus mr-1"></i> Add App
+            </button>
+            <div class="flex gap-2">
+              <button onclick="moveCarousel(-1)" class="w-10 h-10 rounded-full border border-[#dfe3e8] bg-white flex items-center justify-center hover:bg-gray-50"><i class="fas fa-chevron-left"></i></button>
+              <button onclick="moveCarousel(1)" class="w-10 h-10 rounded-full border border-[#dfe3e8] bg-white flex items-center justify-center hover:bg-gray-50"><i class="fas fa-chevron-right"></i></button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="overflow-hidden">
+          <div id="appCarousel" class="carousel-track gap-6"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="previewModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 modal-backdrop">
+    <div class="modal-container rounded-2xl max-w-3xl w-full overflow-hidden shadow-2xl relative">
+      <div id="modalHeader" class="modal-header text-lg font-bold"></div>
+      <button onclick="closeModal()" class="absolute top-4 right-4 close-modal-btn z-10">
+        <i class="fas fa-times"></i>
+      </button>
+      <div id="modalContent" class="aspect-video bg-black flex items-center justify-center">
+        <img id="modalImg" src="" alt="Preview" class="w-full h-full object-contain">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'findter_features_v5';
+    
+    const defaultFeatures = [
+      { id: 1, title: 'Filter by Metafields', desc: 'Create custom metafields as filter options. Start with 10 metafields included. Need additional metafields? Contact us for upgrade', status: 'Locked', gif: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcDN4OWRobnhvbGRuejh3M2NqaGYzd2JtNWN4NzZ1d3Eybmx4ZDg3dCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/jTAdnH5MtdVAJHLv4N/giphy.gif' },
+      { id: 2, title: 'Boost In-Stock Products', desc: 'When shoppers choose a variant filter, products with matching in-stock variants appear first in the storefront results.', status: 'Locked', gif: 'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExcmNnNGhiYzFna2d3bmhhdzVhc3M4cHRuYWRhYmd6OXhjeDM2NDRmdCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/XkyxgzbM5rxYY/giphy.gif' },
+      { id: 3, title: 'Hide Out-of-Stock Products', desc: 'Out-of-stock items matching that selected value are hidden from the filter results', status: 'Locked', gif: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcDN4OWRobnhvbGRuejh3M2NqaGYzd2JtNWN4NzZ1d3Eybmx4ZDg3dCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/PATFfc1VF9mtlbzZfL/giphy.gif' },
+      { id: 4, title: 'Local Currency Adaption', desc: 'Show product and filter prices in the shopper\'s local currency instead of only the default currency set in your store.', status: 'Locked', gif: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcDN4OWRobnhvbGRuejh3M2NqaGYzd2JtNWN4NzZ1d3Eybmx4ZDg3dCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/iDzgyb5736rjvdGdFb/giphy.gif' },
+      { id: 5, title: 'Image Swatches Filter', desc: 'Display product images instead of plain color or text swatches. Let shoppers preview and select different patterns, designs, or styles visually for a better shopping experience.', status: 'Locked', gif: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcDN4OWRobnhvbGRuejh3M2NqaGYzd2JtNWN4NzZ1d3Eybmx4ZDg3dCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/3o7TKMGpxvF7657904/giphy.gif' },
+      { id: 6, title: 'Multi-Filters by One Source', desc: 'Reuse a single source, such as Tags, Type, Category or Vendor, etc... multiple times in one filter set (based on your needs)', status: 'Locked', gif: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHJleW1pOHZ1MTR1ZHJkNjVnNmpnbnZhcWlneWxsaHVpNXpwNnc4ZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/26uf7O0I7YmYgN528/giphy.gif' }
+    ];
+
+    const recommendedApps = [
+      { name: 'Findter Search', tag: 'Boost Sales', desc: 'Advanced AI search that understands customer intent.', logo: 'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?auto=format&fit=crop&q=80&w=400', link: '#' },
+      { name: 'Reviewify', tag: 'Social Proof', desc: 'Import and display stunning reviews in seconds.', logo: 'https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format&fit=crop&q=80&w=400', link: '#' },
+      { name: 'LoyaltyPro', tag: 'Retention', desc: 'Build lasting relationships with rewards and points.', logo: 'https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&q=80&w=400', link: '#' },
+      { name: 'CartOptimizer', tag: 'Conversion', desc: 'Reduce abandoned carts with smart upsell nudges.', logo: 'https://images.unsplash.com/photo-1557682250-33bd709cbe85?auto=format&fit=crop&q=80&w=400', link: '#' },
+      { name: 'ShipEasy', tag: 'Logistics', desc: 'Streamline your shipping process and lower costs.', logo: 'https://images.unsplash.com/photo-1566576721346-d4a3b4eaad5b?auto=format&fit=crop&q=80&w=400', link: '#' },
+      { name: 'MailBoost', tag: 'Marketing', desc: 'Automated email marketing for Shopify stores.', logo: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=400', link: '#' },
+      { name: 'Bundler', tag: 'AOV', desc: 'Create beautiful product bundles to increase order value.', logo: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=400', link: '#' },
+      { name: 'InstaFeed', tag: 'Social', desc: 'Display your Instagram feed directly on your store.', logo: 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?auto=format&fit=crop&q=80&w=400', link: '#' }
+    ];
+
+    let features = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultFeatures;
+    let appsData = JSON.parse(localStorage.getItem(STORAGE_KEY + '_apps')) || recommendedApps;
+    let isEditing = false;
+    let carouselIndex = 0;
+    let currentScale = 100;
+    let currentView = 5;
+
+    const grid = document.getElementById('featureGrid');
+    const scaleInput = document.getElementById('scaleInput');
+    const editBtn = document.getElementById('editBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const addCardBtn = document.getElementById('addCardBtn');
+    const addAppBtn = document.getElementById('addAppBtn');
+    const previewModal = document.getElementById('previewModal');
+    const modalImg = document.getElementById('modalImg');
+    const modalHeader = document.getElementById('modalHeader');
+    const appCarousel = document.getElementById('appCarousel');
+    const view3Btn = document.getElementById('view3Btn');
+    const view5Btn = document.getElementById('view5Btn');
+    const recAppsTitle = document.getElementById('recAppsTitle');
+    const featureRequestText = document.getElementById('featureRequestText');
+
+    view3Btn.onclick = () => {
+      currentView = 3;
+      view3Btn.classList.add('active');
+      view5Btn.classList.remove('active');
+      carouselIndex = 0;
+      appCarousel.style.transform = `translateX(0px)`;
+      renderApps();
+    };
+
+    view5Btn.onclick = () => {
+      currentView = 5;
+      view5Btn.classList.add('active');
+      view3Btn.classList.remove('active');
+      carouselIndex = 0;
+      appCarousel.style.transform = `translateX(0px)`;
+      renderApps();
+    };
+
+    scaleInput.oninput = (e) => {
+      currentScale = Math.max(80, Math.min(100, Number(e.target.value) || 100));
+      scaleInput.value = currentScale;
+      renderGrid();
+    };
+
+    function toggleChat() {
+      const win = document.getElementById('chat-window');
+      win.classList.toggle('active');
+    }
+
+    function openChatWith(message) {
+      if (isEditing) return;
+      const win = document.getElementById('chat-window');
+      const messages = document.getElementById('chat-messages');
+      win.classList.add('active');
+      
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'message message-sent';
+      msgDiv.textContent = message;
+      messages.appendChild(msgDiv);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function renderGrid() {
+      grid.innerHTML = '';
+      const scaleFactor = currentScale / 100;
+      const baseGap = 32;
+      grid.style.gap = `${baseGap * scaleFactor}px`;
+      features.forEach((f, index) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'feature-card-wrapper';
+        wrapper.style.transform = `scale(${scaleFactor})`;
+        wrapper.style.transformOrigin = 'center center';
+        
+        const card = document.createElement('div');
+        card.className = `group relative overflow-visible rounded-2xl border border-[#dfe3e8] bg-white shadow-sm card-zoom card-glow card-square flex flex-col`;
+        
+        const isEnabled = f.status.toLowerCase() === 'enabled';
+        const badgeColor = !isEnabled ? 'bg-[#fbeae5] text-[#8a2c0d] border-[#f1b8b8]' : 'bg-[#e3f1df] text-[#0c5132] border-[#b7e0cf]';
+        const contactText = isEnabled ? "Still Need Assistant? Contact Us" : "Contact Us";
+
+        // To show a static image for a Giphy URL, we can often replace 'giphy.gif' with 'giphy_s.gif' 
+        // or just use a container with background-repeat: no-repeat and avoid playing. 
+        // For standard Giphy links, appending _s to the filename often gives the static version.
+        const staticImg = f.gif.replace('.gif', '_s.gif');
+
+        const isLocked = f.status.toLowerCase() === 'locked';
+        let chatMsg = "";
+        if (isLocked) {
+          const map = {
+            'Filter by Metafields': 'Hi, I want to unlock Filter by Metafield.',
+            'Boost In-Stock Products': 'Hi, I want to enable Boost In-Stock Products',
+            'Hide Out-of-Stock Products': 'Hi, I want to enable Hide Out-of-Stock Products.',
+            'Local Currency Adaption': 'Hi, I want to enable Local Currency Adaption.',
+            'Image Swatches Filter': 'Hi, I want to enable Image Swatches Filter.',
+            'Multi-Filters by One Source': 'Hi, I want to enable Multi-Filter Source.'
+          };
+          chatMsg = map[f.title] || `Hi, I want to unlock ${f.title}`;
+        } else {
+          chatMsg = `Hi, I need help with ${f.title}`;
+        }
+
+        card.innerHTML = `
+          <div class="relative h-3/4 bg-[#f8f9fa] ${isEditing ? 'cursor-default' : 'cursor-zoom-in'} overflow-hidden rounded-t-2xl"
+               onmouseenter="showPreview(this, '${f.gif}')"
+               onmouseleave="hidePreview(this, '${staticImg}')"
+               onclick="${isEditing ? '' : `openModal('${f.gif}', '${f.title}', '${f.status}')`}">
+            
+            ${!isEditing ? `
+            <div class="expand-badge absolute top-1/2 left-1/2 z-30 bg-white/95 backdrop-blur-sm border border-[#dfe3e8] px-5 py-2.5 rounded-full shadow-2xl flex items-center gap-2 text-xs font-bold text-[#111213] whitespace-nowrap">
+              <i class="fas fa-expand-alt text-sm"></i>
+              <span>Click to Expand</span>
+            </div>
+            ` : ''}
+
+            <!-- Static Background Layer -->
+            <img src="${staticImg}" class="absolute inset-0 w-full h-full object-cover z-0 filter brightness-[0.9]" alt="${f.title}">
+            
+            <!-- Play Overlay -->
+            <div class="absolute inset-0 bg-black/5 z-10 transition-opacity duration-200 preview-placeholder flex flex-col items-center justify-center text-white text-xs font-medium space-y-2">
+               <i class="fas fa-play-circle text-3xl opacity-90 drop-shadow-md"></i>
+               <span class="drop-shadow-md">Hover to preview</span>
+            </div>
+
+            <!-- Animated Layer (Initially Hidden) -->
+            <img data-src="${f.gif}" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 z-20 opacity-0" alt="${f.title}">
+            
+            <div class="absolute top-4 right-4 z-40 px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wider ${badgeColor}" 
+                 contenteditable="${isEditing}" onblur="updateField(${index}, 'status', this.innerText)" onclick="event.stopPropagation()">
+              ${f.status}
+            </div>
+          </div>
+
+          <div class="h-1/4 p-4 relative flex flex-col justify-center bg-white rounded-b-2xl border-t border-[#f1f2f3]">
+            <div class="flex items-center gap-2 mb-2">
+              <h3 class="font-bold text-sm text-[#111213] truncate" contenteditable="${isEditing}" onblur="updateField(${index}, 'title', this.innerText)">${f.title}</h3>
+              <div class="relative group/tooltip inline-block">
+                <i class="far fa-question-circle text-[#6d7175] text-xs cursor-help p-1 transition-colors hover:text-[#008060]" 
+                   onclick="${isEditing ? `toggleTooltip(this)` : ''}"></i>
+                <div class="tooltip-box bg-[#111213] text-white text-[11px] p-4 rounded-xl shadow-2xl leading-relaxed border border-white/10">
+                  <div contenteditable="${isEditing}" onblur="updateField(${index}, 'desc', this.innerText)">${f.desc}</div>
+                  <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-[#111213] rotate-45"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button onclick="openChatWith('${chatMsg.replace(/'/g, "\\'")}')" class="flex-1 h-8 rounded-lg bg-[#111213] text-white text-[10px] font-bold px-2 hover:bg-black transition-all truncate">
+                ${contactText}
+              </button>
+              ${isEditing ? `
+                <button onclick="removeCard(${index}); event.stopPropagation();" class="w-8 h-8 rounded-lg border border-red-100 text-red-500 hover:bg-red-50 transition-colors">
+                  <i class="fas fa-trash-alt text-xs"></i>
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        `;
+        wrapper.appendChild(card);
+        grid.appendChild(wrapper);
+      });
+    }
+
+    function renderApps() {
+      appCarousel.innerHTML = '';
+      const list = currentView === 3 ? appsData.slice(0, 3) : appsData;
+      
+      list.forEach((app, index) => {
+        const div = document.createElement('div');
+        if (currentView === 5) {
+          div.className = 'app-card shrink-0 w-64 h-80 rounded-2xl relative overflow-hidden border border-[#dfe3e8] shadow-sm bg-white';
+          div.innerHTML = `
+            <img src="${app.logo}" class="w-full h-full object-cover" alt="${app.name}">
+            <div class="app-card-tag-badge absolute top-4 left-4 z-10 px-2 py-1 rounded bg-white/90 text-[10px] font-bold text-[#008060] uppercase tracking-wide border border-[#008060]/20 transition-opacity duration-300" contenteditable="${isEditing}" onblur="updateAppField(${index}, 'tag', this.innerText)">${app.tag}</div>
+            <div class="app-card-main-title absolute bottom-0 inset-x-0 p-4 z-10">
+              <h4 class="text-white font-bold text-lg leading-tight drop-shadow-md" contenteditable="${isEditing}" onblur="updateAppField(${index}, 'name', this.innerText)">${app.name}</h4>
+            </div>
+            <div class="app-card-overlay absolute inset-0 flex flex-col justify-end p-6 text-white">
+              <span class="text-[10px] font-bold text-[#b7e0cf] uppercase mb-1">${app.tag}</span>
+              <h4 class="font-bold text-xl mb-2">${app.name}</h4>
+              <p class="text-xs text-gray-200 mb-4 line-clamp-3" contenteditable="${isEditing}" onblur="updateAppField(${index}, 'desc', this.innerText)">${app.desc}</p>
+              <div class="flex gap-2">
+                <a href="${app.link}" class="flex-1 py-2 bg-white text-[#111213] rounded-lg text-center text-xs font-bold hover:bg-gray-100 transition-colors">View App</a>
+                ${isEditing ? `<button onclick="removeApp(${index})" class="w-9 h-9 bg-red-500 text-white rounded-lg flex items-center justify-center hover:bg-red-600 transition-colors"><i class="fas fa-trash-alt text-xs"></i></button>` : ''}
+              </div>
+            </div>
+          `;
+        } else {
+          div.className = 'shrink-0 w-full md:w-[calc(100%-1rem)] lg:w-[calc(100%-2rem)] max-w-2xl relative group';
+          div.innerHTML = `
+            <div class="app-card-3 shadow-md hover:shadow-lg">
+              <div class="logo-box">
+                <img src="${app.logo}" class="w-full h-full object-cover" alt="${app.name}">
+              </div>
+              <div class="content-box">
+                <span class="tag" contenteditable="${isEditing}" onblur="updateAppField(${index}, 'tag', this.innerText)">${app.tag}</span>
+                <h4 class="text-2xl font-bold text-[#111213] mb-1" contenteditable="${isEditing}" onblur="updateAppField(${index}, 'name', this.innerText)">${app.name}</h4>
+                <p class="text-[#6d7175] text-sm leading-relaxed" contenteditable="${isEditing}" onblur="updateAppField(${index}, 'desc', this.innerText)">${app.desc}</p>
+                <div class="flex items-center gap-3">
+                  <a href="${app.link}" class="view-btn">
+                    View app <i class="fas fa-arrow-right text-[10px]"></i>
+                  </a>
+                  ${isEditing ? `<button onclick="removeApp(${index})" class="mt-4 w-9 h-9 border border-red-100 text-red-500 rounded-lg flex items-center justify-center hover:bg-red-50 transition-colors"><i class="fas fa-trash-alt text-xs"></i></button>` : ''}
+                </div>
+              </div>
+            </div>
+          `;
+        }
+        appCarousel.appendChild(div);
+      });
+    }
+
+    function updateAppField(index, field, value) {
+      appsData[index][field] = value;
+    }
+
+    function removeApp(index) {
+      appsData.splice(index, 1);
+      renderApps();
+    }
+
+    addAppBtn.onclick = () => {
+      appsData.push({
+        name: 'New App',
+        tag: 'Marketing',
+        desc: 'New application description goes here.',
+        logo: 'https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format&fit=crop&q=80&w=400',
+        link: '#'
+      });
+      renderApps();
+    };
+
+    function moveCarousel(dir) {
+      const cardWidth = currentView === 5 ? 256 : appCarousel.firstElementChild.offsetWidth;
+      const gap = 24;
+      const maxScroll = appCarousel.scrollWidth - appCarousel.parentElement.offsetWidth;
+      carouselIndex = Math.max(0, Math.min(carouselIndex + dir * (cardWidth + gap), maxScroll));
+      appCarousel.style.transform = `translateX(-${carouselIndex}px)`;
+    }
+
+    function showPreview(container, gif) {
+      const animatedImg = container.querySelector('img[data-src]');
+      const placeholder = container.querySelector('.preview-placeholder');
+      if (!animatedImg || !placeholder || isEditing) return;
+      
+      // Load and play GIF
+      if (animatedImg.src !== gif) {
+        animatedImg.src = gif;
+      }
+      
+      animatedImg.classList.remove('opacity-0');
+      placeholder.classList.add('opacity-0');
+    }
+
+    function hidePreview(container) {
+      const animatedImg = container.querySelector('img[data-src]');
+      const placeholder = container.querySelector('.preview-placeholder');
+      if (!animatedImg || !placeholder || isEditing) return;
+      
+      // Hide animated layer and reset src to stop play
+      animatedImg.classList.add('opacity-0');
+      animatedImg.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+      placeholder.classList.remove('opacity-0');
+    }
+
+    function updateField(index, field, value) {
+      features[index][field] = value;
+      if (field === 'status') renderGrid();
+    }
+
+    function removeCard(index) {
+      features.splice(index, 1);
+      renderGrid();
+    }
+
+    function openModal(gif, title, status) {
+      modalImg.src = gif;
+      modalHeader.innerHTML = `
+        <div class="flex items-center gap-3">
+          <span>${title}</span>
+          <span class="px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wider ${status.toLowerCase() === 'enabled' ? 'bg-[#e3f1df] text-[#0c5132] border-[#b7e0cf]' : 'bg-[#fbeae5] text-[#8a2c0d] border-[#f1b8b8]'}">
+            ${status}
+          </span>
+        </div>
+      `;
+      previewModal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function toggleTooltip(el) {
+      if (!isEditing) return;
+      const box = el.nextElementSibling;
+      const isActive = box.classList.contains('active');
+      document.querySelectorAll('.tooltip-box').forEach(b => b.classList.remove('active'));
+      if (!isActive) box.classList.add('active');
+    }
+
+    function closeModal() {
+      previewModal.classList.add('hidden');
+      modalImg.src = '';
+      document.body.style.overflow = '';
+    }
+
+    editBtn.onclick = () => {
+      isEditing = true;
+      document.body.classList.add('editing');
+      editBtn.classList.add('hidden');
+      saveBtn.classList.remove('hidden');
+      addCardBtn.classList.remove('hidden');
+      addAppBtn.classList.remove('hidden');
+      recAppsTitle.contentEditable = true;
+      recAppsSub.contentEditable = true;
+      featureRequestText.contentEditable = true;
+      renderGrid();
+      renderApps();
+    };
+
+    saveBtn.onclick = () => {
+      isEditing = false;
+      document.body.classList.remove('editing');
+      editBtn.classList.remove('hidden');
+      saveBtn.classList.add('hidden');
+      addCardBtn.classList.add('hidden');
+      addAppBtn.classList.add('hidden');
+      recAppsTitle.contentEditable = false;
+      recAppsSub.contentEditable = false;
+      featureRequestText.contentEditable = false;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(features));
+      localStorage.setItem(STORAGE_KEY + '_apps', JSON.stringify(appsData));
+      renderGrid();
+      renderApps();
+    };
+
+    addCardBtn.onclick = () => {
+      features.push({
+        id: Date.now(),
+        title: 'New Feature',
+        desc: 'New description.',
+        status: 'Locked',
+        gif: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcDN4OWRobnhvbGRuejh3M2NqaGYzd2JtNWN4NzZ1d3Eybmx4ZDg3dCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/jTAdnH5MtdVAJHLv4N/giphy.gif'
+      });
+      renderGrid();
+    };
+
+    renderGrid();
+    renderApps();
+
+    scaleInput.addEventListener('blur', () => {
+      currentScale = Math.max(80, Math.min(100, Number(scaleInput.value) || 100));
+      scaleInput.value = currentScale;
+      renderGrid();
+    });
+
+    window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+  </script>
+</body>
+</html>

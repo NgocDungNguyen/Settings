@@ -1,304 +1,932 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Year Make Model – Findter Filter &amp; Search</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900&display=swap" rel="stylesheet">
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
---ff:'Inter',-apple-system,BlinkMacSystemFont,'San Francisco','Segoe UI',sans-serif;
---bg:rgba(241,241,241,1);--sf:#fff;--sf-hov:rgba(247,247,247,1);--sf-act:rgba(243,243,243,1);
---fill:#303030;--fill-hov:#1a1a1a;--fill-t:rgba(0,0,0,.02);
---text:rgba(48,48,48,1);--text2:rgba(97,97,97,1);--textd:rgba(181,181,181,1);--lnk:rgba(0,91,211,1);
---bdr:rgba(227,227,227,1);--bdr-foc:rgba(0,91,211,1);--crit:rgba(181,38,11,1);
---r1:4px;--r2:8px;--r3:12px;
---sh1:0px 1px 0px 0px rgba(26,26,26,.07);
---sh3:0px 4px 6px -2px rgba(26,26,26,.2);
---shbtn:0px -1px 0px 0px #b5b5b5 inset,0px 0px 0px 1px rgba(0,0,0,.1) inset,0px .5px 0px 1.5px #fff inset;
---shbtn-hov:0px 1px 0px 0px #ebebeb inset,-1px 0px 0px 0px #ebebeb inset,1px 0px 0px 0px #ebebeb inset,0px -1px 0px 0px #ccc inset;
---shbtnp:0px -1px 0px 1px rgba(0,0,0,.8) inset,0px 0px 0px 1px rgba(48,48,48,1) inset,0px .5px 0px 1.5px rgba(255,255,255,.25) inset;
---shbtnp-hov:0px 1px 0px 0px rgba(255,255,255,.24) inset,1px 0px 0px 0px rgba(255,255,255,.2) inset,-1px 0px 0px 0px rgba(255,255,255,.2) inset,0px -1px 0px 0px #000 inset;
-}
-html,body{font-family:var(--ff);background:var(--bg);color:var(--text);font-size:13px;line-height:1.5;min-height:100vh}
-a{color:var(--lnk)}
-.lay{display:flex;min-height:100vh}
-.sb{width:248px;background:var(--sf);border-right:1px solid var(--bdr);display:flex;flex-direction:column;flex-shrink:0;transition:width .25s;min-height:100vh}
-.sb.col{width:56px}
-.sb-hd{padding:12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bdr);gap:8px;overflow:hidden}
-.sb-logo{width:28px;height:28px;border-radius:6px;background:var(--fill);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.sb-title{font-size:13px;font-weight:650;color:var(--text);flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-.sb-tgl{width:28px;height:28px;border:none;background:transparent;cursor:pointer;border-radius:var(--r1);display:flex;align-items:center;justify-content:center;color:var(--text2);flex-shrink:0}
-.sb-tgl:hover{background:var(--sf-hov)}
-.sb-nav{padding:8px;display:flex;flex-direction:column;gap:2px;flex:1}
-.nav-btn{width:100%;border:none;background:transparent;cursor:pointer;padding:6px 12px;border-radius:var(--r2);font-family:var(--ff);font-size:13px;font-weight:450;color:var(--text2);text-align:left;display:flex;align-items:center;overflow:hidden;transition:background .1s,color .1s;white-space:nowrap}
-.nav-btn:hover:not([disabled]){background:var(--sf-hov);color:var(--text)}
-.nav-btn.act{background:var(--sf-act)!important;color:var(--text)!important;font-weight:650}
-.nav-btn[disabled]{color:var(--textd)!important;cursor:not-allowed}
-.nav-more{width:100%;border:none;background:transparent;cursor:pointer;padding:4px 12px;font-family:var(--ff);font-size:12px;color:var(--textd);text-align:left;display:flex;align-items:center;gap:4px;transition:color .1s;white-space:nowrap}
-.nav-more:hover{color:var(--text2)}
-.nav-sp{flex:1;min-height:4px}
-.nav-sep{height:1px;background:var(--bdr);margin:2px 0;flex-shrink:0}
-.nav-lbl{overflow:hidden;text-overflow:ellipsis}
-.main{flex:1;overflow-x:hidden}
-.pg{max-width:960px;margin:0 auto;padding:24px}
-.ic{width:16px;height:16px;fill:currentColor;display:block;flex-shrink:0}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:6px 16px;height:32px;border-radius:var(--r2);font-family:var(--ff);font-size:13px;font-weight:550;cursor:pointer;border:none;white-space:nowrap;transition:box-shadow .1s,background .1s}
-.btn-p{background:var(--fill);color:#fff;box-shadow:var(--shbtnp)}
-.btn-p:hover{background:var(--fill-hov);box-shadow:var(--shbtnp-hov)}
-.btn-s{background:var(--sf);color:var(--text);box-shadow:var(--shbtn)}
-.btn-s:hover{box-shadow:var(--shbtn-hov)}
-.card{background:var(--sf);border-radius:var(--r2);box-shadow:var(--sh3);overflow:hidden}
-.card-hd{padding:16px;border-bottom:1px solid var(--bdr)}
-.card-hd-ttl{font-size:13px;font-weight:650}
-.card-hd-sub{font-size:12px;color:var(--text2);margin-top:2px}
-.card-bd{padding:16px;display:flex;flex-direction:column;gap:16px}
-.inp{width:100%;border:1px solid var(--bdr);border-radius:var(--r2);padding:7px 12px;font-family:var(--ff);font-size:13px;color:var(--text);background:var(--sf);outline:none;transition:border-color .1s,box-shadow .1s}
-.inp::placeholder{color:var(--textd)}
-.inp:focus{border-color:var(--bdr-foc);box-shadow:0 0 0 3px rgba(0,91,211,.2)}
-.sel{width:100%;border:1px solid var(--bdr);border-radius:var(--r2);padding:7px 12px;font-family:var(--ff);font-size:13px;color:var(--text);background:var(--sf);outline:none;appearance:none;cursor:pointer;transition:border-color .1s,box-shadow .1s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='%23616161' fill-rule='evenodd' d='M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:16px;padding-right:36px}
-.sel:focus{border-color:var(--bdr-foc);box-shadow:0 0 0 3px rgba(0,91,211,.2)}
-.flbl{font-size:13px;font-weight:550;color:var(--text);display:block;margin-bottom:4px}
-.fhint{font-size:12px;color:var(--text2);margin-top:3px}
-.tgl{position:relative;display:inline-block;width:44px;height:24px;border:none;padding:0;cursor:pointer;border-radius:12px;outline:none;appearance:none;-webkit-appearance:none;transition:background .2s;flex-shrink:0;vertical-align:middle}
-.tgl:focus-visible{box-shadow:0 0 0 3px rgba(0,91,211,.25)}
-.tgl.on{background:var(--fill)}.tgl.off{background:rgba(204,204,204,1)}
-.tgl-th{display:block;position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.3);transition:transform .2s;pointer-events:none}
-.tgl.on .tgl-th{transform:translateX(20px)}
-.divider{height:1px;background:var(--bdr);margin:4px 0}
-.bnr{border-radius:var(--r2);padding:12px 16px;display:flex;align-items:flex-start;gap:10px;font-size:13px;background:#e8f4fe;border:1px solid rgba(0,91,211,.2);color:#003d9c}
-.hidden{display:none!important}
-.mt3{margin-top:12px}.mt4{margin-top:16px}.mt5{margin-top:20px}
-.frow{display:flex;gap:8px;align-items:center}.fend{justify-content:flex-end}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Finder Custom Filter & Search - Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: Inter, sans-serif; }
+    .scrollbar::-webkit-scrollbar { width: 6px; }
+    .scrollbar::-webkit-scrollbar-thumb { background: #cfcfd4; border-radius: 10px; }
+    .dragging { opacity: 0.5; background: #f6f6f7; }
+    #sidebar { transition: width 0.3s ease; overflow: hidden; }
+    .sidebar-collapsed { width: 60px !important; }
+    .sidebar-collapsed .nav-text, .sidebar-collapsed .sidebar-header-text { display: none; }
+    .animate-fadeIn { animation: fadeIn 0.2s ease-in; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .rotate-270 { transform: rotate(-90deg); }
+
+    /* Row toggle switch (used for manual value include/exclude) */
+    .row-switch { position: relative; display: inline-block; width: 34px; height: 18px; }
+    .row-switch input { opacity: 0; width: 0; height: 0; }
+    .row-switch .slider {
+      position: absolute; cursor: pointer; inset: 0;
+      background-color: #c9c9c9; border-radius: 999px; transition: .2s;
+    }
+    .row-switch .slider:before {
+      content: ""; position: absolute; height: 14px; width: 14px;
+      left: 2px; top: 2px; background-color: white; border-radius: 50%; transition: .2s;
+    }
+    .row-switch input:checked + .slider { background-color: #303030; }
+    .row-switch input:checked + .slider:before { transform: translateX(16px); }
+
+    /* Disabled (locked) form field look */
+    .field-locked { opacity: 0.55; pointer-events: none; cursor: not-allowed; background-color: #f3f3f4 !important; }
+  </style>
 </head>
-<body>
-<div class="lay">
-  <aside class="sb" id="sidebar">
-    <div class="sb-hd">
-      <div class="sb-logo">Fd</div>
-      <span class="sb-title nav-lbl">Findter Filter &amp; Search</span>
-      <button class="sb-tgl" id="sidebar-toggle" title="Toggle sidebar">
-        <span id="toggle-icon"><svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.78 5.97a.75.75 0 0 1 0 1.06L8.81 10l2.97 2.97a.75.75 0 1 1-1.06 1.06l-3.5-3.5a.75.75 0 0 1 0-1.06l3.5-3.5a.75.75 0 0 1 1.06 0Z" fill="currentColor"/></svg></span>
+<body class="bg-[#f6f6f7] text-[#303030] h-screen flex flex-col overflow-hidden">
+
+  <!-- Header -->
+  <header class="h-12 border-b border-[#ededf0] bg-white flex items-center justify-between px-5 text-[14px] shrink-0 z-50">
+    <div class="flex items-center gap-3">
+      <button onclick="toggleSidebar()" class="p-2 hover:bg-gray-100 rounded text-gray-600">
+        <i class="fas fa-bars"></i>
       </button>
-    </div>
-    <div class="sb-nav" id="nav"></div>
-  </aside>
-  <main class="main">
-    <div class="pg">
-      <h1 style="font-size:1.25rem;font-weight:650;line-height:1.3">Year Make Model</h1>
-      <p style="font-size:13px;color:var(--text2);margin-top:4px">Configure the vehicle fitment widget shown on product pages and collection pages.</p>
-
-      <div class="bnr mt5">
-        <svg class="ic" style="width:20px;height:20px;flex-shrink:0;margin-top:1px" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-7.25-3.25a.75.75 0 0 1 .75.75v.5a.75.75 0 0 1-1.5 0v-.5a.75.75 0 0 1 .75-.75Zm0 2.5a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5a.75.75 0 0 1 .75-.75Z" fill="currentColor"/></svg>
-        <p>The Year Make Model widget lets customers filter products by vehicle compatibility. Make sure your product metafields are tagged correctly for this feature to work.</p>
-      </div>
-
-      <!-- General settings card -->
-      <div class="card mt5">
-        <div class="card-hd">
-          <p class="card-hd-ttl">General</p>
-          <p class="card-hd-sub">Configure basic widget behavior.</p>
-        </div>
-        <div class="card-bd">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <div>
-              <p style="font-weight:550;font-size:13px">Enable YMM widget</p>
-              <p class="fhint">Show the vehicle selector widget on your store.</p>
-            </div>
-            <button id="tgl-enabled" class="tgl on" type="button"><span class="tgl-th"></span></button>
-          </div>
-          <div class="divider"></div>
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <div>
-              <p style="font-weight:550;font-size:13px">Show on product pages</p>
-              <p class="fhint">Display a "Fits your vehicle" badge on matching products.</p>
-            </div>
-            <button id="tgl-product" class="tgl on" type="button"><span class="tgl-th"></span></button>
-          </div>
-          <div class="divider"></div>
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <div>
-              <p style="font-weight:550;font-size:13px">Show on collection pages</p>
-              <p class="fhint">Filter collection results by the selected vehicle.</p>
-            </div>
-            <button id="tgl-collection" class="tgl on" type="button"><span class="tgl-th"></span></button>
-          </div>
-          <div class="divider"></div>
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <div>
-              <p style="font-weight:550;font-size:13px">Remember vehicle selection</p>
-              <p class="fhint">Persist the selected vehicle across sessions using localStorage.</p>
-            </div>
-            <button id="tgl-remember" class="tgl off" type="button"><span class="tgl-th"></span></button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Widget appearance card -->
-      <div class="card mt4">
-        <div class="card-hd">
-          <p class="card-hd-ttl">Widget Appearance</p>
-          <p class="card-hd-sub">Customize labels and layout of the dropdowns.</p>
-        </div>
-        <div class="card-bd">
-          <div>
-            <label class="flbl" for="widget-title">Widget title</label>
-            <input id="widget-title" type="text" class="inp" placeholder="e.g. Find parts for your vehicle" value="Find parts for your vehicle">
-          </div>
-          <div class="g2">
-            <div>
-              <label class="flbl" for="widget-position">Position on page</label>
-              <select id="widget-position" class="sel">
-                <option value="top">Top of page</option>
-                <option value="sidebar">Sidebar</option>
-                <option value="below-header">Below header</option>
-              </select>
-            </div>
-            <div>
-              <label class="flbl" for="widget-layout">Layout</label>
-              <select id="widget-layout" class="sel">
-                <option value="horizontal">Horizontal (inline)</option>
-                <option value="vertical">Vertical (stacked)</option>
-              </select>
-            </div>
-          </div>
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <div>
-              <p style="font-weight:550;font-size:13px">Show reset button</p>
-              <p class="fhint">Allow customers to clear their vehicle selection.</p>
-            </div>
-            <button id="tgl-reset-btn" class="tgl on" type="button"><span class="tgl-th"></span></button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Data source card -->
-      <div class="card mt4">
-        <div class="card-hd">
-          <p class="card-hd-ttl">Data Source</p>
-          <p class="card-hd-sub">Map your metafields to Year, Make, and Model values.</p>
-        </div>
-        <div class="card-bd">
-          <div>
-            <label class="flbl" for="mf-year">Year metafield</label>
-            <input id="mf-year" type="text" class="inp" placeholder="e.g. custom.vehicle_year">
-            <p class="fhint">Namespace and key of the metafield that stores the vehicle year.</p>
-          </div>
-          <div>
-            <label class="flbl" for="mf-make">Make metafield</label>
-            <input id="mf-make" type="text" class="inp" placeholder="e.g. custom.vehicle_make">
-            <p class="fhint">Namespace and key of the metafield that stores the vehicle make.</p>
-          </div>
-          <div>
-            <label class="flbl" for="mf-model">Model metafield</label>
-            <input id="mf-model" type="text" class="inp" placeholder="e.g. custom.vehicle_model">
-            <p class="fhint">Namespace and key of the metafield that stores the vehicle model.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="frow fend mt4">
-        <button id="cancel-ymm" class="btn btn-s">Cancel</button>
-        <button id="save-ymm" class="btn btn-p">Save</button>
+      <div class="flex items-center gap-2 font-medium">
+        <span class="w-5 h-5 bg-[#b60000] rounded flex items-center justify-center text-white text-[11px]">F</span>
+        <span class="nav-text">Finder Admin</span>
       </div>
     </div>
-  </main>
-</div>
-<script>
-const $=id=>document.getElementById(id);
-const IC={
-  chevL:`<svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.78 5.97a.75.75 0 0 1 0 1.06L8.81 10l2.97 2.97a.75.75 0 1 1-1.06 1.06l-3.5-3.5a.75.75 0 0 1 0-1.06l3.5-3.5a.75.75 0 0 1 1.06 0Z" fill="currentColor"/></svg>`,
-  chevR:`<svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.22 5.97a.75.75 0 0 0 0 1.06L11.19 10 8.22 12.97a.75.75 0 1 0 1.06 1.06l3.5-3.5a.75.75 0 0 0 0-1.06l-3.5-3.5a.75.75 0 0 0-1.06 0Z" fill="currentColor"/></svg>`,
-  chk:`<svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M15.78 5.97a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L3.97 10.72a.75.75 0 0 1 1.06-1.06l3 3 6.69-6.69a.75.75 0 0 1 1.06 0Z" fill="currentColor"/></svg>`,
-};
-const NAV_MAIN=[
-  {id:'filter',   label:'Filter'},
-  {id:'search',   label:'Search'},
-  {id:'settings', label:'Settings'},
-  {id:'ymm',      label:'Year Make Model'},
-  {id:'advanced', label:'Advanced Feature'},
-  {id:'analytics',label:'Analytics'},
-];
-const NAV_MORE_ITEMS=[{id:'subscription',label:'Subscription'}];
-const NAV_BTM={id:'storefront',label:'Storefront Preview'};
-const ENABLED=new Set(['search','settings','ymm','storefront']);
-const ACTIVE='ymm';
-let col=false;
-let navExp=false;
-function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function renderNav(){
-  function nb(n,act,en,style){return`<button data-nav="${n.id}"${en?'':' disabled'} class="nav-btn${act?' act':''}" title="${n.label}"${style?` style="${style}"`:''}><span class="nav-lbl">${escapeHtml(n.label)}</span></button>`;}
-  const main=NAV_MAIN.map(n=>nb(n,n.id===ACTIVE,ENABLED.has(n.id))).join('');
-  const tgl=`<button id="nav-exp" class="nav-more"><span class="nav-lbl">${navExp?'View less':'View more'}</span><svg style="flex-shrink:0;transition:transform .2s;transform:rotate(${navExp?180:0}deg)" width="10" height="10" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"/></svg></button>`;
-  const more=navExp?NAV_MORE_ITEMS.map(n=>nb(n,n.id===ACTIVE,ENABLED.has(n.id),'padding-left:24px')).join(''):'';
-  const btm=nb(NAV_BTM,NAV_BTM.id===ACTIVE,ENABLED.has(NAV_BTM.id));
-  $('nav').innerHTML=main+tgl+more+`<div class="nav-sp"></div><div class="nav-sep"></div>`+btm;
-  $('nav').querySelectorAll('[data-nav]').forEach(b=>{
-    if(!ENABLED.has(b.dataset.nav))return;
-    b.onclick=()=>{
-      const v=b.dataset.nav;
-      if(v==='settings')location.href='index.html';
-      else if(v==='search')location.href='Search.html';
-      else if(v==='ymm')location.href='YearMakeModel.html';
-      else if(v==='storefront')location.href='StoreFront.html';
+  </header>
+
+  <div class="flex flex-1 overflow-hidden">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="w-[240px] bg-[#f2f2f3] border-r border-[#e2e2e5] flex flex-col shrink-0">
+      <div class="p-4 text-xs text-[#5c5f62] font-medium sidebar-header-text">Menu</div>
+      <nav class="px-2 text-[13px] flex flex-col gap-1">
+        <div onclick="switchView('dashboard')" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-[#e9e9eb] cursor-pointer" id="nav-dashboard">
+          <i class="fas fa-chart-line w-5 text-center"></i>
+          <span class="nav-text">Year Make Model</span>
+        </div>
+        <div onclick="switchView('products')" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-[#e9e9eb] cursor-pointer" id="nav-products">
+          <i class="fas fa-tag w-5 text-center"></i>
+          <span class="nav-text">Products</span>
+        </div>
+        <div onclick="switchView('storefront')" class="flex items-center gap-3 px-3 py-2 rounded hover:bg-[#e9e9eb] cursor-pointer" id="nav-storefront">
+          <i class="fas fa-desktop w-5 text-center"></i>
+          <span class="nav-text">Storefront Preview</span>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- Content Area -->
+    <main class="flex-1 overflow-y-auto scrollbar">
+      <div id="mainContainer" class="p-8 max-w-[1200px] mx-auto">
+
+        <!-- YMM DASHBOARD -->
+        <div id="view-dashboard" class="view-content animate-fadeIn">
+          <h1 class="text-[20px] font-semibold">Year Make Model</h1>
+          <p class="text-[12px] text-[#6d7175] mt-1">Year Make Model Guideline <a href="#" class="text-blue-600 underline">here</a></p>
+          <p class="text-[12px] text-[#6d7175] mt-1">If you need help with Year Make Model set up, <a href="#" class="text-blue-600 underline font-semibold">contact us</a></p>
+
+          <!-- Enable Year Make Model Search toggle box -->
+          <div class="mt-6 bg-white border border-[#e2e2e5] rounded-lg p-4 mb-4 flex items-center justify-between shadow-sm">
+            <div>
+              <div class="font-medium text-[14px]">Enable Year Make Model Search</div>
+              <p class="text-[12px] text-[#6d7175]">Turn on to display the search widget on your storefront.</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="enableToggle" class="sr-only peer" checked onchange="handleGlobalToggle()">
+              <div class="w-10 h-5 bg-[#e2e2e5] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#008060]"></div>
+            </label>
+          </div>
+
+          <!-- Widget settings + YMM Options + Preview — single grid -->
+          <div class="grid grid-cols-12 gap-6 mt-4 items-start">
+          <div class="col-span-8 space-y-4">
+          <div class="bg-white border border-[#e2e2e5] rounded-lg p-4 shadow-sm">
+            <!-- Widget title row -->
+            <div class="flex items-center justify-between">
+              <div class="font-medium text-[14px]">Widget title</div>
+              <input type="text" id="widgetTitleInput" placeholder="Find parts for your vehicle"
+                class="border border-[#e2e2e5] rounded px-3 py-1.5 text-[13px] w-64 focus:outline-none focus:border-[#303030]"
+                oninput="handleWidgetTitleChange(this.value)">
+            </div>
+            <div class="border-t border-[#e2e2e5] my-4"></div>
+            <!-- Remember vehicle selection row -->
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="font-medium text-[14px]">Remember vehicle selection</div>
+                <p class="text-[12px] text-[#6d7175]">Persist the selected vehicle across sessions.</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="rememberVehicleToggle" class="sr-only peer" onchange="handleRememberVehicleToggle()">
+                <div class="w-10 h-5 bg-[#e2e2e5] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#008060]"></div>
+              </label>
+            </div>
+          </div>
+              <div class="bg-white border border-[#e2e2e5] rounded-lg shadow-sm flex flex-col">
+                <div class="p-4 border-b flex items-center justify-between">
+                  <h2 class="font-semibold text-[14px]">Year Make Model Options</h2>
+                  <button onclick="showAddView()" class="bg-white border px-3 py-1.5 rounded text-[12px] font-medium hover:bg-gray-50">+ Add Option</button>
+                </div>
+                <table class="w-full text-left text-[13px]">
+                  <thead class="bg-[#f9f9f9] border-b">
+                    <tr>
+                      <th class="w-10 p-4"></th>
+                      <th class="p-4">Label</th>
+                      <th class="p-4">Source</th>
+                      <th class="p-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="ymmTableBody"></tbody>
+                </table>
+              </div>
+
+              <!-- Collapsible setup guide (same width as YMM Options) -->
+              <div class="bg-white border border-[#e2e2e5] rounded-lg overflow-hidden shadow-sm" id="notificationBox">
+                <button onclick="toggleNotification()" class="w-full flex items-center justify-between p-3 text-[13px] font-medium text-[#303030] hover:bg-[#f6f6f7]">
+                  <div class="flex items-center gap-2">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Important: Add Year Make Model Widget to your store <a href="#" onclick="event.stopPropagation()" class="text-blue-600 underline font-normal">(Guideline here)</a></span>
+                  </div>
+                  <i class="fas fa-chevron-up transition-transform" id="notiChevron"></i>
+                </button>
+                <div id="notiContent" class="px-6 pb-5 pt-2 text-[13px] text-[#303030] grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <!-- Left: text steps -->
+                  <div class="space-y-3" style="margin-top: 0px;">
+                    <div>
+                      <p class="font-semibold mb-1.5">Step 1: Choose Applied Theme</p>
+                      <select id="themeSelect" class="border border-[#e2e2e5] rounded px-2 py-1.5 text-[13px] bg-white w-full max-w-[260px] focus:outline-none focus:border-[#303030]">
+                        <option value="">Choose your theme</option>
+                        <option value="dawn">Dawn (Live)</option>
+                        <option value="horizon">Horizon</option>
+                        <option value="eclit">Eclit</option>
+                        <option value="craft">Craft</option>
+                        <option value="sense">Sense</option>
+                        <option value="studio">Studio</option>
+                      </select>
+                    </div>
+                    <div>
+                      <div class="ai-style-change-4" style="margin-top: 2rem;"> 
+                      <p class="font-semibold mb-1">Step 2: Add Widget:</p>
+                      <p class="text-[#6d7175] mb-2">Enter Theme Editor → Homepage → Add Section → Apps → Year Make Model → Save</p>
+                      <button onclick="showToast('Opening Theme Editor...')" class="bg-black text-white px-3 py-1.5 rounded text-[12px] font-medium hover:bg-[#1a1a1a]">
+                        Add Year Make Model Widget
+                      </button>
+                    </div>
+                    </div>
+                  </div>
+                  <!-- Right: expandable image -->
+                  <div class="flex md:justify-end">
+                    <button type="button" onclick="openImageModal()" class="group relative aspect-square w-full max-w-[260px] rounded-lg overflow-hidden border border-[#e2e2e5] bg-gray-50 hover:border-[#303030] transition-colors">
+                      <img src="theme-editor-guide.jpg" alt="Theme editor guide" class="w-full h-full object-cover">
+                      <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                        <div class="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 rounded-full w-10 h-10 flex items-center justify-center shadow">
+                          <i class="fas fa-expand text-[#303030]"></i>
+                        </div>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <div class="col-span-4">
+            <div class="bg-white border border-[#e2e2e5] rounded-lg shadow-sm sticky top-6 overflow-hidden">
+              <div class="p-4 bg-gray-50 font-semibold text-[14px] text-center">Preview</div>
+              <div class="border-b border-[#e2e2e5]"></div>
+              <div class="p-5" id="previewContainer">
+                <div id="previewDisabled" class="hidden flex-col items-center py-10 text-center">
+                  <p class="text-[12px] text-gray-500">Widget is disabled</p>
+                </div>
+                <div id="previewEnabled" class="space-y-4"></div>
+              </div>
+            </div>
+          </div>
+          </div>
+        </div>
+
+        <!-- Image modal -->
+        <div id="imageModal" class="hidden fixed inset-0 z-[70] bg-black/70 flex items-center justify-center p-6" onclick="closeImageModal()">
+          <div class="relative max-w-5xl w-full" onclick="event.stopPropagation()">
+            <button onclick="closeImageModal()" class="absolute -top-3 -right-3 bg-white w-9 h-9 rounded-full flex items-center justify-center shadow-lg hover:bg-gray-100">
+              <i class="fas fa-times text-[#303030]"></i>
+            </button>
+            <img src="theme-editor-guide.jpg" alt="Theme editor guide" class="w-full h-auto rounded-lg shadow-2xl">
+          </div>
+        </div>
+
+        <!-- PRODUCTS VIEW -->
+        <div id="view-products" class="view-content hidden animate-fadeIn">
+          <div class="flex items-center justify-between mb-6">
+            <h1 class="text-[20px] font-semibold">Products</h1>
+            <button onclick="addNewProduct()" class="bg-[#008060] text-white px-4 py-2 rounded text-[13px] font-medium">Add Product</button>
+          </div>
+          <div class="bg-white border border-[#e2e2e5] rounded-lg shadow-sm overflow-x-auto scrollbar">
+            <table class="w-full text-left text-[12px]">
+              <thead class="bg-[#f9f9f9] border-b whitespace-nowrap">
+                <tr>
+                  <th class="p-3">Title</th>
+                  <th class="p-3">Collection</th>
+                  <th class="p-3">Vendor</th>
+                  <th class="p-3">Year</th>
+                  <th class="p-3">Make</th>
+                  <th class="p-3">Model</th>
+                  <th class="p-3">Sub</th>
+                  <th class="p-3">Eng</th>
+                  <th class="p-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="productsTableBody" class="divide-y"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- STOREFRONT SIMULATOR -->
+        <div id="view-storefront" class="view-content hidden animate-fadeIn flex flex-col h-full bg-white border border-[#e2e2e5] rounded-lg overflow-hidden">
+          <div class="bg-gray-100 border-b px-6 py-3 flex items-center justify-between sticky top-0 z-30">
+            <div class="flex gap-6 text-[13px] font-medium" id="storefrontNav"></div>
+          </div>
+          <div id="storefrontIframe" class="flex-1 overflow-y-auto scrollbar p-8 bg-[#fcfcfc]"></div>
+        </div>
+
+        <!-- ADD/EDIT FORM -->
+        <div id="view-add-option" class="view-content hidden animate-fadeIn max-w-2xl mx-auto">
+          <div class="flex items-center gap-3 mb-6">
+            <button onclick="switchView('dashboard')" class="text-[#5c5f62] hover:text-[#303030]"><i class="fas fa-arrow-left"></i></button>
+            <div>
+              <h1 id="formTitle" class="text-[20px] font-semibold">Add Year Make Model Option</h1>
+              <p class="text-[12px] text-[#6d7175] mt-1">Year Make Model Guideline <span class="font-semibold underline">here</span></p>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <div class="bg-white border border-[#e2e2e5] rounded-lg shadow-sm overflow-hidden">
+              <div class="px-5 py-4 border-b border-[#f1f1f1] bg-[#f9f9f9]">
+                <h2 class="font-semibold text-[14px]">Field Configuration</h2>
+                <p class="text-[12px] text-[#6d7175] mt-1">Create and edit fields by mapping sources and controlling the values shown in the widget.</p>
+              </div>
+              <div class="p-5 space-y-5">
+                <div>
+                  <label class="block text-[13px] font-medium text-[#303030] mb-1.5">Source</label>
+                  <select id="fieldSource" onchange="handleSourceChange()" class="w-full bg-[#f6f6f7] border border-[#d1d1d1] rounded px-3 py-2 text-[13px] outline-none">
+                    <option value="" disabled selected>Select a source</option>
+                    <optgroup label="Metafield" id="metafieldOptionsGroup">
+                      <option value="product.metafields.custom.vehicles_year">vehicles_year</option>
+                      <option value="product.metafields.custom.vehicles_make">vehicles_make</option>
+                      <option value="product.metafields.custom.vehicles_model">vehicles_model</option>
+                      <option value="product.metafields.custom.vehicles_sub">vehicles_sub</option>
+                      <option value="product.metafields.custom.vehicles_eng">vehicles_eng</option>
+                      <option value="product.metafields.custom.vehicles_trim">vehicles_trim</option>
+                    </optgroup>
+                    <optgroup label="Standard" id="standardOptionsGroup">
+                      <option value="vendor">Vendor</option>
+                      <option value="collection">Collection</option>
+                    </optgroup>
+                  </select>
+                </div>
+
+                <div id="sourceDetails" class="grid grid-cols-2 gap-4 pt-1">
+                  <div>
+                    <label class="block text-[13px] font-medium text-[#303030] mb-1.5">Label</label>
+                    <input type="text" id="fieldLabel" class="w-full border border-[#d1d1d1] rounded px-3 py-2 text-[13px] outline-none field-locked">
+                  </div>
+                  <div>
+                    <label class="block text-[13px] font-medium text-[#303030] mb-1.5">Values</label>
+                    <select id="valueTypeSelect" onchange="handleValueTypeChange()" class="w-full border border-[#d1d1d1] rounded px-3 py-2 text-[13px] outline-none field-locked">
+                      <option value="all">Use all values</option>
+                      <option value="manual">Manual Selection</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="manualSelectionBox" class="hidden bg-white border border-[#e2e2e5] rounded-lg shadow-sm overflow-hidden">
+              <div class="p-4 border-b border-[#f1f1f1] bg-[#f9f9f9]">
+                <h3 class="font-medium text-[13px]">Select Values</h3>
+                <p class="text-[12px] text-[#6d7175]">Include/Exclude and Drag to reorder values</p>
+              </div>
+              <div class="max-h-[300px] overflow-y-auto scrollbar p-2" id="valuesListContainer"></div>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-4">
+              <button onclick="switchView('dashboard')" class="px-4 py-2 border border-[#d1d1d1] rounded text-[13px] font-medium hover:bg-[#f6f6f7]">Cancel</button>
+              <button onclick="saveOption()" class="px-4 py-2 bg-[#008060] text-white rounded text-[13px] font-medium hover:bg-[#006e52]">Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="toastContainer" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-[60] flex flex-col gap-2"></div>
+
+  <script src="mockProducts.js"></script>
+  <script src="storefrontPages.js"></script>
+  <script src="configuredOptions.js"></script>
+  <script>
+    let mockProducts = window.mockProductsData || [];
+    let storefrontPages = window.storefrontPagesData || [];
+    let configuredOptions = window.configuredOptionsData || [];
+
+    let ymmEnabled = true;
+    let widgetTitle = '';
+    let rememberVehicle = false;
+    let vehicleHistory = [];
+    let previewSelections = {};
+    let storefrontSelections = {};
+    let searchPageFilters = {};
+    let ymmBaselineFilters = {};
+    let currentStorePage = "hp";
+    let widgetPlacement = { sec: 's-hero', pos: 'bottom' };
+    let editingId = null;
+    const filterBarConfig = [
+      { key: 'vendor', label: 'Shop by Vendor', source: 'vendor' },
+      { key: 'collection', label: 'Collection', source: 'collection' },
+      { key: 'year', label: 'Year', source: 'product.metafields.custom.vehicles_year' },
+      { key: 'make', label: 'Make', source: 'product.metafields.custom.vehicles_make' },
+      { key: 'model', label: 'Model', source: 'product.metafields.custom.vehicles_model' },
+      { key: 'sub', label: 'Sub', source: 'product.metafields.custom.vehicles_sub' },
+      { key: 'eng', label: 'Eng', source: 'product.metafields.custom.vehicles_eng' },
+      { key: 'trim', label: 'Trim', source: 'product.metafields.custom.vehicles_trim' }
+    ];
+    const sourceLabelMap = {
+      'product.metafields.custom.vehicles_year': 'Year',
+      'product.metafields.custom.vehicles_make': 'Make',
+      'product.metafields.custom.vehicles_model': 'Model',
+      'product.metafields.custom.vehicles_sub': 'Sub',
+      'product.metafields.custom.vehicles_eng': 'Eng',
+      'product.metafields.custom.vehicles_trim': 'Trim',
+      vendor: 'Vendor',
+      collection: 'Collection'
     };
-  });
-  const expBtn=$('nav-exp');
-  if(expBtn)expBtn.onclick=()=>{navExp=!navExp;renderNav();updateSb();};
-  updateSb();
-}
-function updateSb(){
-  $('sidebar').classList.toggle('col',col);
-  $('sidebar').querySelectorAll('.nav-lbl').forEach(el=>el.classList.toggle('hidden',col));
-  document.querySelector('.sb-title').classList.toggle('hidden',col);
-  $('toggle-icon').innerHTML=col?IC.chevR:IC.chevL;
-  const expBtn=$('nav-exp');if(expBtn)expBtn.style.display=col?'none':'';
-}
-$('sidebar-toggle').onclick=()=>{col=!col;updateSb();};
 
-/* toggles */
-document.querySelectorAll('.tgl').forEach(btn=>{
-  btn.onclick=()=>{btn.classList.toggle('on');btn.classList.toggle('off');};
-});
+    function getSourceValue(p, source) {
+      if (source.startsWith('product.metafields.custom.')) {
+        const key = source.split('.').pop().replace('vehicles_', '');
+        return p.metafields[key] || [];
+      }
+      return [p[source]].filter(Boolean);
+    }
 
-function snapshot(){
-  return {
-    title:$('widget-title').value,
-    position:$('widget-position').value,
-    layout:$('widget-layout').value,
-    mfYear:$('mf-year').value,
-    mfMake:$('mf-make').value,
-    mfModel:$('mf-model').value,
-    toggles:[...'enabled product collection remember reset-btn'.split(' ')].map(id=>$('tgl-'+id).classList.contains('on')),
-  };
-}
-function restore(s){
-  $('widget-title').value=s.title;
-  $('widget-position').value=s.position;
-  $('widget-layout').value=s.layout;
-  $('mf-year').value=s.mfYear;
-  $('mf-make').value=s.mfMake;
-  $('mf-model').value=s.mfModel;
-  'enabled product collection remember reset-btn'.split(' ').forEach((id,i)=>{
-    const btn=$('tgl-'+id);
-    btn.classList.toggle('on',s.toggles[i]);
-    btn.classList.toggle('off',!s.toggles[i]);
-  });
-}
-let saved=snapshot();
-$('save-ymm').onclick=()=>{
-  saved=snapshot();
-  const btn=$('save-ymm');btn.innerHTML=IC.chk+' Saved';
-  setTimeout(()=>{btn.innerHTML='Save';},1500);
-};
-$('cancel-ymm').onclick=()=>restore(saved);
+    function getUniqueValues(source, products = mockProducts) {
+      const set = new Set();
+      products.forEach(p => getSourceValue(p, source).forEach(v => set.add(v)));
+      return Array.from(set).sort();
+    }
 
-renderNav();
-</script>
+    function getFilterSource(key) {
+      const match = filterBarConfig.find(cfg => cfg.key === key);
+      return match ? match.source : null;
+    }
+
+    function getFilterValues(products, key) {
+      const source = getFilterSource(key);
+      if (!source) return [];
+      const set = new Set();
+      products.forEach(p => getSourceValue(p, source).forEach(v => set.add(v)));
+      return Array.from(set).sort();
+    }
+
+    function getProductsForFilterOptions(excludeKey) {
+      let products = [...mockProducts];
+      const combinedKeys = new Set([
+        ...Object.keys(ymmBaselineFilters),
+        ...Object.keys(searchPageFilters)
+      ]);
+      combinedKeys.forEach(key => {
+        if (key === excludeKey) return;
+        const baselineVal = ymmBaselineFilters[key];
+        const userVal = searchPageFilters[key];
+        const val = baselineVal && baselineVal.length ? baselineVal : userVal;
+        if (val && (Array.isArray(val) ? val.length : true)) {
+          products = products.filter(p => productMatchesFilter(p, key, val));
+        }
+      });
+      return products;
+    }
+
+    function productMatchesFilter(p, key, val) {
+      if (!val || (Array.isArray(val) && val.length === 0)) return true;
+      const source = getFilterSource(key);
+      if (!source) return true;
+      const values = Array.isArray(val) ? val : [val];
+      return values.some(v => getSourceValue(p, source).includes(v));
+    }
+
+    function sourceToFilterKey(source) {
+      if (source === 'vendor') return 'vendor';
+      if (source === 'collection') return 'collection';
+      if (source.endsWith('vehicles_year')) return 'year';
+      if (source.endsWith('vehicles_make')) return 'make';
+      if (source.endsWith('vehicles_model')) return 'model';
+      if (source.endsWith('vehicles_sub')) return 'sub';
+      if (source.endsWith('vehicles_eng')) return 'eng';
+      if (source.endsWith('vehicles_trim')) return 'trim';
+      return null;
+    }
+
+    function applyYmmToFilters() {
+      const nextFilters = {};
+      configuredOptions.forEach((opt, idx) => {
+        const selected = storefrontSelections[idx];
+        if (!selected) return;
+        const key = sourceToFilterKey(opt.source);
+        if (key) nextFilters[key] = [selected];
+      });
+      ymmBaselineFilters = nextFilters;
+      searchPageFilters = {};
+    }
+
+    function getAvailableOptions(levelIdx, selections, pool = mockProducts) {
+      const config = configuredOptions[levelIdx];
+      if (!config) return [];
+      let filtered = pool;
+      for (let i = 0; i < levelIdx; i++) {
+        const src = configuredOptions[i].source;
+        const val = selections[i];
+        if (val) filtered = filtered.filter(p => getSourceValue(p, src).includes(val));
+      }
+      let options = getUniqueValues(config.source, filtered);
+      if (config.type === 'manual' && config.customValues) {
+        return config.customValues.filter(cv => options.includes(cv));
+      }
+      return options;
+    }
+
+    function switchView(viewId) {
+      document.querySelectorAll('.view-content').forEach(v => v.classList.add('hidden'));
+      document.getElementById('view-' + viewId).classList.remove('hidden');
+      if (viewId === 'dashboard') { renderOptionsTable(); updateAdminPreview(); }
+      if (viewId === 'products') renderProductsTable();
+      if (viewId === 'storefront') { renderStorefront(); }
+    }
+
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('sidebar-collapsed'); }
+    function toggleNotification() {
+      const content = document.getElementById('notiContent');
+      const chevron = document.getElementById('notiChevron');
+      content.classList.toggle('hidden');
+      chevron.classList.toggle('fa-chevron-up');
+      chevron.classList.toggle('fa-chevron-down');
+    }
+    function showToast(msg) {
+      const container = document.getElementById('toastContainer');
+      const t = document.createElement('div');
+      t.className = "bg-[#303030] text-white text-[13px] px-4 py-2 rounded-lg shadow-xl animate-bounce-short";
+      t.innerText = msg;
+      container.appendChild(t);
+      setTimeout(() => t.remove(), 3000);
+    }
+
+    function renderOptionsTable() {
+      const tbody = document.getElementById('ymmTableBody');
+      if (configuredOptions.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td class="p-6 text-center text-[13px] text-[#6d7175]" colspan="4">
+              No options yet. Click "Add Option" to start.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+      tbody.innerHTML = configuredOptions.map((opt, i) => `
+        <tr class="draggable-row border-b hover:bg-gray-50" draggable="true" ondragstart="handleDragStart(event, ${i})" ondragover="event.preventDefault()" ondrop="handleDrop(event, ${i})">
+          <td class="p-4 text-gray-400 cursor-move"><i class="fas fa-grip-vertical"></i></td>
+          <td class="p-4 font-medium">${opt.label}</td>
+          <td class="p-4 text-gray-500 font-mono text-[11px]">${opt.source.split('.').pop()}</td>
+          <td class="p-4 text-right space-x-2">
+            <button onclick="showEditView(${opt.id})" class="text-blue-600 p-2"><i class="fas fa-edit"></i></button>
+            <button onclick="deleteOption(${opt.id})" class="text-red-600 p-2"><i class="fas fa-trash-alt"></i></button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Build Search button — black bg, white text, faded until at least one selection
+    function renderSearchButton(selections, onclickAttr) {
+      const hasSelection = Object.values(selections).some(v => v);
+      const fadedClass = hasSelection ? '' : 'opacity-40 cursor-not-allowed';
+      const disabledAttr = hasSelection ? '' : 'disabled';
+      return `<button ${onclickAttr} ${disabledAttr} class="bg-black text-white py-2.5 px-4 rounded-xl font-bold text-[12px] uppercase tracking-widest hover:bg-[#1a1a1a] transition-colors ${fadedClass}">SEARCH</button>`;
+    }
+
+    function updateAdminPreview() {
+      const isEnabled = ymmEnabled;
+      document.getElementById('enableToggle').checked = isEnabled;
+      const disabledEl = document.getElementById('previewDisabled');
+      const enabledEl = document.getElementById('previewEnabled');
+      if (disabledEl) disabledEl.classList.toggle('hidden', isEnabled);
+      if (enabledEl) enabledEl.classList.toggle('hidden', !isEnabled);
+      if (!isEnabled) return;
+      const dropdowns = configuredOptions.map((opt, i) => {
+        const active = i === 0 || previewSelections[i-1] !== undefined;
+        const options = active ? getAvailableOptions(i, previewSelections, mockProducts) : [];
+        return `
+          <div class="space-y-1">
+            <label class="text-[11px] font-bold text-gray-400 uppercase tracking-tight">${opt.label}</label>
+            <select onchange="handleAdminPreviewChange(${i}, this.value)" ${!active ? 'disabled' : ''} class="w-full border rounded-lg px-2 py-2 text-[12px] bg-white outline-none disabled:bg-gray-50">
+              <option value="">Select ${opt.label}</option>
+              ${options.length === 0 ? '<option value="" disabled>No options available</option>' : options.map(o => `<option value="${o}" ${previewSelections[i] === o ? 'selected' : ''}>${o}</option>`).join('')}
+            </select>
+          </div>
+        `;
+      }).join('');
+      enabledEl.innerHTML = dropdowns + `<div class="pt-2">${renderSearchButton(previewSelections, 'onclick="showToast(\'Search (preview)\')"')}</div>`;
+      const lastBtn = enabledEl.querySelector('button');
+      if (lastBtn) lastBtn.classList.add('w-full');
+    }
+
+    function handleAdminPreviewChange(idx, val) {
+      Object.keys(previewSelections).forEach(k => { if(parseInt(k) >= idx) delete previewSelections[k]; });
+      if(val) previewSelections[idx] = val;
+      updateAdminPreview();
+    }
+
+    function handleGlobalToggle() {
+      ymmEnabled = document.getElementById('enableToggle').checked;
+      updateAdminPreview();
+      showToast(ymmEnabled ? 'Year Make Model Search Enabled' : 'Year Make Model Search Disabled');
+    }
+
+    function handleWidgetTitleChange(val) {
+      widgetTitle = val;
+      updateAdminPreview();
+    }
+
+    function handleRememberVehicleToggle() {
+      rememberVehicle = document.getElementById('rememberVehicleToggle').checked;
+      if (rememberVehicle) {
+        try { vehicleHistory = JSON.parse(localStorage.getItem('ymmVehicleHistory') || '[]'); } catch(e) { vehicleHistory = []; }
+      } else {
+        vehicleHistory = [];
+      }
+      renderStorefront();
+    }
+
+    function restoreVehicleHistory(idx) {
+      storefrontSelections = { ...vehicleHistory[idx].selections };
+      applyYmmToFilters();
+      currentStorePage = 'search';
+      renderStorefront();
+    }
+
+    function openImageModal() { document.getElementById('imageModal').classList.remove('hidden'); }
+    function closeImageModal() { document.getElementById('imageModal').classList.add('hidden'); }
+
+
+    function handleValueTypeChange() {
+      const type = document.getElementById('valueTypeSelect').value;
+      const box = document.getElementById('manualSelectionBox');
+      if (type === 'manual') {
+        box.classList.remove('hidden');
+        renderManualValuesList();
+      } else box.classList.add('hidden');
+    }
+
+    function renderManualValuesList() {
+      const source = document.getElementById('fieldSource').value;
+      const container = document.getElementById('valuesListContainer');
+      container.innerHTML = '';
+      if (!source) return;
+      const allPossible = getUniqueValues(source);
+      let currentSelection = [];
+      if (editingId) {
+        const opt = configuredOptions.find(o => o.id === editingId);
+        if (opt && opt.customValues) currentSelection = opt.customValues;
+      }
+      const listToRender = [...currentSelection];
+      allPossible.forEach(v => { if (!listToRender.includes(v)) listToRender.push(v); });
+      listToRender.forEach(val => {
+        const isOn = currentSelection.length === 0 || currentSelection.includes(val);
+        const item = document.createElement('div');
+        item.className = "flex items-center gap-3 p-2 hover:bg-gray-50 border-b draggable-value cursor-move bg-white";
+        item.draggable = true;
+        item.dataset.value = val;
+        item.innerHTML = `
+          <i class="fas fa-grip-vertical text-gray-300 text-xs"></i>
+          <span class="text-[13px] flex-1">${val}</span>
+          <label class="row-switch shrink-0">
+            <input type="checkbox" ${isOn ? 'checked' : ''}>
+            <span class="slider"></span>
+          </label>
+        `;
+        container.appendChild(item);
+        item.addEventListener('dragstart', () => item.classList.add('dragging-val'));
+        item.addEventListener('dragend', () => item.classList.remove('dragging-val'));
+      });
+      container.addEventListener('dragover', e => {
+        e.preventDefault();
+        const dragging = document.querySelector('.dragging-val');
+        if (!dragging) return;
+        const afterElement = getDragAfterElement(container, e.clientY, '.draggable-value:not(.dragging-val)');
+        if (afterElement == null) container.appendChild(dragging);
+        else container.insertBefore(dragging, afterElement);
+      });
+    }
+
+    function getDragAfterElement(container, y, selector) {
+      const elements = [...container.querySelectorAll(selector)];
+      return elements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        if (offset < 0 && offset > closest.offset) return { offset: offset, element: child };
+        else return closest;
+      }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    function saveOption() {
+      const label = document.getElementById('fieldLabel').value;
+      const source = document.getElementById('fieldSource').value;
+      const type = document.getElementById('valueTypeSelect').value;
+      if (!source) { showToast('Please choose a Source first'); return; }
+      if (!label) { showToast('Label is required'); return; }
+      let customValues = [];
+      if (type === 'manual') {
+        const rows = document.querySelectorAll('#valuesListContainer .draggable-value');
+        rows.forEach(r => { if (r.querySelector('input').checked) customValues.push(r.dataset.value); });
+      }
+      if (editingId) {
+        const opt = configuredOptions.find(o => o.id === editingId);
+        opt.label = label; opt.source = source; opt.type = type; opt.customValues = customValues;
+      } else configuredOptions.push({ id: Date.now(), label, source, type, customValues });
+      switchView('dashboard');
+      showToast("Settings saved");
+    }
+
+    function setLabelValueLocked(locked) {
+      const labelEl = document.getElementById('fieldLabel');
+      const valEl = document.getElementById('valueTypeSelect');
+      labelEl.classList.toggle('field-locked', locked);
+      valEl.classList.toggle('field-locked', locked);
+      labelEl.disabled = locked;
+      valEl.disabled = locked;
+    }
+
+    function showAddView() {
+      editingId = null;
+      document.getElementById('formTitle').innerText = "Add Year Make Model Option";
+      document.getElementById('fieldLabel').value = "";
+      document.getElementById('fieldSource').value = "";
+      document.getElementById('valueTypeSelect').value = "all";
+      document.getElementById('manualSelectionBox').classList.add('hidden');
+      refreshSourceDropdown();
+      setLabelValueLocked(true); // Lock until Source picked
+      switchView('add-option');
+    }
+
+    function showEditView(id) {
+      editingId = id;
+      const opt = configuredOptions.find(o => o.id === id);
+      document.getElementById('formTitle').innerText = "Edit Year Make Model Option";
+      document.getElementById('fieldLabel').value = opt.label;
+      document.getElementById('fieldSource').value = opt.source;
+      document.getElementById('valueTypeSelect').value = opt.type || "all";
+      setLabelValueLocked(false); // editing always unlocked since Source exists
+      handleSourceChange(true);
+      handleValueTypeChange();
+      switchView('add-option');
+    }
+
+    function getUsedSources() {
+      return configuredOptions.filter(o => o.id !== editingId).map(o => o.source);
+    }
+
+    function refreshSourceDropdown() {
+      const select = document.getElementById('fieldSource');
+      const used = new Set(getUsedSources());
+      [...select.querySelectorAll('option')].forEach(opt => {
+        if (!opt.value) return;
+        const isCurrentEditSelection = editingId && opt.value === select.value;
+        opt.hidden = used.has(opt.value) && !isCurrentEditSelection;
+      });
+    }
+
+    function handleSourceChange(skipLabelUpdate = false) {
+      const source = document.getElementById('fieldSource').value;
+      if (source && !skipLabelUpdate) document.getElementById('fieldLabel').value = sourceLabelMap[source] || document.getElementById('fieldLabel').value;
+      setLabelValueLocked(!source);
+      refreshSourceDropdown();
+      if (document.getElementById('valueTypeSelect').value === 'manual') renderManualValuesList();
+    }
+
+    function renderProductsTable() {
+      const tbody = document.getElementById('productsTableBody');
+      tbody.innerHTML = mockProducts.map(p => `
+        <tr class="hover:bg-gray-50">
+          <td class="p-3"><input type="text" value="${p.title}" onchange="updateProduct(${p.id},'title',this.value)" class="w-full border-none focus:ring-0 bg-transparent"></td>
+          <td class="p-3"><input type="text" value="${p.collection}" onchange="updateProduct(${p.id},'collection',this.value)" class="w-full border-none focus:ring-0 bg-transparent"></td>
+          <td class="p-3"><input type="text" value="${p.vendor}" onchange="updateProduct(${p.id},'vendor',this.value)" class="w-full border-none focus:ring-0 bg-transparent"></td>
+          <td class="p-3"><input type="text" value="${p.metafields.year.join(',')}" onchange="updateMeta(${p.id},'year',this.value)" class="w-16 border-none focus:ring-0 bg-transparent"></td>
+          <td class="p-3"><input type="text" value="${p.metafields.make.join(',')}" onchange="updateMeta(${p.id},'make',this.value)" class="w-20 border-none focus:ring-0 bg-transparent"></td>
+          <td class="p-3"><input type="text" value="${p.metafields.model.join(',')}" onchange="updateMeta(${p.id},'model',this.value)" class="w-20 border-none focus:ring-0 bg-transparent"></td>
+          <td class="p-3"><input type="text" value="${p.metafields.sub.join(',')}" onchange="updateMeta(${p.id},'sub',this.value)" class="w-16 border-none focus:ring-0 bg-transparent"></td>
+          <td class="p-3"><input type="text" value="${p.metafields.eng.join(',')}" onchange="updateMeta(${p.id},'eng',this.value)" class="w-16 border-none focus:ring-0 bg-transparent"></td>
+          <td class="p-3 text-right">
+            <button onclick="deleteProduct(${p.id})" class="text-red-400 p-2"><i class="fas fa-trash-alt"></i></button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function updateProduct(id, k, v) { const p = mockProducts.find(x => x.id === id); if(p) p[k] = v; }
+    function updateMeta(id, k, v) { const p = mockProducts.find(x => x.id === id); if(p) p.metafields[k] = v.split(',').map(s=>s.trim()); }
+    function deleteProduct(id) { mockProducts = mockProducts.filter(p => p.id !== id); renderProductsTable(); }
+    function addNewProduct() {
+      mockProducts.unshift({ id: Date.now(), title: "New Item", collection: "General", vendor: "Brand", metafields: { year:[], make:[], model:[], sub:[], eng:[], trim:[] } });
+      renderProductsTable();
+    }
+
+    function renderStorefront() {
+      const nav = document.getElementById('storefrontNav');
+      nav.innerHTML = storefrontPages.map(p => `
+        <div onclick="currentStorePage='${p.id}'; renderStorefront();" class="cursor-pointer hover:text-[#b60000] py-1 border-b-2 ${currentStorePage === p.id ? 'text-[#b60000] border-[#b60000]' : 'border-transparent'}">
+          ${p.name}
+        </div>
+      `).join('');
+
+      const frame = document.getElementById('storefrontIframe');
+      const isHP = currentStorePage === 'hp';
+      const isYMMEnabled = ymmEnabled;
+
+      let filteredProducts = [...mockProducts];
+      if (!isHP) {
+        const combinedKeys = new Set([
+          ...Object.keys(ymmBaselineFilters),
+          ...Object.keys(searchPageFilters)
+        ]);
+        combinedKeys.forEach(key => {
+          const baselineVal = ymmBaselineFilters[key];
+          const userVal = searchPageFilters[key];
+          const val = baselineVal && baselineVal.length ? baselineVal : userVal;
+          if (val && (Array.isArray(val) ? val.length : true)) {
+            filteredProducts = filteredProducts.filter(p => productMatchesFilter(p, key, val));
+          }
+        });
+      }
+
+      const renderSections = (sections) => sections.map(sec => `
+        <div class="space-y-4">
+          ${widgetPlacement && widgetPlacement.sec === sec.id && widgetPlacement.pos === 'top' && isYMMEnabled ? renderWidgetUI(filteredProducts, isHP) : ''}
+          ${sec.html}
+          ${widgetPlacement && widgetPlacement.sec === sec.id && widgetPlacement.pos === 'bottom' && isYMMEnabled ? renderWidgetUI(filteredProducts, isHP) : ''}
+        </div>
+      `).join('');
+
+      if (isHP) {
+        frame.innerHTML = `
+          <div class="space-y-16 max-w-6xl mx-auto pb-20">
+            ${renderSections([
+              { id: 's-hero', html: `<section id="s-hero" class="relative group border-2 border-transparent hover:border-blue-300 p-20 bg-gray-900 text-white rounded-[2.5rem] text-center">
+                ${isYMMEnabled ? renderAddButtons('s-hero', true) : ''}
+                <h1 class="text-5xl font-extrabold mb-6">Expert Parts for Your Drive</h1>
+                <p class="text-gray-400 mb-10 max-w-2xl mx-auto text-lg leading-relaxed">Shop millions of parts from top brands. Guaranteed fitment when you provide your vehicle details.</p>
+              </section>` },
+              { id: 's-categories', html: `<section class="grid grid-cols-4 gap-6">${['Braking','Engine','Lighting','Suspension'].map(cat => `<div class="bg-white border rounded-2xl p-6 hover:shadow-md transition-shadow cursor-pointer"><div class="w-12 h-12 bg-red-50 text-red-600 rounded-lg flex items-center justify-center mb-4"><i class="fas fa-cog"></i></div><h4 class="font-bold">${cat}</h4><p class="text-xs text-gray-500 mt-1">Browse ${cat} parts</p></div>`).join('')}</section>` },
+              { id: 's-promo', html: `<section id="s-promo" class="relative group border-2 border-transparent hover:border-blue-300 p-12 bg-[#b60000] text-white rounded-[2.5rem] flex items-center justify-between">
+                ${isYMMEnabled ? renderAddButtons('s-promo', true) : ''}
+                <div class="max-w-md"><h2 class="text-3xl font-bold mb-4">Summer Maintenance Sale</h2><p class="opacity-90 mb-6">Get up to 20% off on all engine filters and spark plugs this month.</p><button class="bg-white text-[#b60000] px-6 py-2 rounded-full font-bold text-sm">Shop Sale</button></div><div class="hidden md:block text-8xl opacity-20"><i class="fas fa-tools"></i></div>
+              </section>` },
+              { id: 's-info', html: `<section class="text-center"><h2 class="text-2xl font-bold mb-10">Why Choose Us?</h2><div class="grid grid-cols-3 gap-12"><div class="space-y-3"><div class="text-3xl text-red-600"><i class="fas fa-shipping-fast"></i></div><h3 class="font-bold">Fast Shipping</h3><p class="text-sm text-gray-500">Same day processing on all orders placed before 2 PM.</p></div><div class="space-y-3"><div class="text-3xl text-red-600"><i class="fas fa-award"></i></div><h3 class="font-bold">OEM Quality</h3><p class="text-sm text-gray-500">We only stock certified parts from trusted global manufacturers.</p></div><div class="space-y-3"><div class="text-3xl text-red-600"><i class="fas fa-handshake"></i></div><h3 class="font-bold">Expert Advice</h3><p class="text-sm text-gray-500">Talk to a real mechanic any time you need help with your installation.</p></div></div></section>` }
+            ])}
+          </div>
+        `;
+      } else {
+        const filterSections = filterBarConfig.map(cfg => {
+          const selectedValues = searchPageFilters[cfg.key] || [];
+          const baselineValues = ymmBaselineFilters[cfg.key] || [];
+          const optionProducts = getProductsForFilterOptions(cfg.key);
+          const values = baselineValues.length > 0
+            ? baselineValues
+            : getFilterValues(optionProducts, cfg.key);
+          const items = values.map(v => `
+            <label class="flex items-center gap-2.5 cursor-pointer text-[13px]">
+              <input type="checkbox" ${selectedValues.includes(v) ? 'checked' : ''} onchange="toggleSidebarFilter('${cfg.key}', '${v}')" class="w-4 h-4 rounded text-[#b60000] border-gray-300 focus:ring-0">
+              <span class="${selectedValues.includes(v) ? 'text-[#b60000] font-semibold' : 'text-gray-600'}">${v}</span>
+            </label>
+          `).join('');
+          return `
+            <div>
+              <h4 class="font-bold text-sm mb-4 border-b pb-2 uppercase tracking-wider text-gray-800">${cfg.label}</h4>
+              <div class="space-y-2.5">
+                ${items}${values.length === 0 ? '<p class="text-xs text-gray-400">No options available</p>' : ''}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        const selectedChips = filterBarConfig.flatMap(cfg => {
+          const values = searchPageFilters[cfg.key] || [];
+          return values.map(v => `<span class="px-2 py-1 bg-gray-100 text-gray-700 text-[11px] rounded-full border">${cfg.label}: ${v}</span>`);
+        }).join('');
+
+        frame.innerHTML = `<div class="max-w-7xl mx-auto space-y-8">${isYMMEnabled ? renderWidgetUI(mockProducts, false) : ''}<div class="flex gap-10"><aside class="w-64 shrink-0 space-y-8">${filterSections}</aside><div class="flex-1"><div class="flex items-center justify-between mb-8 pb-4 border-b"><div class="space-y-2"><div class="border border-gray-200 bg-white rounded-lg px-3 py-2 flex flex-wrap gap-2 min-h-[42px]">${selectedChips || '<span class="text-[11px] text-gray-400">No filters selected</span>'}</div><div class="text-[12px] text-gray-500">${filteredProducts.length} items found</div></div><div class="flex items-center gap-3"><span class="text-sm text-gray-500">Sort by:</span><select class="border-none bg-transparent text-sm font-semibold focus:ring-0 cursor-pointer"><option>Relevance</option><option>Price: Low to High</option><option>Price: High to Low</option></select></div></div><div class="grid grid-cols-4 gap-6">${filteredProducts.length > 0 ? filteredProducts.map(p => `<div class="bg-white border rounded-2xl overflow-hidden flex flex-col hover:shadow-lg transition-shadow"><div class="aspect-square bg-gray-100 flex items-center justify-center text-gray-300 text-5xl"><i class="fas fa-image"></i></div><div class="p-4 flex-1 flex flex-col"><div class="text-[10px] text-red-600 font-bold mb-1 uppercase tracking-widest">${p.vendor}</div><div class="font-bold text-sm mb-4 h-10 overflow-hidden line-clamp-2">${p.title}</div><div class="mt-auto flex items-center justify-between pt-4 border-t"><span class="font-extrabold text-lg">$${(Math.random() * 100 + 50).toFixed(2)}</span><button class="bg-gray-900 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"><i class="fas fa-plus text-xs"></i></button></div></div></div>`).join('') : `<div class="col-span-4 py-32 text-center"><div class="text-5xl text-gray-200 mb-4"><i class="fas fa-search"></i></div><h3 class="text-lg font-bold text-gray-400">No exact matches found</h3><p class="text-sm text-gray-400">Try broadening your search criteria.</p></div>`}</div></div></div></div>`;
+      }
+    }
+
+    function toggleSidebarFilter(type, value) {
+      const current = searchPageFilters[type] || [];
+      if (current.includes(value)) searchPageFilters[type] = current.filter(v => v !== value);
+      else searchPageFilters[type] = [...current, value];
+      renderStorefront();
+    }
+
+    function renderAddButtons(sec, allowed) {
+      if (!allowed) return '';
+      return `
+        <div class="absolute inset-x-0 -top-4 h-8 opacity-0 group-hover:opacity-100 flex items-center justify-center pointer-events-none z-10">
+          <button onclick="placeWidget('${sec}', 'top')" class="pointer-events-auto bg-blue-600 text-white text-[10px] px-3 py-1 rounded shadow-lg transition-transform hover:scale-105">+ Add YMM Top</button>
+        </div>
+        <div class="absolute inset-x-0 -bottom-4 h-8 opacity-0 group-hover:opacity-100 flex items-center justify-center pointer-events-none z-10">
+          <button onclick="placeWidget('${sec}', 'bottom')" class="pointer-events-auto bg-blue-600 text-white text-[10px] px-3 py-1 rounded shadow-lg transition-transform hover:scale-105">+ Add YMM Bottom</button>
+        </div>
+      `;
+    }
+
+    function placeWidget(sec, pos) { widgetPlacement = { sec, pos }; renderStorefront(); }
+
+    // Storefront widget — max 4 dropdowns per row, then wrap. Search btn black/white, faded until selection.
+    function renderWidgetUI(pool, isHP) {
+      const hasSelection = Object.values(storefrontSelections).some(v => v);
+      const fadedClass = hasSelection ? '' : 'opacity-40 cursor-not-allowed';
+      const disabledAttr = hasSelection ? '' : 'disabled';
+
+      const dropdowns = configuredOptions.map((opt, i) => {
+        const active = i === 0 || storefrontSelections[i-1] !== undefined;
+        const options = active ? getAvailableOptions(i, storefrontSelections, pool) : [];
+        return `
+          <div class="space-y-1.5 text-left">
+            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest pl-1">${opt.label}</label>
+            <select onchange="handleStorefrontChange(${i}, this.value)" ${!active ? 'disabled' : ''} class="w-full border-gray-200 border rounded-xl px-3 py-2.5 text-[12px] bg-white outline-none focus:ring-2 focus:ring-red-100 disabled:bg-gray-50 transition-all cursor-pointer">
+              <option value="">Choose ${opt.label}</option>
+              ${options.length === 0 ? '<option value="" disabled>No options available</option>' : options.map(o => `<option value="${o}" ${storefrontSelections[i] === o ? 'selected' : ''}>${o}</option>`).join('')}
+            </select>
+          </div>
+        `;
+      }).join('');
+
+      return `
+        <div class="bg-white border-2 border-[#b60000] p-6 rounded-2xl shadow-2xl relative animate-fadeIn w-full text-[#303030]">
+          ${isHP ? `<button onclick="widgetPlacement=null; storefrontSelections={}; renderStorefront();" class="absolute -top-3 -right-3 bg-red-600 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-lg hover:bg-red-700"><i class="fas fa-times text-[10px]"></i></button>` : ''}
+          <div class="flex items-center justify-between mb-5">
+            <h3 class="font-bold text-sm flex items-center gap-2"><i class="fas fa-car-side text-red-600"></i> ${widgetTitle || 'Find parts for your vehicle'}</h3>
+            <button onclick="storefrontSelections={}; renderStorefront();" class="text-[10px] font-bold text-gray-400 hover:text-red-600 uppercase tracking-wider">Reset Selection</button>
+          </div>
+          <div class="grid grid-cols-4 gap-4 items-end">
+            ${dropdowns}
+            <div>
+              <button onclick="goToSearch()" ${disabledAttr} class="w-full bg-black text-white py-2.5 rounded-xl font-bold text-[12px] uppercase tracking-widest hover:bg-[#1a1a1a] transition-colors shadow-lg ${fadedClass}">SEARCH</button>
+            </div>
+          </div>
+          ${rememberVehicle && vehicleHistory.length > 0 ? `
+            <div class="mt-4 pt-4 border-t border-gray-100">
+              <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2"><i class="fas fa-history mr-1"></i>Recent Search</p>
+              <div class="flex flex-wrap gap-2">
+                ${vehicleHistory.map((h, i) => `
+                  <button onclick="restoreVehicleHistory(${i})" class="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-xl text-[11px] text-gray-600 hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition-colors">
+                    <i class="fas fa-car text-[9px] mr-1"></i>${h.label}
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    function goToSearch() {
+      const hasSelection = Object.values(storefrontSelections).some(v => v);
+      if (!hasSelection) return;
+      if (rememberVehicle) {
+        const label = configuredOptions.map((opt, i) => storefrontSelections[i]).filter(Boolean).join(' ');
+        const entry = { label, selections: { ...storefrontSelections } };
+        vehicleHistory = vehicleHistory.filter(h => h.label !== entry.label);
+        vehicleHistory.unshift(entry);
+        vehicleHistory = vehicleHistory.slice(0, 5);
+        try { localStorage.setItem('ymmVehicleHistory', JSON.stringify(vehicleHistory)); } catch(e) {}
+      }
+      applyYmmToFilters();
+      currentStorePage = 'search';
+      renderStorefront();
+    }
+
+    function handleStorefrontChange(idx, val) {
+      Object.keys(storefrontSelections).forEach(k => { if(parseInt(k) >= idx) delete storefrontSelections[k]; });
+      if(val) storefrontSelections[idx] = val;
+      renderStorefront();
+    }
+
+    function deleteOption(id) {
+      configuredOptions = configuredOptions.filter(o => o.id !== id);
+      renderOptionsTable();
+      updateAdminPreview();
+    }
+
+    let dragSrc = null;
+    function handleDragStart(e, idx) { dragSrc = idx; }
+    function handleDrop(e, idx) {
+      const moved = configuredOptions.splice(dragSrc, 1)[0];
+      configuredOptions.splice(idx, 0, moved);
+      renderOptionsTable();
+      updateAdminPreview();
+    }
+
+    switchView('dashboard');
+  </script>
 </body>
 </html>
