@@ -319,6 +319,7 @@ setAsbWidth(248);
 
 /* ── localStorage helpers ── */
 function lsGet(key){try{const r=localStorage.getItem(key);return r?JSON.parse(r):null;}catch(e){return null;}}
+function TR(tab,key,fb){return(TRANSLATIONS[tab]&&TRANSLATIONS[tab][key])||fb;}
 
 /* ── Mock Products (20 items) ── */
 const MOCK_PRODUCTS=[
@@ -387,6 +388,7 @@ let VARIANT_SPLIT=new Set();
 let ACTIVE_EXCLUSIVE='featured';
 let SORT_OPTS_RAW=null;
 let lastQuery='';
+let TRANSLATIONS={};
 
 /* ── Settings loader ── */
 function buildSynMap(groups){
@@ -418,6 +420,8 @@ function loadSettingsFromStorage(){
   if(syn&&syn.length)SYNONYMS=buildSynMap(syn);
   if(rd&&rd.length)REDIRECTS=rd.map(r=>({terms:r.terms.split(',').map(t=>t.trim()).filter(Boolean),url:r.url,label:r.url}));
   if(vr){VARIANT_ENABLED=!!vr.enabled;VARIANT_SPLIT=new Set(vr.selectedOptions||[]);}
+  const tr=lsGet('findter_translate');
+  if(tr)TRANSLATIONS=tr;
   return{sb,sch,syn,rd,vr};
 }
 
@@ -504,7 +508,7 @@ function pCardHtml(p){
     `<div class="psizes">${p.sizes.map(s=>`<span class="psize">${esc(s)}</span>`).join('')}</div>`:'';
   const compare=p.ca>0?`<span class="pcompare">$${p.ca.toFixed(2)}</span>`:'';
   const varLbl=p.variantLabel?` <span style="color:var(--text2);font-weight:400">– ${esc(p.variantLabel)}</span>`:'';
-  const oos=p.inventory===0?`<p class="poos">Out of stock</p>`:'';
+  const oos=p.inventory===0?`<p class="poos">${esc(TR('product','sold_out','Out of stock'))}</p>`:'';
   return `
     <div class="pcard">
       <div class="pimg-wrap">
@@ -522,7 +526,7 @@ function pCardHtml(p){
         </div>
         ${sizes}${oos}
         <button class="padd"${p.inventory===0?' disabled':''}>
-          ${p.inventory===0?'Out of Stock':'Add to cart'}
+          ${p.inventory===0?TR('product','sold_out','Out of Stock'):TR('product','add_to_cart','Add to cart')}
         </button>
       </div>
     </div>`;
@@ -536,7 +540,7 @@ function renderGrid(){
   const grid=$('pgrid');
   $('pcount').textContent=sorted.length+' product'+(sorted.length!==1?'s':'');
   if(!sorted.length){
-    grid.innerHTML=`<div class="no-res"><h3>No products found</h3><p>Try removing some filters.</p></div>`;
+    grid.innerHTML=`<div class="no-res"><h3>${esc(TR('product','no_products','No products found'))}</h3><p>Try removing some filters.</p></div>`;
     return;
   }
   grid.innerHTML=sorted.map(pCardHtml).join('');
@@ -811,6 +815,34 @@ function doSearch(){
 }
 $('so-clear-btn').onclick=()=>{$('so-inp').value='';lastQuery='';doSearch();$('so-inp').focus();};
 
+/* ── Apply translations to static UI ── */
+function applyTranslations(){
+  // Filter sidebar header "Filters"
+  const fh=document.querySelector('.fsb-hdr h2');
+  if(fh)fh.textContent=TR('filter','filter_by','Filters');
+  // "Clear all" button
+  const ca=$('clear-all-btn');
+  if(ca)ca.textContent=TR('filter','clear_all','Clear all');
+  // "Sort by:" prefix in sort button
+  const sp=document.querySelector('#sort-btn span:first-child');
+  if(sp)sp.textContent=TR('sort','sort_by','Sort by')+': ';
+  // Trending products section title (zero-char state)
+  const zeroTitle=$('so-zero').querySelector('.so-sec-ttl');
+  if(zeroTitle)zeroTitle.textContent=TR('search','zero_char_prods_title','Trending Products');
+  // No-results prefix text node ("No results for ")
+  const emptyTtl=document.querySelector('.so-empty-ttl');
+  if(emptyTtl){
+    const tn=[...emptyTtl.childNodes].find(n=>n.nodeType===3);
+    if(tn)tn.textContent=TR('search','empty_search_msg','No results for')+' ';
+  }
+  // No-results sub text
+  const emptySub=document.querySelector('.so-empty-sub');
+  if(emptySub)emptySub.textContent=TR('search','product_not_found','Try a different search term or browse collections below.');
+  // "You might also like" suggestion title
+  const sugTitle=$('so-empty').querySelector('.so-sec-ttl');
+  if(sugTitle)sugTitle.textContent=TR('search','no_res_prods_title','You might also like');
+}
+
 /* ── Settings status badge ── */
 function renderStatusBadge(loaded){
   const total=5;
@@ -831,6 +863,7 @@ sortKey=ACTIVE_EXCLUSIVE;
 })();
 renderFilters();
 renderGrid();
+applyTranslations();
 renderStatusBadge(_loaded);
 </script>
 </body>

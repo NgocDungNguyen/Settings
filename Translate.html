@@ -14,6 +14,7 @@
 --bg:rgba(241,241,241,1);--sf:#fff;--sf-hov:rgba(247,247,247,1);--sf-act:rgba(243,243,243,1);
 --fill:#303030;--fill-hov:#1a1a1a;--fill-t:rgba(0,0,0,.02);
 --text:rgba(48,48,48,1);--text2:rgba(97,97,97,1);--textd:rgba(181,181,181,1);--lnk:rgba(0,91,211,1);
+--ref:rgba(0,91,211,1);
 --bdr:rgba(227,227,227,1);--bdr-foc:rgba(0,91,211,1);--crit:rgba(181,38,11,1);
 --r1:4px;--r2:8px;--r3:12px;
 --sh1:0px 1px 0px 0px rgba(26,26,26,.07);
@@ -50,12 +51,23 @@ a{color:var(--lnk)}
 .back-a{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border-radius:var(--r2);text-decoration:none;border:1px solid var(--bdr);background:var(--sf);color:var(--text2);box-shadow:var(--sh1);flex-shrink:0;transition:background .1s}
 .back-a:hover{background:var(--sf-hov)}
 .card{background:var(--sf);border-radius:var(--r2);box-shadow:var(--sh3);overflow:hidden}
-.inp{width:100%;border:1px solid var(--bdr);border-radius:var(--r2);padding:7px 12px;font-family:var(--ff);font-size:13px;color:var(--text);background:var(--sf);outline:none;transition:border-color .1s,box-shadow .1s}
+.inp{width:100%;border:none;border-radius:0;padding:0;font-family:var(--ff);font-size:13px;color:var(--text);background:transparent;outline:none}
 .inp::placeholder{color:var(--textd)}
-.inp:focus{border-color:var(--bdr-foc);box-shadow:0 0 0 3px rgba(0,91,211,.2)}
 .tabs{display:flex;overflow-x:auto;border-bottom:1px solid var(--bdr);padding:0 16px;gap:4px}
 .tab{padding:10px 12px;font-size:13px;font-weight:450;color:var(--text2);border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:color .1s;font-family:var(--ff)}
 .tab:hover{color:var(--text)}.tab.act{color:var(--text);font-weight:650;border-bottom-color:var(--fill)}
+/* col headers */
+.col-hdr{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--bdr);background:var(--sf)}
+.col-hdr-ref{flex:1;font-size:13px;font-weight:650;color:var(--text)}
+.col-hdr-eng{flex:1;font-size:13px;font-weight:650;color:var(--lnk)}
+/* field rows */
+.fld-row{display:flex;align-items:center;gap:0;padding:0 16px;border-bottom:1px solid var(--bdr);min-height:42px}
+.fld-row:last-child{border-bottom:none}
+.fld-ref{flex:1;font-size:13px;color:var(--ref);padding:10px 12px 10px 0}
+.fld-chev{flex-shrink:0;color:var(--textd);margin-right:12px}
+.fld-eng{flex:1;padding:10px 0}
+/* custom empty */
+.custom-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:56px 16px;text-align:center}
 .hidden{display:none!important}
 .mt3{margin-top:12px}.mt4{margin-top:16px}.mt5{margin-top:20px}
 .frow{display:flex;gap:8px}.fend{justify-content:flex-end}
@@ -103,6 +115,7 @@ const IC={
   chevL:`<svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.78 5.97a.75.75 0 0 1 0 1.06L8.81 10l2.97 2.97a.75.75 0 1 1-1.06 1.06l-3.5-3.5a.75.75 0 0 1 0-1.06l3.5-3.5a.75.75 0 0 1 1.06 0Z" fill="currentColor"/></svg>`,
   chevR:`<svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.22 5.97a.75.75 0 0 0 0 1.06L11.19 10 8.22 12.97a.75.75 0 1 0 1.06 1.06l3.5-3.5a.75.75 0 0 0 0-1.06l-3.5-3.5a.75.75 0 0 0-1.06 0Z" fill="currentColor"/></svg>`,
   chk:`<svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M15.78 5.97a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L3.97 10.72a.75.75 0 0 1 1.06-1.06l3 3 6.69-6.69a.75.75 0 0 1 1.06 0Z" fill="currentColor"/></svg>`,
+  chvSmall:`<svg style="width:12px;height:12px;fill:var(--textd);display:block;flex-shrink:0" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.69L11.72 6.53a.75.75 0 0 1 1.06-1.06l4 4a.75.75 0 0 1 0 1.06l-4 4a.75.75 0 1 1-1.06-1.06l2.72-2.72H3.75A.75.75 0 0 1 3 10Z" fill="currentColor"/></svg>`,
 };
 const NAV=[
   {id:'filter',label:'Filter'},{id:'search',label:'Search'},
@@ -139,91 +152,193 @@ function updateSb(){
 }
 $('sidebar-toggle').onclick=()=>{col=!col;updateSb();};
 
+// ── localStorage ──
+const LS_KEY='findter_translate';
+function lsLoad(){try{const r=localStorage.getItem(LS_KEY);return r?JSON.parse(r):null;}catch(e){return null;}}
+function lsSave(d){try{localStorage.setItem(LS_KEY,JSON.stringify(d));}catch(e){}}
+
 const SUBTABS=[
-  {id:'product',label:'Product'},
-  {id:'search', label:'Search'},
-  {id:'filter', label:'Filter'},
-  {id:'sort',   label:'Sort'},
-  {id:'ymm',    label:'Year Make Model Widget'},
+  {id:'product',      label:'Product'},
+  {id:'search',       label:'Search'},
+  {id:'filter',       label:'Filter'},
+  {id:'sort',         label:'Sort'},
+  {id:'filterlabels', label:'Filter option labels'},
+  {id:'ymm',          label:'Year Make Model form'},
+  {id:'custom',       label:'Custom'},
 ];
+
+// ref = Reference column label, def = default English value ('' = "Enter translation value")
 const FIELDS={
   product:[
-    {key:'add_to_cart',  label:'Add to cart'},{key:'sold_out',    label:'Sold out'},
-    {key:'out_of_stock', label:'Out of stock'},{key:'sale',        label:'Sale'},
-    {key:'new',          label:'New'},         {key:'quick_view',  label:'Quick view'},
-    {key:'view_details', label:'View details'},{key:'from',        label:'From'},
-    {key:'compare_at',   label:'Compare at'},  {key:'only_x_left', label:'Only X left'},
-    {key:'free_shipping',label:'Free shipping'},
+    {key:'add_to_cart',   ref:'Add to cart',                                        def:'Add to cart'},
+    {key:'unavailable',   ref:'Unavailable',                                        def:'Unavailable'},
+    {key:'sold_out',      ref:'Sold out',                                            def:'Sold out'},
+    {key:'sale',          ref:'Sale',                                                def:'Sale'},
+    {key:'load_more',     ref:'Load more',                                           def:'Load more'},
+    {key:'show',          ref:'Show',                                                def:'Show'},
+    {key:'search_prods',  ref:'Search products',                                     def:'Search products'},
+    {key:'no_products',   ref:'Sorry, there are no products in this collection',     def:'Sorry, there are no products in this collection'},
   ],
   search:[
-    {key:'search_placeholder',label:'Search (placeholder)'},{key:'no_results',   label:'No results found'},
-    {key:'results_for',       label:'Search results for'}, {key:'did_you_mean',  label:'Did you mean?'},
-    {key:'view_all',          label:'View all results'},    {key:'products',      label:'Products'},
-    {key:'collections',       label:'Collections'},         {key:'pages',         label:'Pages'},
-    {key:'clear_search',      label:'Clear search'},        {key:'suggestions',   label:'Suggestions'},
+    {key:'suggestions',           ref:'Suggestions',                                 def:'Suggestions'},
+    {key:'collections',           ref:'Collections',                                 def:'Collections'},
+    {key:'blog_posts',            ref:'Blog Posts',                                  def:'Blog Posts'},
+    {key:'pages',                 ref:'Pages',                                       def:'Pages'},
+    {key:'product',               ref:'Product',                                     def:'Product'},
+    {key:'products',              ref:'Products',                                    def:'Products'},
+    {key:'search_for',            ref:'Search for',                                  def:'Search for'},
+    {key:'view_all_products',     ref:'View all products',                           def:'View all products'},
+    {key:'empty_search_msg',      ref:'Empty search message',                        def:'Sorry, nothing found for'},
+    {key:'product_not_found',     ref:'Product not found message',                   def:'No products were found'},
+    {key:'no_res_prods_title',    ref:'No result products suggestions title',        def:'However, You may like'},
+    {key:'no_res_kw_title',       ref:'No result keywords suggestions title',        def:'Popular searches'},
+    {key:'zero_char_prods_title', ref:'Zero character products suggestions title',   def:'Trending products'},
+    {key:'zero_char_kw_title',    ref:'Zero character keywords suggestions title',   def:''},
   ],
   filter:[
-    {key:'filters',     label:'Filters'},      {key:'filter',      label:'Filter'},
-    {key:'clear_all',   label:'Clear all'},     {key:'apply',       label:'Apply'},
-    {key:'show_results',label:'Show results'},  {key:'price',       label:'Price'},
-    {key:'from',        label:'From'},          {key:'to',          label:'To'},
-    {key:'in_stock',    label:'In stock'},      {key:'available',   label:'Available'},
-    {key:'more',        label:'More'},          {key:'less',        label:'Less'},
-    {key:'selected',    label:'Selected'},      {key:'remove',      label:'Remove'},
+    {key:'filter_by',     ref:'Filter By',        def:'Filter By'},
+    {key:'clear_all',     ref:'Clear All',         def:'Clear All'},
+    {key:'view',          ref:'View',              def:'View'},
+    {key:'clear',         ref:'Clear',             def:'Clear'},
+    {key:'in_stock',      ref:'In Stock',          def:'In Stock'},
+    {key:'out_of_stock',  ref:'Out of Stock',      def:'Out of Stock'},
+    {key:'ready_to_ship', ref:'Ready to ship',     def:'Ready to ship'},
+    {key:'search_options',ref:'Search options',    def:'Search options'},
+    {key:'choose_values', ref:'Choose values',     def:'Choose values'},
+    {key:'show_more',     ref:'Show more',         def:'Show more'},
+    {key:'show_less',     ref:'Show less',         def:'Show less'},
   ],
   sort:[
-    {key:'sort_by',     label:'Sort by'},       {key:'featured',    label:'Featured'},
-    {key:'best_selling',label:'Best Selling'},   {key:'newest',      label:'Newest'},
-    {key:'oldest',      label:'Oldest'},         {key:'discount',    label:'% Discount'},
-    {key:'az',          label:'Alphabetical: A-Z'},{key:'za',        label:'Alphabetical: Z-A'},
-    {key:'price_asc',   label:'Price: Low to High'},{key:'price_desc',label:'Price: High to Low'},
-    {key:'inventory',   label:'Stock Availability'},
+    {key:'sort_by',         ref:'Sort By',                        def:'Sort By'},
+    {key:'featured',        ref:'Featured',                       def:'Featured'},
+    {key:'manually',        ref:'Manually',                       def:''},
+    {key:'availability',    ref:'Availability',                   def:'Availability'},
+    {key:'avail_instock',   ref:'Availability, in-stock first',   def:''},
+    {key:'relevance',       ref:'Relevance',                      def:'Relevance'},
+    {key:'most_relevant',   ref:'Most relevant',                  def:'Most relevant'},
+    {key:'best_selling',    ref:'Best Selling',                   def:'Best Selling'},
+    {key:'az',              ref:'Alphabetically, A-Z',            def:'Alphabetically, A-Z'},
+    {key:'za',              ref:'Alphabetically, Z-A',            def:'Alphabetically, Z-A'},
+    {key:'price_asc',       ref:'Price, low to high',             def:'Price, low to high'},
+    {key:'price_desc',      ref:'Price, high to low',             def:'Price, high to low'},
+    {key:'date_new',        ref:'Date, new to old',               def:'Date, new to old'},
+    {key:'date_old',        ref:'Date, old to new',               def:'Date, old to new'},
+    {key:'inv_low_high',    ref:'Inventory quantity, low to high',def:''},
+    {key:'inv_high_low',    ref:'Inventory quantity, high to low',def:''},
+    {key:'sale_off',        ref:'% Sale off',                     def:'% Sale off'},
+  ],
+  filterlabels:[
+    {key:'collection',    ref:'Collection',     def:''},
+    {key:'category',      ref:'Category',       def:''},
+    {key:'vendor',        ref:'Vendor',         def:''},
+    {key:'product_type',  ref:'Product Type',   def:''},
+    {key:'price',         ref:'Price',          def:''},
+    {key:'percent_sale',  ref:'Percent Sale',   def:''},
+    {key:'availability',  ref:'Availability',   def:''},
+    {key:'tag',           ref:'Tag',            def:''},
+    {key:'ready_to_ship', ref:'Ready To Ship',  def:''},
+    {key:'location',      ref:'Location',       def:''},
+    {key:'color',         ref:'Color',          def:''},
+    {key:'design',        ref:'Design',         def:''},
+    {key:'landscape',     ref:'Landscape',      def:''},
+    {key:'portrait',      ref:'Portrait',       def:''},
+    {key:'shape',         ref:'Shape',          def:''},
+    {key:'size',          ref:'Size',           def:''},
+    {key:'title',         ref:'Title',          def:''},
+    {key:'type',          ref:'Type',           def:''},
   ],
   ymm:[
-    {key:'year',          label:'Year'},          {key:'make',          label:'Make'},
-    {key:'model',         label:'Model'},          {key:'select_year',   label:'Select Year'},
-    {key:'select_make',   label:'Select Make'},    {key:'select_model',  label:'Select Model'},
-    {key:'find_parts',    label:'Find parts'},     {key:'reset',         label:'Reset'},
-    {key:'fits',          label:'Fits your vehicle'},{key:'does_not_fit',label:'Does not fit'},
-    {key:'select_vehicle',label:'Select a vehicle'},{key:'change_vehicle',label:'Change vehicle'},
+    {key:'form_heading',       ref:'Form heading',              def:'Search products'},
+    {key:'select_placeholder', ref:'Select placeholder',        def:'-- Select --'},
+    {key:'search_input',       ref:'Search input placeholder',  def:'Search'},
+    {key:'search_button',      ref:'Search button text',        def:'Search'},
   ],
+  custom:[],
 };
 
 let activeSubtab='product';
-function emptyTranslations(){
+
+function defaultTranslations(){
   const t={};
-  for(const tab of SUBTABS){t[tab.id]={};for(const f of FIELDS[tab.id])t[tab.id][f.key]='';}
+  for(const st of SUBTABS){
+    t[st.id]={};
+    for(const f of (FIELDS[st.id]||[]))t[st.id][f.key]='';
+  }
   return t;
 }
-let workingTranslations=emptyTranslations();
-let savedTranslations=emptyTranslations();
+let workingTranslations=defaultTranslations();
+let savedTranslations=defaultTranslations();
+
+// Override from localStorage
+(()=>{
+  const stored=lsLoad();
+  if(stored){
+    // Merge: keep defaults for missing keys, override with stored values
+    for(const st of SUBTABS){
+      if(stored[st.id]){
+        for(const f of (FIELDS[st.id]||[])){
+          if(stored[st.id][f.key]!==undefined)workingTranslations[st.id][f.key]=stored[st.id][f.key];
+        }
+      }
+    }
+    savedTranslations=JSON.parse(JSON.stringify(workingTranslations));
+  }
+})();
 
 function renderSubtabs(){
   $('subtab-bar').innerHTML=SUBTABS.map(t=>`<button data-tab="${t.id}" class="tab${t.id===activeSubtab?' act':''}">${escapeHtml(t.label)}</button>`).join('');
   $('subtab-bar').querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{flushFields();activeSubtab=b.dataset.tab;renderSubtabs();renderFields();});
 }
+
 function renderFields(){
-  const fields=FIELDS[activeSubtab];
-  const vals=workingTranslations[activeSubtab];
-  $('fields-area').innerHTML=fields.map(f=>`
-    <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--bdr)">
-      <span style="width:192px;flex-shrink:0;font-weight:550;font-size:13px">${escapeHtml(f.label)}</span>
-      <svg style="width:16px;height:16px;fill:var(--textd);flex-shrink:0" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.69L11.72 6.53a.75.75 0 0 1 1.06-1.06l4 4a.75.75 0 0 1 0 1.06l-4 4a.75.75 0 1 1-1.06-1.06l2.72-2.72H3.75A.75.75 0 0 1 3 10Z" fill="currentColor"/></svg>
-      <input data-key="${f.key}" type="text" value="${escapeHtml(vals[f.key]||'')}" placeholder="Translation…" class="inp" style="flex:1">
-    </div>`).join('');
-  const rows=$('fields-area').children;
-  if(rows.length)rows[rows.length-1].style.borderBottom='none';
+  const fields=FIELDS[activeSubtab]||[];
+  const vals=workingTranslations[activeSubtab]||{};
+  if(!fields.length){
+    $('fields-area').innerHTML=`<div class="custom-empty">
+      <svg style="width:40px;height:40px;fill:var(--textd)" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a.75.75 0 0 1 .75.75v.512a6.5 6.5 0 0 1 5.05 8.12.75.75 0 0 1-1.452-.37A5 5 0 0 0 5.378 5H6.25a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 5.75V3.25a.75.75 0 0 1 1.5 0v.634A6.484 6.484 0 0 1 9.25 3.28V2.75A.75.75 0 0 1 10 2ZM5.148 13.853a5 5 0 0 0 8.76-1.488.75.75 0 0 1 1.452.37A6.5 6.5 0 0 1 4.95 11.62V11h-.2a.75.75 0 0 1 0-1.5h2.5a.75.75 0 0 1 .75.75v2.5a.75.75 0 0 1-1.5 0v-.897Z" fill="currentColor"/></svg>
+      <p style="font-size:13px;font-weight:550;color:var(--text2)">No custom translations yet</p>
+      <p style="font-size:12px;color:var(--textd)">Custom translation keys will appear here once added.</p>
+    </div>`;
+    return;
+  }
+  // Header row
+  let html=`<div class="col-hdr">
+    <span class="col-hdr-ref">Reference</span>
+    <span style="width:28px;flex-shrink:0"></span>
+    <span class="col-hdr-eng">English</span>
+  </div>`;
+  // Data rows
+  html+=fields.map(f=>{
+    const v=vals[f.key]||'';
+    return `<div class="fld-row">
+      <span class="fld-ref">${escapeHtml(f.ref)}</span>
+      <span class="fld-chev">${IC.chvSmall}</span>
+      <div class="fld-eng">
+        <input data-key="${f.key}" type="text" value="${escapeHtml(v)}" placeholder="${escapeHtml(f.ref)}" class="inp">
+      </div>
+    </div>`;
+  }).join('');
+  $('fields-area').innerHTML=html;
 }
+
 function flushFields(){
-  $('fields-area').querySelectorAll('[data-key]').forEach(inp=>{workingTranslations[activeSubtab][inp.dataset.key]=inp.value;});
+  $('fields-area').querySelectorAll('[data-key]').forEach(inp=>{
+    if(!workingTranslations[activeSubtab])workingTranslations[activeSubtab]={};
+    workingTranslations[activeSubtab][inp.dataset.key]=inp.value;
+  });
 }
 
 $('save-translate').onclick=()=>{
-  flushFields();savedTranslations=JSON.parse(JSON.stringify(workingTranslations));
+  flushFields();
+  savedTranslations=JSON.parse(JSON.stringify(workingTranslations));
+  lsSave(workingTranslations);
   const btn=$('save-translate');btn.innerHTML=IC.chk+' Saved';
   setTimeout(()=>{btn.innerHTML='Save';},1500);
 };
-$('cancel-translate').onclick=()=>{workingTranslations=JSON.parse(JSON.stringify(savedTranslations));renderFields();};
+$('cancel-translate').onclick=()=>{
+  workingTranslations=JSON.parse(JSON.stringify(savedTranslations));
+  renderFields();
+};
 
 renderNav();renderSubtabs();renderFields();
 </script>
