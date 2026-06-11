@@ -379,6 +379,8 @@ let NO_RES_IDS=[1,3,6];
 let NO_RES_KEYWORDS=['sale','clearance','deals'];
 let ZERO_CHAR_IDS=[1,2,3,4,5,6,7,8];
 let NUMERIC_ENABLED=true;
+let PARTIAL_ENABLED=true;
+let TYPO_ENABLED=false;
 let SEARCH_FIELDS=new Set(['title','tags','type','vendor','sku','color']);
 let VARIANT_ENABLED=false;
 let VARIANT_SPLIT=new Set();
@@ -410,6 +412,8 @@ function loadSettingsFromStorage(){
     if(sch.noResultKeywords)NO_RES_KEYWORDS=sch.noResultKeywords;
     if(sch.zeroCharProductIds&&sch.zeroCharProductIds.length)ZERO_CHAR_IDS=sch.zeroCharProductIds;
     NUMERIC_ENABLED=sch.numericEnabled!==undefined?sch.numericEnabled:true;
+    PARTIAL_ENABLED=sch.partialEnabled!==undefined?sch.partialEnabled:true;
+    TYPO_ENABLED=sch.typoEnabled!==undefined?sch.typoEnabled:false;
   }
   if(syn&&syn.length)SYNONYMS=buildSynMap(syn);
   if(rd&&rd.length)REDIRECTS=rd.map(r=>({terms:r.terms.split(',').map(t=>t.trim()).filter(Boolean),url:r.url,label:r.url}));
@@ -658,18 +662,48 @@ function renderZeroChar(){
     </div>`).join('');
 }
 
-/* ── Numeric parsing ── */
+/* ── Numeric / discount parsing ── */
 function parseNumeric(q){
   if(!NUMERIC_ENABLED)return null;
-  const range=q.match(/\$?(\d+(?:\.\d+)?)\s*[-–]\s*\$?(\d+(?:\.\d+)?)/);
-  if(range){const lo=+range[1],hi=+range[2];return p=>p>=lo&&p<=hi;}
+  // 1. Percentage range: "20-30%"
+  const pctRange=q.match(/(\d+(?:\.\d+)?)\s*[-–]\s*(\d+(?:\.\d+)?)\s*%/);
+  if(pctRange){const lo=+pctRange[1]/100,hi=+pctRange[2]/100;
+    return{type:'discount',fn:p=>{const d=p.ca>p.price?(p.ca-p.price)/p.ca:0;return d>=lo&&d<=hi;}};}
+  // 2. Single percentage: "20%" or "sale 50%"
+  const pctSingle=q.match(/(\d+(?:\.\d+)?)\s*%/);
+  if(pctSingle){const lo=+pctSingle[1]/100;
+    return{type:'discount',fn:p=>{const d=p.ca>p.price?(p.ca-p.price)/p.ca:0;return d>=lo;}};}
+  // 3. Price range: "$70-$100" or "70-100" (no %)
+  const priceRange=q.match(/\$?(\d+(?:\.\d+)?)\s*[-–]\s*\$?(\d+(?:\.\d+)?)/);
+  if(priceRange){const lo=+priceRange[1],hi=+priceRange[2];return{type:'price',fn:p=>p.price>=lo&&p.price<=hi};}
+  // 4. Under / over
   const under=q.match(/under\s+\$?(\d+(?:\.\d+)?)/);
-  if(under){const hi=+under[1];return p=>p<=hi;}
+  if(under){return{type:'price',fn:p=>p.price<=+under[1]};}
   const over=q.match(/over\s+\$?(\d+(?:\.\d+)?)/);
-  if(over){const lo=+over[1];return p=>p>=lo;}
+  if(over){return{type:'price',fn:p=>p.price>=+over[1]};}
+  // 5. Exact price: "$50"
   const exact=q.match(/^\$(\d+(?:\.\d+)?)$/);
-  if(exact){const v=+exact[1];return p=>Math.abs(p-v)/v<=0.25;}
+  if(exact){const v=+exact[1];return{type:'price',fn:p=>Math.abs(p.price-v)/v<=0.25};}
   return null;
+}
+
+/* ── Token matching — respects PARTIAL_ENABLED and TYPO_ENABLED ── */
+function levenshtein(a,b){
+  const m=a.length,n=b.length;
+  if(Math.abs(m-n)>3)return 99;
+  const dp=Array.from({length:m+1},(_,i)=>Array.from({length:n+1},(_,j)=>i?(j?0:i):j));
+  for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)
+    dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+  return dp[m][n];
+}
+function matchToken(token,haystack){
+  if(PARTIAL_ENABLED){if(haystack.includes(token))return true;}
+  else{const re=new RegExp('\\b'+token.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b');if(re.test(haystack))return true;}
+  if(TYPO_ENABLED&&token.length>=4){
+    const maxDist=token.length<=5?1:2;
+    return haystack.split(/\s+/).some(w=>levenshtein(token,w)<=maxDist);
+  }
+  return false;
 }
 
 /* ── Live search ── */
@@ -686,9 +720,11 @@ function doSearch(){
     renderZeroChar();return;
   }
   $('so-zero').classList.add('hidden');
-  const qLow=q.toLowerCase();
+  // Normalize: strip special chars (keep $, %, -, .), collapse spaces
+  const qNorm=q.toLowerCase().replace(/[^a-z0-9\s$%.\-]/g,' ').replace(/\s+/g,' ').trim();
 
-  // Redirect check
+  // Redirect check (use original lowercase for exact matching)
+  const qLow=q.toLowerCase();
   let redirected=false;
   for(const rd of REDIRECTS){
     if(rd.terms.some(t=>qLow===t||qLow.split(/\s+/).includes(t))){
@@ -699,21 +735,35 @@ function doSearch(){
   }
   if(!redirected)$('so-rd-msg').classList.add('hidden');
 
-  // No-result keyword check
-  const tokens=qLow.split(/\s+/).filter(t=>t&&!STOP_WORDS.has(t));
-  const isNoResKw=NO_RES_KEYWORDS.some(kw=>qLow===kw.toLowerCase()||tokens.includes(kw.toLowerCase()));
+  // Numeric / discount filter
+  const numeric=parseNumeric(qNorm);
 
-  // Numeric
-  const numeric=parseNumeric(qLow);
+  // Strip numeric pattern + modifier words from text query
+  let textQ=qNorm;
+  if(numeric){
+    textQ=textQ
+      .replace(/\d+(?:\.\d+)?\s*[-–]\s*\d+(?:\.\d+)?\s*%/,' ')
+      .replace(/\d+(?:\.\d+)?\s*%/,' ')
+      .replace(/\$?\d+(?:\.\d+)?\s*[-–]\s*\$?\d+(?:\.\d+)?/,' ')
+      .replace(/under\s+\$?\d+(?:\.\d+)?/,' ')
+      .replace(/over\s+\$?\d+(?:\.\d+)?/,' ')
+      .replace(/\b(sale|discount|off|cheap)\b/g,' ')
+      .replace(/\s+/g,' ').trim();
+  }
+
+  // Tokenize remaining text
+  const tokens=textQ.split(/\s+/).filter(t=>t&&!STOP_WORDS.has(t));
+  const isNoResKw=NO_RES_KEYWORDS.some(kw=>qLow===kw.toLowerCase()||qLow.split(/\s+/).includes(kw.toLowerCase()));
 
   // Expand synonyms
   const allTerms=new Set(tokens);
   tokens.forEach(t=>(SYNONYMS[t]||[]).forEach(s=>allTerms.add(s)));
 
   let products=getDisplayProducts();
-  if(numeric){
-    products=products.filter(p=>numeric(p.price));
-  }else if(allTerms.size){
+  // Apply numeric/discount filter
+  if(numeric)products=products.filter(p=>numeric.fn(p));
+  // Apply text filter on remaining tokens (if any)
+  if(allTerms.size){
     products=products.filter(p=>{
       const parts=[];
       if(SEARCH_FIELDS.has('title'))parts.push(p.title);
@@ -723,7 +773,7 @@ function doSearch(){
       if(SEARCH_FIELDS.has('sku'))parts.push(p.sku);
       if(SEARCH_FIELDS.has('tags'))parts.push(...(p.tags||[]));
       const haystack=parts.join(' ').toLowerCase();
-      return[...allTerms].some(t=>haystack.includes(t));
+      return[...allTerms].some(t=>matchToken(t,haystack));
     });
   }
 
