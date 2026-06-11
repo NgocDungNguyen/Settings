@@ -38,6 +38,10 @@ a{color:var(--lnk)}
 .nav-btn:hover:not([disabled]){background:var(--sf-hov);color:var(--text)}
 .nav-btn.act{background:var(--sf-act)!important;color:var(--text)!important;font-weight:650}
 .nav-btn[disabled]{color:var(--textd)!important;cursor:not-allowed}
+.nav-more{width:100%;border:none;background:transparent;cursor:pointer;padding:4px 12px;font-family:var(--ff);font-size:12px;color:var(--textd);text-align:left;display:flex;align-items:center;gap:4px;transition:color .1s;white-space:nowrap}
+.nav-more:hover{color:var(--text2)}
+.nav-sp{flex:1;min-height:4px}
+.nav-sep{height:1px;background:var(--bdr);margin:2px 0;flex-shrink:0}
 .nav-lbl{overflow:hidden;text-overflow:ellipsis}
 .main{flex:1;overflow-x:hidden}
 .pg{max-width:960px;margin:0 auto;padding:24px}
@@ -49,8 +53,13 @@ a{color:var(--lnk)}
 .sc:hover{box-shadow:var(--sh3),0 0 0 2px rgba(0,0,0,.12)}
 .sc-ttl{font-size:13px;font-weight:650;display:flex;align-items:center;gap:6px;margin-bottom:4px}
 .sc-sub{font-size:12px;color:var(--text2);line-height:1.5}
+.sc-dim{display:block;text-decoration:none;background:var(--sf);border-radius:var(--r2);box-shadow:var(--sh3);padding:16px;opacity:.55;cursor:default}
 .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.mt5{margin-top:20px}.mt6{margin-top:24px}
+.stabs{display:flex;gap:8px}
+.stab{padding:7px 16px;border-radius:var(--r2);font-size:13px;font-weight:550;cursor:pointer;border:1px solid var(--bdr);background:var(--sf);color:var(--text2);font-family:var(--ff);transition:background .1s,color .1s,border-color .1s;white-space:nowrap}
+.stab:hover{border-color:var(--bdr2,#bbb);color:var(--text)}
+.stab.act{background:var(--fill);color:#fff;border-color:var(--fill)}
+.mt5{margin-top:20px}.mt4{margin-top:16px}.mt6{margin-top:24px}
 .hidden{display:none!important}
 </style>
 </head>
@@ -70,7 +79,8 @@ a{color:var(--lnk)}
     <div class="pg">
       <h1 class="pg-ttl">Settings</h1>
       <p class="pg-sub">Configure how Findter behaves across your store.</p>
-      <div id="settings-cards" class="g3 mt6"></div>
+      <div class="stabs mt6" id="stab-bar"></div>
+      <div id="settings-cards" class="g3 mt4"></div>
     </div>
   </main>
 </div>
@@ -81,31 +91,40 @@ const IC={
   chevL:`<svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.78 5.97a.75.75 0 0 1 0 1.06L8.81 10l2.97 2.97a.75.75 0 1 1-1.06 1.06l-3.5-3.5a.75.75 0 0 1 0-1.06l3.5-3.5a.75.75 0 0 1 1.06 0Z" fill="currentColor"/></svg>`,
   chevR:`<svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.22 5.97a.75.75 0 0 0 0 1.06L11.19 10 8.22 12.97a.75.75 0 1 0 1.06 1.06l3.5-3.5a.75.75 0 0 0 0-1.06l-3.5-3.5a.75.75 0 0 0-1.06 0Z" fill="currentColor"/></svg>`,
 };
-const NAV=[
-  {id:'filter',label:'Filter'},{id:'search',label:'Search'},
-  {id:'metafield',label:'Metafield'},
-  {id:'grid',label:'Filter & Product Grid Design'},{id:'settings',label:'Settings'},
-  {id:'analytics',label:'Analytics'},{id:'advanced',label:'Advanced Features'},
-  {id:'storefront',label:'Storefront Preview'},
+const NAV_MAIN=[
+  {id:'filter',   label:'Filter'},
+  {id:'search',   label:'Search'},
+  {id:'settings', label:'Settings'},
+  {id:'ymm',      label:'Year Make Model'},
+  {id:'advanced', label:'Advanced Feature'},
+  {id:'analytics',label:'Analytics'},
 ];
-const ENABLED=new Set(['settings','metafield','search','storefront']);
+const NAV_MORE_ITEMS=[{id:'subscription',label:'Subscription'}];
+const NAV_BTM={id:'storefront',label:'Storefront Preview'};
+const ENABLED=new Set(['search','settings','ymm','storefront']);
 const ACTIVE='settings';
 let col=false;
+let navExp=false;
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function renderNav(){
-  $('nav').innerHTML=NAV.map(n=>{
-    const en=ENABLED.has(n.id),act=n.id===ACTIVE;
-    return `<button data-nav="${n.id}" ${en?'':'disabled'} class="nav-btn${act?' act':''}" title="${n.label}"><span class="nav-lbl">${escapeHtml(n.label)}</span></button>`;
-  }).join('');
+  function nb(n,act,en,style){return`<button data-nav="${n.id}"${en?'':' disabled'} class="nav-btn${act?' act':''}" title="${n.label}"${style?` style="${style}"`:''}><span class="nav-lbl">${escapeHtml(n.label)}</span></button>`;}
+  const main=NAV_MAIN.map(n=>nb(n,n.id===ACTIVE,ENABLED.has(n.id))).join('');
+  const tgl=`<button id="nav-exp" class="nav-more"><span class="nav-lbl">${navExp?'View less':'View more'}</span><svg style="flex-shrink:0;transition:transform .2s;transform:rotate(${navExp?180:0}deg)" width="10" height="10" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"/></svg></button>`;
+  const more=navExp?NAV_MORE_ITEMS.map(n=>nb(n,n.id===ACTIVE,ENABLED.has(n.id),'padding-left:24px')).join(''):'';
+  const btm=nb(NAV_BTM,NAV_BTM.id===ACTIVE,ENABLED.has(NAV_BTM.id));
+  $('nav').innerHTML=main+tgl+more+`<div class="nav-sp"></div><div class="nav-sep"></div>`+btm;
   $('nav').querySelectorAll('[data-nav]').forEach(b=>{
-    if(ENABLED.has(b.dataset.nav))b.onclick=()=>{
+    if(!ENABLED.has(b.dataset.nav))return;
+    b.onclick=()=>{
       const v=b.dataset.nav;
       if(v==='settings')location.href='index.html';
-      else if(v==='metafield')location.href='Metafield.html';
       else if(v==='search')location.href='Search.html';
+      else if(v==='ymm')location.href='YearMakeModel.html';
       else if(v==='storefront')location.href='StoreFront.html';
     };
   });
+  const expBtn=$('nav-exp');
+  if(expBtn)expBtn.onclick=()=>{navExp=!navExp;renderNav();updateSb();};
   updateSb();
 }
 function updateSb(){
@@ -113,22 +132,49 @@ function updateSb(){
   $('sidebar').querySelectorAll('.nav-lbl').forEach(el=>el.classList.toggle('hidden',col));
   document.querySelector('.sb-name').classList.toggle('hidden',col);
   $('toggle-icon').innerHTML=col?IC.chevR:IC.chevL;
+  const expBtn=$('nav-exp');if(expBtn)expBtn.style.display=col?'none':'';
 }
 $('sidebar-toggle').onclick=()=>{col=!col;updateSb();};
-const CARDS=[
-  {title:'Sort By',                           sub:'Configure the sort options shoppers see on collection pages.',        href:'Sort_by.html'},
-  {title:'Translating',                       sub:'Manage translations for filter labels and messages.',                href:'Translate.html'},
-{title:'Show variants as separate product', sub:'Display each product variant as an individual item in collections.', href:'Variant.html'},
-  {title:'Search Redirect',                   sub:'Redirect customers to specific URLs when they search for keywords.', href:'Search_Redirect.html'},
+
+/* ── Settings tabs ── */
+const BASIC_CARDS=[
+  {title:'Metafield',                    sub:'Configure metafield mappings for your product data.',              href:'Metafield.html'},
+  {title:'Filter & Product Grid Design', sub:'Customize the filter panel layout and product grid appearance.',   href:null},
 ];
+const ADVANCED_CARDS=[
+  {title:'Sort By',                           sub:'Configure the sort options shoppers see on collection pages.',       href:'Sort_by.html'},
+  {title:'Translating',                       sub:'Manage translations for filter labels and messages.',               href:'Translate.html'},
+  {title:'Show variants as separate product', sub:'Display each product variant as an individual item in collections.',href:'Variant.html'},
+  {title:'Search Redirect',                   sub:'Redirect customers to specific URLs when they search for keywords.',href:'Search_Redirect.html'},
+];
+let stab='basic';
+
+function renderSettingsTabs(){
+  $('stab-bar').innerHTML=
+    `<button class="stab${stab==='basic'?' act':''}" id="stab-basic">Basic Settings</button>`+
+    `<button class="stab${stab==='advanced'?' act':''}" id="stab-advanced">Advanced Settings</button>`;
+  $('stab-basic').onclick=()=>{stab='basic';renderSettingsTabs();renderCards();};
+  $('stab-advanced').onclick=()=>{stab='advanced';renderSettingsTabs();renderCards();};
+}
+
 function renderCards(){
-  $('settings-cards').innerHTML=CARDS.map(c=>`
-    <a href="${c.href}" class="sc">
+  const cards=stab==='basic'?BASIC_CARDS:ADVANCED_CARDS;
+  $('settings-cards').innerHTML=cards.map(c=>{
+    if(!c.href){
+      return `<div class="sc-dim">
+        <div class="sc-ttl">${escapeHtml(c.title)}</div>
+        <p class="sc-sub">${escapeHtml(c.sub)}</p>
+        <p style="font-size:11px;color:var(--textd);margin-top:8px">Coming soon</p>
+      </div>`;
+    }
+    return `<a href="${c.href}" class="sc">
       <div class="sc-ttl">${escapeHtml(c.title)} ${IC.arrR}</div>
       <p class="sc-sub">${escapeHtml(c.sub)}</p>
-    </a>`).join('');
+    </a>`;
+  }).join('');
 }
-renderNav();renderCards();
+
+renderNav();renderSettingsTabs();renderCards();
 </script>
 </body>
 </html>

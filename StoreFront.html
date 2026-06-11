@@ -144,6 +144,10 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .asb-btn:hover:not([disabled]){background:#f7f7f7;color:#303030}
 .asb-btn.cur{background:#f3f3f3!important;color:#303030!important;font-weight:650}
 .asb-btn[disabled]{color:#b5b5b5!important;cursor:not-allowed}
+.asb-more{width:100%;border:none;background:transparent;cursor:pointer;padding:4px 12px;font-family:'Inter',sans-serif;font-size:12px;color:#b5b5b5;text-align:left;display:flex;align-items:center;gap:4px;transition:color .1s;white-space:nowrap}
+.asb-more:hover{color:#616161}
+.asb-sp{flex:1;min-height:4px}
+.asb-sep{height:1px;background:#e3e3e3;margin:2px 0;flex-shrink:0}
 .asb-lbl{overflow:hidden;text-overflow:ellipsis;flex:1}
 .asb-live{font-size:10px;font-weight:700;background:#16a34a;color:#fff;padding:2px 6px;border-radius:3px;margin-left:6px;flex-shrink:0;letter-spacing:.03em}
 </style>
@@ -278,31 +282,37 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 const $=id=>document.getElementById(id);
 
 /* ── Admin sidebar ── */
-const ASB_NAV=[
-  {id:'filter',label:'Filter'},{id:'search',label:'Search'},
-  {id:'metafield',label:'Metafield'},
-  {id:'grid',label:'Filter & Product Grid Design'},{id:'settings',label:'Settings'},
-  {id:'analytics',label:'Analytics'},{id:'advanced',label:'Advanced Features'},
-  {id:'storefront',label:'Storefront Preview',live:true},
+const ASB_MAIN=[
+  {id:'filter',   label:'Filter'},
+  {id:'search',   label:'Search'},
+  {id:'settings', label:'Settings'},
+  {id:'ymm',      label:'Year Make Model'},
+  {id:'advanced', label:'Advanced Feature'},
+  {id:'analytics',label:'Analytics'},
 ];
-const ASB_ENABLED=new Set(['settings','metafield','search','storefront']);
+const ASB_MORE_ITEMS=[{id:'subscription',label:'Subscription'}];
+const ASB_BTM={id:'storefront',label:'Storefront Preview',live:true};
+const ASB_ENABLED=new Set(['search','settings','ymm','storefront']);
 let asbCol=false;
+let asbExp=false;
 function renderAsb(){
-  $('asb-body').innerHTML=ASB_NAV.map(n=>{
-    const en=ASB_ENABLED.has(n.id),act=n.id==='storefront';
-    return `<button data-an="${esc(n.id)}" ${en?'':'disabled'} class="asb-btn${act?' cur':''}" ${act?'style="cursor:default"':''}>
-      <span class="asb-lbl">${esc(n.label)}</span>${n.live?'<span class="asb-live">LIVE</span>':''}
-    </button>`;
-  }).join('');
+  function ab(n,act,en,style){const s=[act?'cursor:default':null,style].filter(Boolean).join(';');return`<button data-an="${esc(n.id)}"${en?'':' disabled'} class="asb-btn${act?' cur':''}"${s?` style="${s}"`:''}><span class="asb-lbl">${esc(n.label)}</span>${n.live?'<span class="asb-live">LIVE</span>':''}</button>`;}
+  const main=ASB_MAIN.map(n=>ab(n,false,ASB_ENABLED.has(n.id))).join('');
+  const tgl=`<button id="asb-exp" class="asb-more"><span class="asb-lbl">${asbExp?'View less':'View more'}</span><svg style="flex-shrink:0;transition:transform .2s;transform:rotate(${asbExp?180:0}deg)" width="10" height="10" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"/></svg></button>`;
+  const more=asbExp?ASB_MORE_ITEMS.map(n=>ab(n,false,ASB_ENABLED.has(n.id),'padding-left:24px')).join(''):'';
+  const btm=ab(ASB_BTM,true,true);
+  $('asb-body').innerHTML=main+tgl+more+`<div class="asb-sp"></div><div class="asb-sep"></div>`+btm;
   $('asb-body').querySelectorAll('[data-an]').forEach(b=>{
     if(!ASB_ENABLED.has(b.dataset.an)||b.dataset.an==='storefront')return;
     b.onclick=()=>{
       const v=b.dataset.an;
       if(v==='settings')location.href='index.html';
-      else if(v==='metafield')location.href='Metafield.html';
       else if(v==='search')location.href='Search.html';
+      else if(v==='ymm')location.href='YearMakeModel.html';
     };
   });
+  const expBtn=$('asb-exp');
+  if(expBtn)expBtn.onclick=()=>{asbExp=!asbExp;renderAsb();if(asbCol)setAsbWidth(56);};
 }
 function setAsbWidth(w){
   document.body.style.paddingLeft=w+'px';
@@ -312,6 +322,7 @@ function setAsbWidth(w){
   $('asb-body').querySelectorAll('.asb-lbl,.asb-live').forEach(el=>el.style.display=collapsed?'none':'');
   $('asb').querySelector('.asb-name').style.display=collapsed?'none':'';
   $('asb-tgl').textContent=collapsed?'›':'‹';
+  const expBtn=$('asb-exp');if(expBtn)expBtn.style.display=collapsed?'none':'';
 }
 $('asb-tgl').onclick=()=>{asbCol=!asbCol;$('asb').classList.toggle('col',asbCol);setAsbWidth(asbCol?56:248);};
 renderAsb();
