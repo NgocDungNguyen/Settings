@@ -372,7 +372,7 @@ const NAV_MAIN=[
 ];
 const NAV_MORE_ITEMS=[{id:'subscription',label:'Subscription'}];
 const NAV_BTM={id:'storefront',label:'Storefront Preview'};
-const ENABLED=new Set(['search','settings','ymm','storefront']);
+const ENABLED=new Set(['filter','search','settings','advanced','storefront']);
 const ACTIVE='search';
 let col=false;
 let navExp=false;
@@ -383,14 +383,15 @@ function renderNav(){
   const tgl=`<button id="nav-exp" class="nav-more"><span class="nav-lbl">${navExp?'View less':'View more'}</span><svg style="flex-shrink:0;transition:transform .2s;transform:rotate(${navExp?180:0}deg)" width="10" height="10" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"/></svg></button>`;
   const more=navExp?NAV_MORE_ITEMS.map(n=>nb(n,n.id===ACTIVE,ENABLED.has(n.id),'padding-left:24px')).join(''):'';
   const btm=nb(NAV_BTM,NAV_BTM.id===ACTIVE,ENABLED.has(NAV_BTM.id));
-  $('nav').innerHTML=main+tgl+more+`<div class="nav-sp"></div><div class="nav-sep"></div>`+btm;
+  $('nav').innerHTML=main+more+btm+`<div class="nav-sep" style="margin-top:auto;flex-shrink:0"></div>`+tgl;
   $('nav').querySelectorAll('[data-nav]').forEach(b=>{
     if(!ENABLED.has(b.dataset.nav))return;
     b.onclick=()=>{
       const v=b.dataset.nav;
-      if(v==='settings')location.href='index.html';
+      if(v==='settings')location.href='Settings.html';
       else if(v==='search')location.href='Search.html';
-      else if(v==='ymm')location.href='YearMakeModel.html';
+      else if(v==='filter')location.href='Filter.html';
+      else if(v==='advanced')location.href='Advanced_Feature.html';
       else if(v==='storefront')location.href='StoreFront.html';
     };
   });

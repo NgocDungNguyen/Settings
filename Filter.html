@@ -7,6 +7,37 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
   <style>
+    *,*::before,*::after{box-sizing:border-box}
+    :root{
+    --ff:'Inter',-apple-system,BlinkMacSystemFont,'San Francisco','Segoe UI',sans-serif;
+    --bg:rgba(241,241,241,1);--sf:#fff;--sf-hov:rgba(247,247,247,1);--sf-act:rgba(243,243,243,1);
+    --fill:#303030;--fill-hov:#1a1a1a;--fill-t:rgba(0,0,0,.02);
+    --text:rgba(48,48,48,1);--text2:rgba(97,97,97,1);--textd:rgba(181,181,181,1);--lnk:rgba(0,91,211,1);
+    --bdr:rgba(227,227,227,1);--bdr-foc:rgba(0,91,211,1);--crit:rgba(181,38,11,1);
+    --r1:4px;--r2:8px;--r3:12px;
+    --sh1:0px 1px 0px 0px rgba(26,26,26,.07);
+    --sh3:0px 4px 6px -2px rgba(26,26,26,.2);
+    }
+    .lay{display:flex;min-height:100vh}
+    .sb{width:248px;background:var(--sf);border-right:1px solid var(--bdr);display:flex;flex-direction:column;flex-shrink:0;transition:width .25s;min-height:100vh}
+    .sb.col{width:56px}
+    .sb-hd{padding:12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bdr);gap:8px;overflow:hidden}
+    .sb-logo{width:28px;height:28px;border-radius:6px;background:var(--fill);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .sb-title{font-size:13px;font-weight:650;color:var(--text);flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+    .sb-tgl{width:28px;height:28px;border:none;background:transparent;cursor:pointer;border-radius:var(--r1);display:flex;align-items:center;justify-content:center;color:var(--text2);flex-shrink:0}
+    .sb-tgl:hover{background:var(--sf-hov)}
+    .sb-nav{padding:8px;display:flex;flex-direction:column;gap:2px;flex:1}
+    .nav-btn{width:100%;border:none;background:transparent;cursor:pointer;padding:6px 12px;border-radius:var(--r2);font-family:var(--ff);font-size:13px;font-weight:450;color:var(--text2);text-align:left;display:flex;align-items:center;overflow:hidden;transition:background .1s,color .1s;white-space:nowrap}
+    .nav-btn:hover:not([disabled]){background:var(--sf-hov);color:var(--text)}
+    .nav-btn.act{background:var(--sf-act)!important;color:var(--text)!important;font-weight:650}
+    .nav-btn[disabled]{color:var(--textd)!important;cursor:not-allowed}
+    .nav-more{width:100%;border:none;background:transparent;cursor:pointer;padding:4px 12px;font-family:var(--ff);font-size:12px;color:var(--textd);text-align:left;display:flex;align-items:center;gap:4px;transition:color .1s;white-space:nowrap}
+    .nav-more:hover{color:var(--text2)}
+    .nav-sp{flex:1;min-height:4px}
+    .nav-sep{height:1px;background:var(--bdr);margin:2px 0;flex-shrink:0}
+    .nav-lbl{overflow:hidden;text-overflow:ellipsis}
+    .ic{width:16px;height:16px;fill:currentColor;display:block;flex-shrink:0}
+    .hidden{display:none!important}
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     }
@@ -32,65 +63,18 @@
     }
   </style>
 </head>
-<body class="bg-[#f1f2f4] overflow-hidden">
+<body style="margin:0;padding:0">
 
-<div class="flex h-screen text-gray-800">
-
-  <!-- Sidebar -->
-  <aside class="w-[260px] bg-[#ebebeb] border-r border-gray-300 flex flex-col h-full overflow-y-auto shrink-0 text-[13px] font-medium text-[#4a4a4a] py-3">
-    <div class="px-3 mb-4 space-y-1">
-      <a href="#" class="flex items-center px-2 py-1.5 rounded hover:bg-gray-200"><i class="fas fa-home w-6 text-gray-500 text-center"></i> Home</a>
-      <a href="#" class="flex items-center px-2 py-1.5 rounded hover:bg-gray-200"><i class="fas fa-inbox w-6 text-gray-500 text-center"></i> Orders</a>
-      <a href="#" class="flex items-center px-2 py-1.5 rounded hover:bg-gray-200"><i class="fas fa-tag w-6 text-gray-500 text-center"></i> Products</a>
-      <a href="#" class="flex items-center px-2 py-1.5 rounded hover:bg-gray-200"><i class="fas fa-user w-6 text-gray-500 text-center"></i> Customers</a>
-      <a href="#" class="flex items-center px-2 py-1.5 rounded hover:bg-gray-200"><i class="fas fa-bullhorn w-6 text-gray-500 text-center"></i> Marketing</a>
-      <a href="#" class="flex items-center px-2 py-1.5 rounded hover:bg-gray-200"><i class="fas fa-percent w-6 text-gray-500 text-center"></i> Discounts</a>
-      <a href="#" class="flex items-center px-2 py-1.5 rounded hover:bg-gray-200"><i class="fas fa-folder w-6 text-gray-500 text-center"></i> Content</a>
-      <a href="#" class="flex items-center px-2 py-1.5 rounded hover:bg-gray-200"><i class="fas fa-globe w-6 text-gray-500 text-center"></i> Markets</a>
-      <a href="#" class="flex items-center px-2 py-1.5 rounded hover:bg-gray-200"><i class="fas fa-chart-line w-6 text-gray-500 text-center"></i> Analytics</a>
+<div class="lay">
+  <aside class="sb" id="sidebar">
+    <div class="sb-hd">
+      <div class="sb-logo">Fd</div>
+      <span class="sb-title nav-lbl">Findter Filter &amp; Search</span>
+      <button class="sb-tgl" id="sidebar-toggle" title="Toggle sidebar">
+        <span id="toggle-icon"><svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.78 5.97a.75.75 0 0 1 0 1.06L8.81 10l2.97 2.97a.75.75 0 1 1-1.06 1.06l-3.5-3.5a.75.75 0 0 1 0-1.06l3.5-3.5a.75.75 0 0 1 1.06 0Z" fill="currentColor"/></svg></span>
+      </button>
     </div>
-    
-    <div class="px-5 py-1 flex items-center justify-between text-xs text-gray-500 font-semibold cursor-pointer hover:bg-gray-200 rounded mx-2">
-      <span>Sales channels</span>
-      <i class="fas fa-chevron-right text-[10px]"></i>
-    </div>
-    <div class="px-3 mb-4">
-      <a href="#" class="flex items-center px-2 py-1.5 rounded hover:bg-gray-200"><i class="fas fa-store w-6 text-gray-500 text-center"></i> Online Store</a>
-    </div>
-
-    <div class="px-5 py-1 flex items-center justify-between text-xs text-gray-500 font-semibold cursor-pointer hover:bg-gray-200 rounded mx-2">
-      <span>Apps</span>
-      <i class="fas fa-chevron-right text-[10px]"></i>
-    </div>
-    <div class="px-3 space-y-1">
-      <a href="#" class="flex items-center px-2 py-1.5 rounded bg-transparent font-bold text-gray-900">
-        <div class="bg-gray-800 text-white rounded w-5 h-5 flex items-center justify-center mr-2 text-[10px]"><i class="fas fa-filter"></i></div>
-        <span class="truncate w-40">Findter Custom Filter & Se...</span>
-      </a>
-      <div class="ml-[22px] pl-3 border-l-2 border-gray-300 space-y-0.5 py-1">
-        <a href="#" class="flex items-center text-gray-900 bg-white shadow-sm font-bold rounded px-2 py-1 relative">
-          <div class="absolute -left-[14px] top-1/2 w-3 h-[2px] bg-gray-300"></div>
-          Filter
-        </a>
-        <a href="#" class="block text-gray-600 hover:text-gray-900 rounded px-2 py-1">Search</a>
-        <a href="#" class="block text-gray-600 hover:text-gray-900 rounded px-2 py-1">Metafield</a>
-        <a href="#" class="block text-gray-600 hover:text-gray-900 rounded px-2 py-1">Custom design (New)</a>
-        <a href="#" class="block text-gray-600 hover:text-gray-900 rounded px-2 py-1">Analytics</a>
-      </div>
-      
-      <a href="#" class="flex items-center px-2 py-1.5 rounded hover:bg-gray-200 mt-2 text-gray-600">
-        <div class="bg-gray-600 text-white rounded w-5 h-5 flex items-center justify-center mr-2 text-[10px]">X</div>
-        <span class="truncate w-40">XCloud Search & Product ...</span>
-      </a>
-      <a href="#" class="flex items-center px-2 py-1.5 rounded hover:bg-gray-200 text-gray-600">
-        <div class="bg-blue-600 text-white rounded w-5 h-5 flex items-center justify-center mr-2 text-[10px]"><i class="fas fa-filter"></i></div>
-        <span class="truncate w-40">Smart Filter & Search</span>
-      </a>
-      <a href="#" class="flex items-center px-2 py-1.5 rounded hover:bg-gray-200 text-gray-600">
-        <div class="bg-indigo-500 text-white rounded w-5 h-5 flex items-center justify-center mr-2 text-[10px]"><i class="fas fa-search"></i></div>
-        <span class="truncate w-40">Searchanise Search &...</span>
-      </a>
-    </div>
+    <div class="sb-nav" id="nav"></div>
   </aside>
 
   <!-- Main content area -->
@@ -401,7 +385,7 @@
     </div>
 
   </div>
-</div>
+</div><!-- end .lay -->
 
 <script>
   // Navigation
@@ -653,6 +637,60 @@
 
   initCollectionLists();
   bindActions();
+</script>
+
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+  const IC_chevL=`<svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.78 5.97a.75.75 0 0 1 0 1.06L8.81 10l2.97 2.97a.75.75 0 1 1-1.06 1.06l-3.5-3.5a.75.75 0 0 1 0-1.06l3.5-3.5a.75.75 0 0 1 1.06 0Z" fill="currentColor"/></svg>`;
+  const IC_chevR=`<svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.22 5.97a.75.75 0 0 0 0 1.06L11.19 10 8.22 12.97a.75.75 0 1 0 1.06 1.06l3.5-3.5a.75.75 0 0 0 0-1.06l-3.5-3.5a.75.75 0 0 0-1.06 0Z" fill="currentColor"/></svg>`;
+  const NAV_MAIN=[
+    {id:'filter',   label:'Filter'},
+    {id:'search',   label:'Search'},
+    {id:'settings', label:'Settings'},
+    {id:'ymm',      label:'Year Make Model'},
+    {id:'advanced', label:'Advanced Feature'},
+    {id:'analytics',label:'Analytics'},
+  ];
+  const NAV_MORE_ITEMS=[{id:'subscription',label:'Subscription'}];
+  const NAV_BTM={id:'storefront',label:'Storefront Preview'};
+  const ENABLED=new Set(['filter','search','settings','advanced','storefront']);
+  const ACTIVE='filter';
+  let col=false;
+  let navExp=false;
+  function escHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  function renderNav(){
+    function nb(n,act,en,style){return`<button data-nav="${n.id}"${en?'':' disabled'} class="nav-btn${act?' act':''}" title="${n.label}"${style?` style="${style}"`:''}><span class="nav-lbl">${escHtml(n.label)}</span></button>`;}
+    const main=NAV_MAIN.map(n=>nb(n,n.id===ACTIVE,ENABLED.has(n.id))).join('');
+    const tgl=`<button id="nav-exp" class="nav-more"><span class="nav-lbl">${navExp?'View less':'View more'}</span><svg style="flex-shrink:0;transition:transform .2s;transform:rotate(${navExp?180:0}deg)" width="10" height="10" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"/></svg></button>`;
+    const more=navExp?NAV_MORE_ITEMS.map(n=>nb(n,n.id===ACTIVE,ENABLED.has(n.id),'padding-left:24px')).join(''):'';
+    const btm=nb(NAV_BTM,NAV_BTM.id===ACTIVE,ENABLED.has(NAV_BTM.id));
+    $('nav').innerHTML=main+more+btm+`<div class="nav-sep" style="margin-top:auto;flex-shrink:0"></div>`+tgl;
+    $('nav').querySelectorAll('[data-nav]').forEach(b=>{
+      if(!ENABLED.has(b.dataset.nav))return;
+      b.onclick=()=>{
+        const v=b.dataset.nav;
+        if(v==='settings')location.href='Settings.html';
+        else if(v==='search')location.href='Search.html';
+        else if(v==='filter')location.href='Filter.html';
+        else if(v==='advanced')location.href='Advanced_Feature.html';
+        else if(v==='storefront')location.href='StoreFront.html';
+      };
+    });
+    const expBtn=$('nav-exp');
+    if(expBtn)expBtn.onclick=()=>{navExp=!navExp;renderNav();updateSb();};
+    updateSb();
+  }
+  function updateSb(){
+    $('sidebar').classList.toggle('col',col);
+    $('sidebar').querySelectorAll('.nav-lbl').forEach(el=>el.classList.toggle('hidden',col));
+    document.querySelector('.sb-title').classList.toggle('hidden',col);
+    $('toggle-icon').innerHTML=col?IC_chevR:IC_chevL;
+    const expBtn=$('nav-exp');if(expBtn)expBtn.style.display=col?'none':'';
+  }
+  $('sidebar-toggle').onclick=()=>{col=!col;updateSb();};
+  renderNav();
+})();
 </script>
 
 </body>
