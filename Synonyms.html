@@ -173,7 +173,7 @@ const NAV_MAIN=[
 ];
 const NAV_MORE_ITEMS=[{id:'subscription',label:'Subscription'}];
 const NAV_BTM={id:'storefront',label:'Storefront Preview'};
-const ENABLED=new Set(['filter','search','settings','advanced','storefront']);
+const ENABLED=new Set(['filter','search','settings','ymm','advanced','storefront']);
 const ACTIVE='search';
 let col=false;
 let navExp=false;
@@ -192,6 +192,7 @@ function renderNav(){
       if(v==='settings')location.href='Settings.html';
       else if(v==='search')location.href='Search.html';
       else if(v==='filter')location.href='Filter.html';
+      else if(v==='ymm')location.href='YearMakeModel.html';
       else if(v==='advanced')location.href='Advanced_Feature.html';
       else if(v==='storefront')location.href='StoreFront.html';
     };
