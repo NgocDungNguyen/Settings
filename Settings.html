@@ -49,16 +49,16 @@ a{color:var(--lnk)}
 .pg-sub{font-size:13px;color:var(--text2);margin-top:4px}
 .ic{width:16px;height:16px;fill:currentColor;display:block;flex-shrink:0}
 .ic-sm{width:12px;height:12px;fill:currentColor;display:block;flex-shrink:0}
-.sc{display:block;text-decoration:none;background:var(--sf);border-radius:var(--r2);box-shadow:var(--sh3);padding:16px;transition:box-shadow .15s}
-.sc:hover{box-shadow:var(--sh3),0 0 0 2px rgba(0,0,0,.12)}
+.sc{display:block;text-decoration:none;background:var(--sf);border-radius:var(--r2);border:1px solid var(--bdr);padding:16px;transition:box-shadow .15s,border-color .15s}
+.sc:hover{box-shadow:var(--sh3);border-color:rgba(0,0,0,.15)}
 .sc-ttl{font-size:13px;font-weight:650;display:flex;align-items:center;gap:6px;margin-bottom:4px}
 .sc-sub{font-size:12px;color:var(--text2);line-height:1.5}
-.sc-dim{display:block;text-decoration:none;background:var(--sf);border-radius:var(--r2);box-shadow:var(--sh3);padding:16px;opacity:.55;cursor:default}
-.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.stabs{display:flex;gap:8px}
-.stab{padding:7px 16px;border-radius:var(--r2);font-size:13px;font-weight:550;cursor:pointer;border:1px solid var(--bdr);background:var(--sf);color:var(--text2);font-family:var(--ff);transition:background .1s,color .1s,border-color .1s;white-space:nowrap}
-.stab:hover{border-color:var(--bdr2,#bbb);color:var(--text)}
-.stab.act{background:var(--fill);color:#fff;border-color:var(--fill)}
+.sc-dim{display:block;text-decoration:none;background:var(--sf);border-radius:var(--r2);border:1px solid var(--bdr);padding:16px;opacity:.55;cursor:default}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.sec{background:var(--sf);border-radius:var(--r3);border:1px solid var(--bdr);overflow:hidden;margin-top:24px}
+.sec-hd{padding:14px 20px;border-bottom:1px solid var(--bdr);background:rgba(250,250,250,1)}
+.sec-ttl{font-size:13px;font-weight:650;color:var(--text)}
+.sec-bd{padding:20px}
 .mt5{margin-top:20px}.mt4{margin-top:16px}.mt6{margin-top:24px}
 .hidden{display:none!important}
 </style>
@@ -78,8 +78,14 @@ a{color:var(--lnk)}
     <div class="pg">
       <h1 class="pg-ttl">Settings</h1>
       <p class="pg-sub">Configure how Findter behaves across your store.</p>
-      <div class="stabs mt6" id="stab-bar"></div>
-      <div id="settings-cards" class="g3 mt4"></div>
+      <div class="sec" id="basic">
+        <div class="sec-hd"><span class="sec-ttl">Basic Settings</span></div>
+        <div class="sec-bd"><div class="g3" id="basic-cards"></div></div>
+      </div>
+      <div class="sec" id="advanced">
+        <div class="sec-hd"><span class="sec-ttl">Advanced Settings</span></div>
+        <div class="sec-bd"><div class="g3" id="advanced-cards"></div></div>
+      </div>
     </div>
   </main>
 </div>
@@ -137,46 +143,29 @@ function updateSb(){
 }
 $('sidebar-toggle').onclick=()=>{col=!col;updateSb();};
 
-/* ── Settings tabs ── */
+/* ── Settings cards ── */
 const BASIC_CARDS=[
-  {title:'Metafield',                    sub:'Configure metafield mappings for your product data.',              href:'Metafield.html'},
-  {title:'Filter & Product Grid Design', sub:'Customize the filter panel layout and product grid appearance.',   href:'Custom_Design.html'},
+  {title:'Metafield',                    sub:'Configure metafield mappings for your product data.',            href:'Metafield.html'},
+  {title:'Filter & Product Grid Design', sub:'Customize the filter panel layout and product grid appearance.', href:'Custom_Design.html'},
 ];
 const ADVANCED_CARDS=[
-  {title:'Sort By',                           sub:'Configure the sort options shoppers see on collection pages.',       href:'Sort_by.html'},
-  {title:'Translating',                       sub:'Manage translations for filter labels and messages.',               href:'Translate.html'},
-  {title:'Show variants as separate product', sub:'Display each product variant as an individual item in collections.',href:'Variant.html'},
-  {title:'Search Redirect',                   sub:'Redirect customers to specific URLs when they search for keywords.',href:'Search_Redirect.html'},
+  {title:'Sort By',                           sub:'Configure the sort options shoppers see on collection pages.',        href:'Sort_by.html'},
+  {title:'Translating',                       sub:'Manage translations for filter labels and messages.',                href:'Translate.html'},
+  {title:'Show variants as separate product', sub:'Display each product variant as an individual item in collections.', href:'Variant.html'},
+  {title:'Search Redirect',                   sub:'Redirect customers to specific URLs when they search for keywords.', href:'Search_Redirect.html'},
 ];
-const _initHash=location.hash.slice(1);
-let stab=(_initHash==='basic'||_initHash==='advanced')?_initHash:'basic';
 
-function renderSettingsTabs(){
-  $('stab-bar').innerHTML=
-    `<button class="stab${stab==='basic'?' act':''}" id="stab-basic">Basic Settings</button>`+
-    `<button class="stab${stab==='advanced'?' act':''}" id="stab-advanced">Advanced Settings</button>`;
-  $('stab-basic').onclick=()=>{stab='basic';renderSettingsTabs();renderCards();};
-  $('stab-advanced').onclick=()=>{stab='advanced';renderSettingsTabs();renderCards();};
+function card(c){
+  if(!c.href) return `<div class="sc-dim"><div class="sc-ttl">${escapeHtml(c.title)}</div><p class="sc-sub">${escapeHtml(c.sub)}</p><p style="font-size:11px;color:var(--textd);margin-top:8px">Coming soon</p></div>`;
+  return `<a href="${c.href}" class="sc"><div class="sc-ttl">${escapeHtml(c.title)} ${IC.arrR}</div><p class="sc-sub">${escapeHtml(c.sub)}</p></a>`;
 }
 
 function renderCards(){
-  const cards=stab==='basic'?BASIC_CARDS:ADVANCED_CARDS;
-  $('settings-cards').innerHTML=cards.map(c=>{
-    if(!c.href){
-      return `<div class="sc-dim">
-        <div class="sc-ttl">${escapeHtml(c.title)}</div>
-        <p class="sc-sub">${escapeHtml(c.sub)}</p>
-        <p style="font-size:11px;color:var(--textd);margin-top:8px">Coming soon</p>
-      </div>`;
-    }
-    return `<a href="${c.href}" class="sc">
-      <div class="sc-ttl">${escapeHtml(c.title)} ${IC.arrR}</div>
-      <p class="sc-sub">${escapeHtml(c.sub)}</p>
-    </a>`;
-  }).join('');
+  $('basic-cards').innerHTML=BASIC_CARDS.map(card).join('');
+  $('advanced-cards').innerHTML=ADVANCED_CARDS.map(card).join('');
 }
 
-renderNav();renderSettingsTabs();renderCards();
+renderNav();renderCards();
 </script>
 </body>
 </html>
