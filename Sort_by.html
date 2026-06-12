@@ -174,7 +174,7 @@ const IC={
 };
 
 // ── localStorage helpers ──
-const LS_KEY='findter_sortby';
+const LS_KEY='findter_sortby_v2';
 function lsLoad(){try{const r=localStorage.getItem(LS_KEY);return r?JSON.parse(r):null;}catch(e){return null;}}
 function lsSave(d){try{localStorage.setItem(LS_KEY,JSON.stringify(d));}catch(e){}}
 
@@ -300,8 +300,7 @@ function renderOptions(){
       </td>
     </tr>`).join('');
 
-  const noteRow=`<tr style="pointer-events:none"><td colspan="5" style="padding:6px 14px;background:var(--fill-t);font-size:12px;color:var(--text2);border-bottom:1px solid var(--bdr)">Only one of these can be active.</td></tr>`;
-  tb.innerHTML=noteRow+exclRows+sepRow+regRows;
+  tb.innerHTML=exclRows+sepRow+regRows;
 
   tb.querySelectorAll('[data-toggle-excl]').forEach(btn=>btn.onclick=()=>{
     exclusiveActive=btn.dataset.toggleExcl;renderOptions();
