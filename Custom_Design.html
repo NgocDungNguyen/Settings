@@ -4406,5 +4406,18 @@ function updateSb(){
 $('sidebar-toggle').onclick=()=>{col=!col;updateSb();};
 renderNav();
 })();</script>
+<script>(function(){
+  var params=new URLSearchParams(location.search);
+  if(params.has('embed')){
+    var sb=document.getElementById('sidebar');
+    if(sb)sb.style.display='none';
+    document.querySelectorAll('[title="Back to Settings"]').forEach(function(a){a.style.display='none';});
+    var tf=document.getElementById('tab-filter');
+    if(tf){var sw=tf.closest('div');if(sw)sw.style.display='none';}
+    if(params.get('section')==='grid')switchTab(1);else switchTab(0);
+    var h1=document.querySelector('h1.text-lg');
+    if(h1)h1.textContent=(params.get('section')==='grid')?'Product Grid & Card design':'Filter Design';
+  }
+})();</script>
 </body>
 </html>

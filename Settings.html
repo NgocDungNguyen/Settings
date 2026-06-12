@@ -25,8 +25,8 @@
 }
 html,body{font-family:var(--ff);background:var(--bg);color:var(--text);font-size:13px;line-height:1.5;min-height:100vh}
 a{color:var(--lnk)}
-.lay{display:flex;min-height:100vh}
-.sb{width:248px;background:var(--sf);border-right:1px solid var(--bdr);display:flex;flex-direction:column;flex-shrink:0;transition:width .25s;min-height:100vh}
+.lay{display:flex;height:100vh;overflow:hidden}
+.sb{width:248px;background:var(--sf);border-right:1px solid var(--bdr);display:flex;flex-direction:column;flex-shrink:0;transition:width .25s;height:100%;overflow-y:auto}
 .sb.col{width:56px}
 .sb-hd{padding:12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bdr);gap:8px;overflow:hidden}
 .sb-logo{width:28px;height:28px;border-radius:6px;background:var(--fill);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -43,23 +43,15 @@ a{color:var(--lnk)}
 .nav-sp{flex:1;min-height:4px}
 .nav-sep{height:1px;background:var(--bdr);margin:2px 0;flex-shrink:0}
 .nav-lbl{overflow:hidden;text-overflow:ellipsis}
-.main{flex:1;overflow-x:hidden}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
 .pg{max-width:960px;margin:0 auto;padding:24px}
 .pg-ttl{font-size:1.25rem;font-weight:650;line-height:1.3}
 .pg-sub{font-size:13px;color:var(--text2);margin-top:4px}
 .ic{width:16px;height:16px;fill:currentColor;display:block;flex-shrink:0}
 .ic-sm{width:12px;height:12px;fill:currentColor;display:block;flex-shrink:0}
-.sc{display:block;text-decoration:none;background:var(--sf);border-radius:var(--r2);border:1px solid var(--bdr);padding:16px;transition:box-shadow .15s,border-color .15s}
-.sc:hover{box-shadow:var(--sh3);border-color:rgba(0,0,0,.15)}
-.sc-ttl{font-size:13px;font-weight:650;display:flex;align-items:center;gap:6px;margin-bottom:4px}
-.sc-sub{font-size:12px;color:var(--text2);line-height:1.5}
-.sc-dim{display:block;text-decoration:none;background:var(--sf);border-radius:var(--r2);border:1px solid var(--bdr);padding:16px;opacity:.55;cursor:default}
-.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.sec{background:var(--sf);border-radius:var(--r3);border:1px solid var(--bdr);overflow:hidden;margin-top:24px}
-.sec-hd{padding:14px 20px;border-bottom:1px solid var(--bdr);background:rgba(250,250,250,1)}
-.sec-ttl{font-size:13px;font-weight:650;color:var(--text)}
-.sec-bd{padding:20px}
-.mt5{margin-top:20px}.mt4{margin-top:16px}.mt6{margin-top:24px}
+.stg-tab{padding:6px 14px;border:1px solid var(--bdr);background:#fff;cursor:pointer;font-family:var(--ff);font-size:13px;font-weight:450;color:var(--text);border-radius:var(--r2);white-space:nowrap;transition:background .1s,color .1s,border-color .1s;flex-shrink:0}
+.stg-tab:hover{border-color:#aaa;background:var(--sf-hov)}
+.stg-tab.act{background:var(--fill);color:#fff;border-color:var(--fill);font-weight:550}
 .hidden{display:none!important}
 </style>
 </head>
@@ -74,19 +66,14 @@ a{color:var(--lnk)}
     </div>
     <div class="sb-nav" id="nav"></div>
   </aside>
-  <main class="main">
-    <div class="pg">
+  <main class="main" style="display:flex;flex-direction:column;overflow:hidden;min-height:0">
+    <div style="padding:20px 24px 16px;background:var(--sf);border-bottom:1px solid var(--bdr);flex-shrink:0">
       <h1 class="pg-ttl">Settings</h1>
-      <p class="pg-sub">Configure how Findter behaves across your store.</p>
-      <div class="sec" id="basic">
-        <div class="sec-hd"><span class="sec-ttl">Basic Settings</span></div>
-        <div class="sec-bd"><div class="g3" id="basic-cards"></div></div>
-      </div>
-      <div class="sec" id="advanced">
-        <div class="sec-hd"><span class="sec-ttl">Advanced Settings</span></div>
-        <div class="sec-bd"><div class="g3" id="advanced-cards"></div></div>
-      </div>
     </div>
+    <div style="padding:12px 24px;background:var(--bg);border-bottom:1px solid var(--bdr);flex-shrink:0;display:flex;justify-content:center;overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none">
+      <div id="stg-tabs" style="display:flex;gap:8px;flex-wrap:nowrap"></div>
+    </div>
+    <iframe id="stg-frame" src="" style="flex:1;width:100%;border:none;display:block;min-height:0" frameborder="0"></iframe>
   </main>
 </div>
 <script>
@@ -143,29 +130,33 @@ function updateSb(){
 }
 $('sidebar-toggle').onclick=()=>{col=!col;updateSb();};
 
-/* ── Settings cards ── */
-const BASIC_CARDS=[
-  {title:'Metafield',                    sub:'Configure metafield mappings for your product data.',            href:'Metafield.html'},
-  {title:'Filter & Product Grid Design', sub:'Customize the filter panel layout and product grid appearance.', href:'Custom_Design.html'},
+/* ── Settings inline tabs ── */
+const STG_PAGES=[
+  {id:'metafield', label:'Metafield',                         href:'Metafield.html?embed=1'},
+  {id:'filterdesign', label:'Filter Design',       href:'Custom_Design.html?embed=1&section=filter'},
+  {id:'griddesign',   label:'Product Grid & Card', href:'Custom_Design.html?embed=1&section=grid'},
+  {id:'sortby',    label:'Sort By',                href:'Sort_by.html?embed=1'},
+  {id:'translate', label:'Translating',            href:'Translate.html?embed=1'},
+  {id:'variant',   label:'Separated variant products', href:'Variant.html?embed=1'},
+  {id:'redirect',  label:'Search Redirect',                   href:'Search_Redirect.html?embed=1'},
 ];
-const ADVANCED_CARDS=[
-  {title:'Sort By',                           sub:'Configure the sort options shoppers see on collection pages.',        href:'Sort_by.html'},
-  {title:'Translating',                       sub:'Manage translations for filter labels and messages.',                href:'Translate.html'},
-  {title:'Show variants as separate product', sub:'Display each product variant as an individual item in collections.', href:'Variant.html'},
-  {title:'Search Redirect',                   sub:'Redirect customers to specific URLs when they search for keywords.', href:'Search_Redirect.html'},
-];
+let activeSTG=STG_PAGES[0].id;
 
-function card(c){
-  if(!c.href) return `<div class="sc-dim"><div class="sc-ttl">${escapeHtml(c.title)}</div><p class="sc-sub">${escapeHtml(c.sub)}</p><p style="font-size:11px;color:var(--textd);margin-top:8px">Coming soon</p></div>`;
-  return `<a href="${c.href}" class="sc"><div class="sc-ttl">${escapeHtml(c.title)} ${IC.arrR}</div><p class="sc-sub">${escapeHtml(c.sub)}</p></a>`;
+function renderSTabs(){
+  $('stg-tabs').innerHTML=STG_PAGES.map(p=>
+    `<button data-sp="${p.id}" class="stg-tab${p.id===activeSTG?' act':''}">${escapeHtml(p.label)}</button>`
+  ).join('');
+  $('stg-tabs').querySelectorAll('[data-sp]').forEach(btn=>{
+    btn.onclick=()=>{activeSTG=btn.dataset.sp;renderSTabs();loadSTG();};
+  });
 }
 
-function renderCards(){
-  $('basic-cards').innerHTML=BASIC_CARDS.map(card).join('');
-  $('advanced-cards').innerHTML=ADVANCED_CARDS.map(card).join('');
+function loadSTG(){
+  const p=STG_PAGES.find(x=>x.id===activeSTG);
+  if(p)$('stg-frame').src=p.href;
 }
 
-renderNav();renderCards();
+renderNav();renderSTabs();loadSTG();
 </script>
 </body>
 </html>
