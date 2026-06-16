@@ -148,16 +148,6 @@ a{color:var(--lnk)}
           </div>
           <div class="card-bd">
             <div>
-              <p class="flbl">Keywords</p>
-              <p class="fhint" style="margin-top:0;margin-bottom:8px">Shoppers searching these terms will trigger the suggestions below.</p>
-              <div id="kw-tags" style="display:flex;flex-wrap:wrap;gap:4px;min-height:0"></div>
-              <div class="frow mt3" style="gap:6px">
-                <input id="kw-inp" class="inp inp-sm" style="flex:1" type="text" placeholder="Type a keyword and press Enter" autocomplete="off">
-                <button id="kw-add" class="btn btn-s btn-sm">Add</button>
-              </div>
-            </div>
-
-            <div style="border-top:1px solid var(--bdr);padding-top:14px">
               <div class="fbc" style="margin-bottom:4px">
                 <p class="flbl" style="margin-bottom:0">Product Suggestions</p>
                 <span id="nr-prod-count" style="font-size:12px;color:var(--text2)">0/5</span>
@@ -174,22 +164,62 @@ a{color:var(--lnk)}
           </div>
         </div>
 
-        <!-- Card 3: Stop Words -->
+        <!-- Card 3: Zero Character Suggestions -->
         <div class="card mt4">
           <div class="card-hd">
-            <p class="card-hd-ttl">Stop Words</p>
-            <p class="card-hd-sub">Ignore filler words to improve search matching speed.</p>
+            <p class="card-hd-ttl">Zero Character Suggestions</p>
+            <p class="card-hd-sub">Products shown when a shopper opens search without typing anything.</p>
           </div>
           <div class="card-bd">
-            <div id="sw-tags" style="display:flex;flex-wrap:wrap;gap:4px"></div>
-            <div class="frow" style="gap:6px">
-              <input id="sw-inp" class="inp inp-sm" style="flex:1" type="text" placeholder="Add a stop word…" autocomplete="off">
-              <button id="sw-add" class="btn btn-s btn-sm">Add</button>
+            <div class="fbc">
+              <p class="flbl" style="margin-bottom:0">Products</p>
+              <span id="zc-count" style="font-size:12px;color:var(--text2)">0/10</span>
+            </div>
+            <div id="zc-prod-list" style="display:flex;flex-direction:column;gap:6px"></div>
+            <div id="zc-picker-wrap">
+              <div class="srch" id="zc-picker-trigger">
+                <svg class="ic" style="color:var(--textd);flex-shrink:0" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M13.74 12.68a6.5 6.5 0 1 1 1.06-1.06l3.26 3.27a.75.75 0 1 1-1.06 1.06l-3.26-3.27Zm.76-5.18a5 5 0 1 1-10 0 5 5 0 0 1 10 0Z" fill="currentColor"/></svg>
+                <input id="zc-picker-inp" type="text" placeholder="Search products to add…" autocomplete="off">
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Card 4: Numeric Search -->
+        <!-- Card 4: Partial Search -->
+        <div class="card mt4">
+          <div class="card-hd">
+            <p class="card-hd-ttl">Partial Search</p>
+            <p class="card-hd-sub">Enables prefix, suffix, and infix matching — partial terms find full results.</p>
+          </div>
+          <div class="card-bd">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:16px">
+              <div>
+                <p style="font-weight:550;font-size:13px">Enable partial matching</p>
+                <p class="fhint">Typing "nik" returns "Nike". Typing "ball" returns "baseball".</p>
+              </div>
+              <button type="button" id="tgl-partial" class="tgl on"><span class="tgl-th"></span></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 5: Typo Tolerance -->
+        <div class="card mt4">
+          <div class="card-hd">
+            <p class="card-hd-ttl">Typo Tolerance</p>
+            <p class="card-hd-sub">Return results even when queries contain minor spelling errors.</p>
+          </div>
+          <div class="card-bd">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:16px">
+              <div>
+                <p style="font-weight:550;font-size:13px">Enable typo tolerance</p>
+                <p class="fhint">"snikers" → "sneakers", "iphnoe" → "iPhone".</p>
+              </div>
+              <button type="button" id="tgl-typo" class="tgl off"><span class="tgl-th"></span></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 6: Numeric Search -->
         <div class="card mt4">
           <div class="card-hd">
             <p class="card-hd-ttl">Numeric Search</p>
@@ -223,57 +253,17 @@ a{color:var(--lnk)}
           </div>
         </div>
 
-        <!-- Card 5: Partial Search -->
+        <!-- Card 7: Stop Words -->
         <div class="card mt4">
           <div class="card-hd">
-            <p class="card-hd-ttl">Partial Search</p>
-            <p class="card-hd-sub">Enables prefix, suffix, and infix matching — partial terms find full results.</p>
+            <p class="card-hd-ttl">Stop Words</p>
+            <p class="card-hd-sub">Ignore filler words to improve search matching speed.</p>
           </div>
           <div class="card-bd">
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:16px">
-              <div>
-                <p style="font-weight:550;font-size:13px">Enable partial matching</p>
-                <p class="fhint">Typing "nik" returns "Nike". Typing "ball" returns "baseball".</p>
-              </div>
-              <button type="button" id="tgl-partial" class="tgl on"><span class="tgl-th"></span></button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Card 6: Typo Tolerance -->
-        <div class="card mt4">
-          <div class="card-hd">
-            <p class="card-hd-ttl">Typo Tolerance</p>
-            <p class="card-hd-sub">Return results even when queries contain minor spelling errors.</p>
-          </div>
-          <div class="card-bd">
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:16px">
-              <div>
-                <p style="font-weight:550;font-size:13px">Enable typo tolerance</p>
-                <p class="fhint">"snikers" → "sneakers", "iphnoe" → "iPhone".</p>
-              </div>
-              <button type="button" id="tgl-typo" class="tgl off"><span class="tgl-th"></span></button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Card 7: Zero Character Suggestions -->
-        <div class="card mt4">
-          <div class="card-hd">
-            <p class="card-hd-ttl">Zero Character Suggestions</p>
-            <p class="card-hd-sub">Products shown when a shopper opens search without typing anything.</p>
-          </div>
-          <div class="card-bd">
-            <div class="fbc">
-              <p class="flbl" style="margin-bottom:0">Products</p>
-              <span id="zc-count" style="font-size:12px;color:var(--text2)">0/10</span>
-            </div>
-            <div id="zc-prod-list" style="display:flex;flex-direction:column;gap:6px"></div>
-            <div id="zc-picker-wrap">
-              <div class="srch" id="zc-picker-trigger">
-                <svg class="ic" style="color:var(--textd);flex-shrink:0" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M13.74 12.68a6.5 6.5 0 1 1 1.06-1.06l3.26 3.27a.75.75 0 1 1-1.06 1.06l-3.26-3.27Zm.76-5.18a5 5 0 1 1-10 0 5 5 0 0 1 10 0Z" fill="currentColor"/></svg>
-                <input id="zc-picker-inp" type="text" placeholder="Search products to add…" autocomplete="off">
-              </div>
+            <div id="sw-tags" style="display:flex;flex-wrap:wrap;gap:4px"></div>
+            <div class="frow" style="gap:6px">
+              <input id="sw-inp" class="inp inp-sm" style="flex:1" type="text" placeholder="Add a stop word…" autocomplete="off">
+              <button id="sw-add" class="btn btn-s btn-sm">Add</button>
             </div>
           </div>
         </div>
@@ -509,25 +499,6 @@ function renderFields(){
   });
 }
 
-/* ---- Keywords ---- */
-let noResultKeywords=['sale','clearance','deals'];
-function renderKwTags(){
-  const el=$('kw-tags');
-  el.innerHTML=noResultKeywords.length
-    ?noResultKeywords.map((kw,i)=>`<span class="tag">${escapeHtml(kw)}<button class="tag-x" data-ki="${i}" title="Remove">×</button></span>`).join('')
-    :`<span style="font-size:12px;color:var(--textd)">No keywords added yet.</span>`;
-  el.querySelectorAll('[data-ki]').forEach(b=>{
-    b.onclick=()=>{noResultKeywords.splice(Number(b.dataset.ki),1);renderKwTags();};
-  });
-}
-function addKw(){
-  const v=$('kw-inp').value.trim();
-  if(!v||noResultKeywords.includes(v))return;
-  noResultKeywords.push(v);$('kw-inp').value='';renderKwTags();
-}
-$('kw-add').onclick=addKw;
-$('kw-inp').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addKw();}});
-
 /* ---- No Results Products (max 5) ---- */
 let noResultProducts=[1,2,3];
 function renderNrProds(){
@@ -619,7 +590,6 @@ $('zc-picker-inp').addEventListener('input',()=>openPickerDrop($('zc-picker-trig
 function stateToObj(){
   return{
     fields:[...searchFields],
-    noResultKeywords:[...noResultKeywords],
     noResultProductIds:[...noResultProducts],
     stopWords:[...stopWords],
     numericEnabled:tglNum.classList.contains('on'),
@@ -631,7 +601,6 @@ function stateToObj(){
 function objToState(d){
   return{
     searchFields:new Set(d.fields||[]),
-    noResultKeywords:d.noResultKeywords||[],
     noResultProducts:d.noResultProductIds||[],
     stopWords:d.stopWords||[],
     numericEnabled:d.numericEnabled!==undefined?d.numericEnabled:true,
@@ -645,7 +614,6 @@ function objToState(d){
 function snapshot(){
   return{
     searchFields:new Set(searchFields),
-    noResultKeywords:[...noResultKeywords],
     noResultProducts:[...noResultProducts],
     stopWords:[...stopWords],
     numericEnabled:tglNum.classList.contains('on'),
@@ -656,7 +624,6 @@ function snapshot(){
 }
 function restore(s){
   searchFields=new Set(s.searchFields);renderFields();
-  noResultKeywords=[...s.noResultKeywords];renderKwTags();
   noResultProducts=[...s.noResultProducts];renderNrProds();
   stopWords=[...s.stopWords];renderSwTags();
   tglNum.classList.toggle('on',s.numericEnabled);
