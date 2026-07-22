@@ -150,7 +150,7 @@ a{color:var(--lnk)}
 <div id="edit-modal" class="ov hidden">
   <div class="mo">
     <div class="mo-hd">
-      <span class="mo-ttl">Edit Sort By Label</span>
+      <span class="mo-ttl" id="modal-ttl">Edit Sort By Label</span>
       <button id="modal-close" class="ibtn" style="border:none;box-shadow:none;background:transparent">
         <svg class="ic" viewBox="0 0 20 20"><path d="m11.06 10 3.22-3.22a.75.75 0 0 0-1.06-1.06L10 8.94 6.78 5.72a.75.75 0 0 0-1.06 1.06L8.94 10l-3.22 3.22a.75.75 0 1 0 1.06 1.06L10 11.06l3.22 3.22a.75.75 0 1 0 1.06-1.06L11.06 10Z" fill="currentColor"/></svg>
       </button>
@@ -329,11 +329,13 @@ function renderOptions(){
   });
 }
 
+const DEFAULT_LABELS=Object.fromEntries(DEFAULT_OPTIONS.map(o=>[o.id,o.label]));
 function openEdit(id){
   const o=workingOptions.find(o=>o.id===id);
   if(!o)return;
   editingId=id;
   $('modal-label-input').value=o.label;
+  $('modal-ttl').textContent=`Edit Sort by ${DEFAULT_LABELS[id]||o.label}`;
   $('edit-modal').classList.remove('hidden');
   setTimeout(()=>$('modal-label-input').focus(),50);
 }
