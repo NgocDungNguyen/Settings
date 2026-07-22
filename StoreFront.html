@@ -396,7 +396,6 @@ let TYPO_ENABLED=false;
 let SEARCH_FIELDS=new Set(['title','tags','type','vendor','sku','color']);
 let VARIANT_ENABLED=false;
 let VARIANT_SPLIT=new Set();
-let ACTIVE_EXCLUSIVE='featured';
 let SORT_OPTS_RAW=null;
 let lastQuery='';
 let TRANSLATIONS={};
@@ -412,12 +411,12 @@ function buildSynMap(groups){
 }
 
 function loadSettingsFromStorage(){
-  const sb=lsGet('findter_sortby_v2');
+  const sb=lsGet('findter_sortby_v3');
   const sch=lsGet('findter_search');
   const syn=lsGet('findter_synonyms');
   const rd=lsGet('findter_redirects');
   const vr=lsGet('findter_variant');
-  if(sb){ACTIVE_EXCLUSIVE=sb.exclusiveActive||'featured';SORT_OPTS_RAW=sb.options||null;}
+  if(sb){SORT_OPTS_RAW=sb.options||null;}
   if(sch){
     if(sch.fields&&sch.fields.length)SEARCH_FIELDS=new Set(sch.fields);
     if(sch.stopWords&&sch.stopWords.length)STOP_WORDS=new Set(sch.stopWords);
@@ -500,6 +499,8 @@ function applySort(products){
     case 'priceasc':   return a.sort((x,y)=>x.price-y.price);
     case 'pricedesc':  return a.sort((x,y)=>y.price-x.price);
     case 'inventory':  return a.sort((x,y)=>(y.inventory||0)-(x.inventory||0));
+    case 'rating':     return a.sort((x,y)=>(y.rating||0)-(x.rating||0));
+    case 'review':     return a.sort((x,y)=>(y.reviewCount||0)-(x.reviewCount||0));
     // backward compat keys
     case 'price-asc':  return a.sort((x,y)=>x.price-y.price);
     case 'price-desc': return a.sort((x,y)=>y.price-x.price);
@@ -630,12 +631,9 @@ document.querySelectorAll('.fst-btn').forEach(btn=>{
 /* ── Sort dropdown — driven by settings ── */
 function buildSortOptions(){
   if(!SORT_OPTS_RAW){
-    return[{key:'featured',label:'Featured'},{key:'priceasc',label:'Price: Low to High'},{key:'pricedesc',label:'Price: High to Low'},{key:'az',label:'A – Z'},{key:'best',label:'Best Selling'}];
+    return[{key:'featured',label:'Featured'},{key:'priceasc',label:'Price: Low to High'},{key:'pricedesc',label:'Price: High to Low'}];
   }
-  const opts=[];
-  const excl=SORT_OPTS_RAW.find(o=>o.id===ACTIVE_EXCLUSIVE);
-  if(excl)opts.push({key:excl.id,label:excl.label});
-  SORT_OPTS_RAW.filter(o=>!o.exclusive&&o.enabled).forEach(o=>opts.push({key:o.id,label:o.label}));
+  const opts=SORT_OPTS_RAW.filter(o=>o.enabled).map(o=>({key:o.id,label:o.label}));
   return opts.length?opts:[{key:'featured',label:'Featured'}];
 }
 function openSortDrop(){
@@ -863,12 +861,14 @@ function renderStatusBadge(loaded){
 
 /* ── Init ── */
 const _loaded=loadSettingsFromStorage();
-sortKey=ACTIVE_EXCLUSIVE;
+// Default sort key = first enabled option from settings, fallback to 'featured'
+sortKey=(SORT_OPTS_RAW&&SORT_OPTS_RAW.find(o=>o.enabled))||{id:'featured'};
+sortKey=sortKey.id||'featured';
 // Set initial sort label
 (()=>{
   const opts=buildSortOptions();
   const active=opts.find(o=>o.key===sortKey)||opts[0];
-  if(active)$('sort-lbl').textContent=active.label;
+  if(active){sortKey=active.key;$('sort-lbl').textContent=active.label;}
 })();
 renderFilters();
 renderGrid();

@@ -84,6 +84,12 @@ a{color:var(--lnk)}
 .mt3{margin-top:12px}.mt4{margin-top:16px}.mt5{margin-top:20px}
 .flex{display:flex}.frow{display:flex;gap:8px}.fend{justify-content:flex-end}
 .sec-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text2)}
+.badge{font-size:10px;font-weight:600;color:var(--text2);background:var(--fill-t);border:1px solid var(--bdr);border-radius:3px;padding:1px 5px;vertical-align:middle;white-space:nowrap}
+.tip-wrap{position:relative;display:inline-flex;align-items:center;margin-left:4px;vertical-align:middle;cursor:default}
+.tip-icon{width:14px;height:14px;border-radius:50%;border:1px solid var(--textd);color:var(--textd);font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1}
+.tip-box{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#303030;color:#fff;font-size:11px;border-radius:6px;padding:6px 10px;width:224px;white-space:normal;line-height:1.4;pointer-events:none;opacity:0;transition:opacity .15s;z-index:99;text-align:left;font-weight:400}
+.tip-box::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#303030}
+.tip-wrap:hover .tip-box{opacity:1}
 </style>
 </head>
 <body>
@@ -120,7 +126,7 @@ a{color:var(--lnk)}
 
           <table class="dt">
             <thead><tr>
-              <th style="width:40px"></th>
+              <th style="width:40px">Order</th>
               <th style="width:72px">Status</th>
               <th>Label</th>
               <th>Type</th>
@@ -174,7 +180,7 @@ const IC={
 };
 
 // ── localStorage helpers ──
-const LS_KEY='findter_sortby_v2';
+const LS_KEY='findter_sortby_v3';
 function lsLoad(){try{const r=localStorage.getItem(LS_KEY);return r?JSON.parse(r):null;}catch(e){return null;}}
 function lsSave(d){try{localStorage.setItem(LS_KEY,JSON.stringify(d));}catch(e){}}
 
@@ -225,112 +231,98 @@ function updateSb(){
 }
 $('sidebar-toggle').onclick=()=>{col=!col;updateSb();};
 
-// ── Default options data ──
+// ── Default options ──
 const DEFAULT_OPTIONS=[
-  {id:'featured', label:'Featured',          type:'Manually ordered',            exclusive:true,  enabled:true },
-  {id:'best',     label:'Best Selling',       type:'By total sales',              exclusive:true,  enabled:false},
-  {id:'relevant', label:'Most Relevant',      type:'By search relevance score',   exclusive:true,  enabled:false},
-  {id:'newest',   label:'Newest',             type:'By created date, newest first',exclusive:false,enabled:false},
-  {id:'oldest',   label:'Oldest',             type:'By created date, oldest first',exclusive:false,enabled:false},
-  {id:'discount', label:'% Discount',         type:'By discount amount, highest first',exclusive:false,enabled:false},
-  {id:'az',       label:'Alphabetical: A–Z',  type:'By product title A → Z',      exclusive:false, enabled:false},
-  {id:'za',       label:'Alphabetical: Z–A',  type:'By product title Z → A',      exclusive:false, enabled:false},
-  {id:'priceasc', label:'Price: Low to High', type:'By price, ascending',         exclusive:false, enabled:true },
-  {id:'pricedesc',label:'Price: High to Low', type:'By price, descending',        exclusive:false, enabled:true },
-  {id:'inventory',label:'Stock Availability', type:'By inventory quantity',       exclusive:false, enabled:false},
+  {id:'featured', label:'Featured',          type:'Default/Manually sort',                group:'featured', enabled:true },
+  {id:'best',     label:'Best Selling',       type:'Most popular products first',          group:'grp2',     enabled:false},
+  {id:'relevant', label:'Most Relevant',      type:'Best matches for your search first',   group:'grp2',     enabled:false},
+  {id:'newest',   label:"What's New",         type:'Latest Created',                                         enabled:false},
+  {id:'discount', label:'% Discount',         type:'Biggest discount first',                                 enabled:false},
+  {id:'az',       label:'A-Z',                type:'Alphabet from A to Z',                                   enabled:false},
+  {id:'za',       label:'Z-A',                type:'Alphabet from Z to A',                                   enabled:false},
+  {id:'priceasc', label:'Price: Low to High', type:'Cheapest first',                                         enabled:true },
+  {id:'pricedesc',label:'Price: High to Low', type:'Most expensive first',                                   enabled:true },
+  {id:'inventory',label:'Stock Availability', type:'Most in-stock product first',                            enabled:false},
+  {id:'rating',   label:'Rating',             type:'Product rating high to low',                             enabled:false},
+  {id:'review',   label:'Review',             type:'Review amount high to low',                              enabled:false},
 ];
 
 let workingOptions=[];
-let exclusiveActive='featured';
 let savedOptions=[];
-let savedExclusive='featured';
 let editingId=null;
 
 function initFromStorage(){
   const stored=lsLoad();
   if(stored&&stored.options&&stored.options.length){
-    exclusiveActive=stored.exclusiveActive||'featured';
     workingOptions=stored.options;
-    // merge in any new default options not in stored data
     DEFAULT_OPTIONS.forEach(def=>{
       if(!workingOptions.find(o=>o.id===def.id))workingOptions.push({...def});
     });
+    // drop obsolete ids (e.g. 'oldest')
+    workingOptions=workingOptions.filter(o=>DEFAULT_OPTIONS.find(d=>d.id===o.id));
   } else {
-    exclusiveActive='featured';
     workingOptions=DEFAULT_OPTIONS.map(o=>({...o}));
   }
-  savedExclusive=exclusiveActive;
   savedOptions=JSON.parse(JSON.stringify(workingOptions));
 }
 
+function toggleOption(id){
+  const opt=workingOptions.find(o=>o.id===id);
+  if(!opt)return;
+  const newVal=!opt.enabled;
+  if(newVal){
+    if(id==='featured'){
+      // enabling featured disables best + relevant
+      ['best','relevant'].forEach(k=>{const o=workingOptions.find(x=>x.id===k);if(o)o.enabled=false;});
+    } else if(id==='best'||id==='relevant'){
+      // enabling best or relevant disables featured
+      const f=workingOptions.find(x=>x.id==='featured');
+      if(f)f.enabled=false;
+    }
+  }
+  opt.enabled=newVal;
+  renderOptions();
+}
+
+const TOOLTIPS={
+  rating:'You need to configure Judge.me app before enable this sort by option',
+  review:'You need to configure Yotpo app before enable this sort by option',
+};
+function labelCell(o){
+  let html=`<span style="font-weight:550">${escapeHtml(o.label)}</span>`;
+  if(o.id==='relevant')html+=` <span class="badge">Search only</span>`;
+  if(TOOLTIPS[o.id])html+=` <span class="tip-wrap"><span class="tip-icon">i</span><span class="tip-box">${escapeHtml(TOOLTIPS[o.id])}</span></span>`;
+  return html;
+}
 function renderOptions(){
   const tb=$('sort-tbody');
-  const excl=workingOptions.filter(o=>o.exclusive);
-  const regular=workingOptions.filter(o=>!o.exclusive);
-
-  const exclRows=excl.map(o=>`
-    <tr draggable="true" data-rid="${o.id}" data-grp="excl">
-      <td style="padding-left:14px">${IC.drag}</td>
-      <td>
-        <button type="button" data-toggle-excl="${o.id}" class="tgl ${exclusiveActive===o.id?'on':'off'}">
-          <span class="tgl-th"></span>
-        </button>
-      </td>
-      <td style="font-weight:550">${escapeHtml(o.label)}</td>
-      <td style="color:var(--text2);font-size:12px">${escapeHtml(o.type)}</td>
-      <td style="text-align:right">
-        <button data-edit="${o.id}" class="ibtn" title="Rename">${IC.edit}</button>
-      </td>
-    </tr>`).join('');
-
-  const sepRow=`<tr style="pointer-events:none;height:1px"><td colspan="5" style="padding:0;background:var(--bdr)"></td></tr>`;
-
-  const regRows=regular.map(o=>`
-    <tr draggable="true" data-rid="${o.id}" data-grp="reg">
+  tb.innerHTML=workingOptions.map(o=>`
+    <tr draggable="true" data-rid="${o.id}">
       <td style="padding-left:14px">${IC.drag}</td>
       <td>
         <button type="button" data-toggle="${o.id}" class="tgl ${o.enabled?'on':'off'}">
           <span class="tgl-th"></span>
         </button>
       </td>
-      <td style="font-weight:550">${escapeHtml(o.label)}</td>
+      <td>${labelCell(o)}</td>
       <td style="color:var(--text2);font-size:12px">${escapeHtml(o.type)}</td>
       <td style="text-align:right">
         <button data-edit="${o.id}" class="ibtn" title="Rename">${IC.edit}</button>
       </td>
     </tr>`).join('');
-
-  tb.innerHTML=exclRows+sepRow+regRows;
-
-  tb.querySelectorAll('[data-toggle-excl]').forEach(btn=>btn.onclick=()=>{
-    exclusiveActive=btn.dataset.toggleExcl;renderOptions();
-  });
-  tb.querySelectorAll('[data-toggle]').forEach(b=>b.onclick=()=>{
-    const idx=workingOptions.findIndex(o=>o.id===b.dataset.toggle);
-    if(idx!==-1){workingOptions[idx].enabled=!workingOptions[idx].enabled;renderOptions();}
-  });
+  tb.querySelectorAll('[data-toggle]').forEach(b=>b.onclick=()=>toggleOption(b.dataset.toggle));
   tb.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openEdit(b.dataset.edit));
-
   let dragId=null;
   tb.querySelectorAll('tr[draggable]').forEach(tr=>{
     tr.addEventListener('dragstart',e=>{dragId=tr.dataset.rid;tr.classList.add('row-drag');e.dataTransfer.effectAllowed='move';});
     tr.addEventListener('dragend',()=>{tr.classList.remove('row-drag');tb.querySelectorAll('tr').forEach(r=>r.classList.remove('row-ov'));});
-    tr.addEventListener('dragover',e=>{
-      e.preventDefault();
-      const srcO=workingOptions.find(o=>o.id===dragId);
-      const tgtO=workingOptions.find(o=>o.id===tr.dataset.rid);
-      if(!srcO||!tgtO||!!srcO.exclusive!==!!tgtO.exclusive)return;
-      tb.querySelectorAll('tr').forEach(r=>r.classList.remove('row-ov'));
-      tr.classList.add('row-ov');
-    });
+    tr.addEventListener('dragover',e=>{e.preventDefault();tb.querySelectorAll('tr').forEach(r=>r.classList.remove('row-ov'));tr.classList.add('row-ov');});
     tr.addEventListener('drop',e=>{
-      e.preventDefault();
-      const targetId=tr.dataset.rid;
+      e.preventDefault();const targetId=tr.dataset.rid;
       if(!dragId||dragId===targetId)return;
       const from=workingOptions.findIndex(o=>o.id===dragId);
       const to=workingOptions.findIndex(o=>o.id===targetId);
       if(from===-1||to===-1)return;
-      if(!!workingOptions[from].exclusive!==!!workingOptions[to].exclusive)return;
       const[m]=workingOptions.splice(from,1);workingOptions.splice(to,0,m);
       dragId=null;renderOptions();
     });
@@ -361,14 +353,12 @@ $('modal-label-input').addEventListener('keydown',e=>{if(e.key==='Enter')$('moda
 
 $('save-sortby').onclick=()=>{
   savedOptions=JSON.parse(JSON.stringify(workingOptions));
-  savedExclusive=exclusiveActive;
-  lsSave({exclusiveActive,options:workingOptions});
+  lsSave({options:workingOptions});
   const btn=$('save-sortby');btn.innerHTML=IC.chk+' Saved';
   setTimeout(()=>{btn.innerHTML='Save';},1500);
 };
 $('cancel-sortby').onclick=()=>{
   workingOptions=JSON.parse(JSON.stringify(savedOptions));
-  exclusiveActive=savedExclusive;
   renderOptions();
 };
 
