@@ -302,7 +302,6 @@ function openApplyModal(id){
   $('apply-modal-name').textContent=m.title;
   $('chk-filter').checked=m.applyTo.includes('Filter');
   $('chk-search').checked=m.applyTo.includes('Search');
-  $('chk-sort').checked  =m.applyTo.includes('Sort');
   $('apply-modal').classList.remove('hidden');
 }
 function closeApplyModal(){$('apply-modal').classList.add('hidden');applyingId=null;}
