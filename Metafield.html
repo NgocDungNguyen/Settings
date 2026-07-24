@@ -246,13 +246,7 @@ const ALL_METAFIELDS=[
   {id:9, title:'Weight',         type:'Measurement'},
   {id:10,title:'Tags',           type:'List of tags'},
 ];
-let metafields=[
-  {id:1,title:'Color',         type:'Metaobject List',applyTo:[]},
-  {id:2,title:'Specifications',type:'Metaobject',     applyTo:[]},
-  {id:3,title:'HOLA',          type:'Metaobject List',applyTo:[]},
-  {id:4,title:'SpecA1',        type:'Metaobject',     applyTo:[]},
-  {id:5,title:'Color mtf',     type:'Color List',     applyTo:[]},
-];
+let metafields=[];
 let savedMetafields=JSON.parse(JSON.stringify(metafields));
 let applyingId=null;
 
