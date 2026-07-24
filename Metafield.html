@@ -294,7 +294,7 @@ function renderDrop(){
       const id=+cb.dataset.mfId;
       const src=ALL_METAFIELDS.find(m=>m.id===id);
       if(cb.checked){
-        if(!metafields.find(m=>m.id===id))metafields.push({...src,applyTo:[]});
+        if(!metafields.find(m=>m.id===id))metafields.push({...src,applyTo:['Filter']});
       }else{
         metafields=metafields.filter(m=>m.id!==id);
       }
