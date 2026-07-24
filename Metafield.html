@@ -85,6 +85,14 @@ a{color:var(--lnk)}
 .hidden{display:none!important}
 .mt3{margin-top:12px}.mt4{margin-top:16px}.mt5{margin-top:20px}
 .frow{display:flex;gap:8px}.fend{justify-content:flex-end}
+.srch-wrap{position:relative}
+.mf-drop{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--sf);border:1px solid var(--bdr);border-radius:var(--r2);box-shadow:var(--sh3);z-index:20;max-height:260px;overflow-y:auto;display:none}
+.mf-drop.open{display:block}
+.mf-drop-row{display:grid;grid-template-columns:28px 1fr 130px;gap:8px;align-items:center;padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--bdr)}
+.mf-drop-row:last-child{border-bottom:none}
+.mf-drop-row:hover{background:var(--sf-hov)}
+.mf-drop-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--fill);cursor:pointer;margin:0}
+.mf-drop-empty{padding:12px 16px;font-size:13px;color:var(--textd);text-align:center}
 </style>
 </head>
 <body>
@@ -115,9 +123,12 @@ a{color:var(--lnk)}
         <!-- card inner header + search -->
         <div style="padding:16px 16px 12px">
           <p style="font-size:13px;font-weight:650;margin-bottom:12px">Metafield</p>
-          <div class="srch">
-            <svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M13.74 12.68a6.5 6.5 0 1 1 1.06-1.06l3.26 3.27a.75.75 0 1 1-1.06 1.06l-3.26-3.27Zm.76-5.18a5 5 0 1 1-10 0 5 5 0 0 1 10 0Z" fill="currentColor"/></svg>
-            <input id="mf-search" type="text" placeholder="Search for metafield">
+          <div id="srch-wrap" class="srch-wrap">
+            <div class="srch">
+              <svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M13.74 12.68a6.5 6.5 0 1 1 1.06-1.06l3.26 3.27a.75.75 0 1 1-1.06 1.06l-3.26-3.27Zm.76-5.18a5 5 0 1 1-10 0 5 5 0 0 1 10 0Z" fill="currentColor"/></svg>
+              <input id="mf-search" type="text" placeholder="Search for metafield">
+            </div>
+            <div id="mf-drop" class="mf-drop"></div>
           </div>
         </div>
         <!-- table -->
@@ -222,7 +233,18 @@ function updateSb(){
 }
 $('sidebar-toggle').onclick=()=>{col=!col;updateSb();};
 
-const MAX_METAFIELDS=10;
+const ALL_METAFIELDS=[
+  {id:1, title:'Color',          type:'Metaobject List'},
+  {id:2, title:'Specifications', type:'Metaobject'},
+  {id:3, title:'HOLA',           type:'Metaobject List'},
+  {id:4, title:'SpecA1',         type:'Metaobject'},
+  {id:5, title:'Color mtf',      type:'Color List'},
+  {id:6, title:'Material',       type:'Single line text'},
+  {id:7, title:'Brand',          type:'Single line text'},
+  {id:8, title:'Dimensions',     type:'Measurement'},
+  {id:9, title:'Weight',         type:'Measurement'},
+  {id:10,title:'Tags',           type:'List of tags'},
+];
 let metafields=[
   {id:1,title:'Color',         type:'Metaobject List',applyTo:[]},
   {id:2,title:'Specifications',type:'Metaobject',     applyTo:[]},
@@ -240,9 +262,7 @@ const BADGE={
 };
 
 function renderTable(){
-  const q=$('mf-search').value.trim().toLowerCase();
-  const visible=q?metafields.filter(m=>m.title.toLowerCase().includes(q)):metafields;
-  $('mf-tbody').innerHTML=visible.map(m=>{
+  $('mf-tbody').innerHTML=metafields.map(m=>{
     const applyCell=m.applyTo.length===0
       ?`<button data-apply="${m.id}" class="btn btn-s" style="height:28px;padding:4px 12px;font-size:12px">Apply</button>`
       :`<div style="display:flex;flex-wrap:wrap;gap:4px;cursor:pointer" data-apply="${m.id}">${m.applyTo.map(o=>BADGE[o]).join('')}</div>`;
@@ -255,7 +275,32 @@ function renderTable(){
   }).join('');
   $('mf-tbody').querySelectorAll('[data-apply]').forEach(el=>el.onclick=()=>openApplyModal(+el.dataset.apply));
   $('mf-tbody').querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>deleteMetafield(+b.dataset.delete));
-  $('mf-count').textContent=`${metafields.length}/${MAX_METAFIELDS} selected`;
+  $('mf-count').textContent=`${metafields.length}/${ALL_METAFIELDS.length} selected`;
+}
+
+function renderDrop(){
+  const q=$('mf-search').value.trim().toLowerCase();
+  const items=q
+    ?ALL_METAFIELDS.filter(m=>m.title.toLowerCase().includes(q)||m.type.toLowerCase().includes(q))
+    :ALL_METAFIELDS;
+  if(!items.length){
+    $('mf-drop').innerHTML=`<div class="mf-drop-empty">No metafields found</div>`;
+    return;
+  }
+  const activeIds=new Set(metafields.map(m=>m.id));
+  $('mf-drop').innerHTML=items.map(m=>`<label class="mf-drop-row"><input type="checkbox" data-mf-id="${m.id}"${activeIds.has(m.id)?' checked':''}><span style="font-size:13px;color:var(--text)">${escapeHtml(m.title)}</span><span style="font-size:12px;color:var(--text2)">${escapeHtml(m.type)}</span></label>`).join('');
+  $('mf-drop').querySelectorAll('input[type=checkbox]').forEach(cb=>{
+    cb.onchange=()=>{
+      const id=+cb.dataset.mfId;
+      const src=ALL_METAFIELDS.find(m=>m.id===id);
+      if(cb.checked){
+        if(!metafields.find(m=>m.id===id))metafields.push({...src,applyTo:[]});
+      }else{
+        metafields=metafields.filter(m=>m.id!==id);
+      }
+      renderTable();
+    };
+  });
 }
 
 function openApplyModal(id){
@@ -273,12 +318,18 @@ function saveApplyModal(){
   m.applyTo=['Filter','Search','Sort'].filter(o=>$(`chk-${o.toLowerCase()}`).checked);
   closeApplyModal();renderTable();
 }
-function deleteMetafield(id){metafields=metafields.filter(m=>m.id!==id);renderTable();}
+function deleteMetafield(id){
+  metafields=metafields.filter(m=>m.id!==id);
+  renderTable();
+  if($('mf-drop').classList.contains('open'))renderDrop();
+}
 
 $('apply-modal-close').onclick=$('apply-modal-cancel').onclick=closeApplyModal;
 $('apply-modal-save').onclick=saveApplyModal;
 $('apply-modal').addEventListener('click',e=>{if(e.target.id==='apply-modal')closeApplyModal();});
-$('mf-search').oninput=()=>renderTable();
+$('mf-search').addEventListener('focus',()=>{renderDrop();$('mf-drop').classList.add('open');});
+$('mf-search').addEventListener('input',()=>{renderDrop();$('mf-drop').classList.add('open');});
+document.addEventListener('click',e=>{if(!$('srch-wrap').contains(e.target)){$('mf-drop').classList.remove('open');}});
 
 $('save-mf').onclick=()=>{
   savedMetafields=JSON.parse(JSON.stringify(metafields));
