@@ -137,7 +137,7 @@ a{color:var(--lnk)}
             <th>Title</th>
             <th style="width:160px">Type</th>
             <th style="width:220px">Apply to</th>
-            <th style="width:80px;text-align:center">Action</th>
+            <th style="width:96px;text-align:center">Action</th>
           </tr></thead>
           <tbody id="mf-tbody"></tbody>
         </table>
@@ -257,13 +257,18 @@ const BADGE={
 function renderTable(){
   $('mf-tbody').innerHTML=metafields.map(m=>{
     const applyCell=m.applyTo.length===0
-      ?`<button data-apply="${m.id}" class="btn btn-s" style="height:28px;padding:4px 12px;font-size:12px">Apply</button>`
-      :`<div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center">${m.applyTo.map(o=>BADGE[o]).join('')}<button data-apply="${m.id}" class="ibtn" style="width:26px;height:26px;flex-shrink:0" title="Edit apply options">${IC.edit}</button></div>`;
+      ?`<span style="color:var(--textd)">Not applied</span>`
+      :`<div style="display:flex;flex-wrap:wrap;gap:4px">${m.applyTo.map(o=>BADGE[o]).join('')}</div>`;
     return `<tr>
       <td>${escapeHtml(m.title)}</td>
       <td style="color:var(--text2)">${escapeHtml(m.type)}</td>
       <td>${applyCell}</td>
-      <td style="text-align:center"><button data-delete="${m.id}" class="ibtn ibtn-del" style="margin:0 auto" title="Remove">${IC.del}</button></td>
+      <td style="text-align:center">
+        <div style="display:flex;gap:6px;justify-content:center">
+          <button data-apply="${m.id}" class="ibtn" title="Edit apply options">${IC.edit}</button>
+          <button data-delete="${m.id}" class="ibtn ibtn-del" title="Remove">${IC.del}</button>
+        </div>
+      </td>
     </tr>`;
   }).join('');
   $('mf-tbody').querySelectorAll('[data-apply]').forEach(el=>el.onclick=()=>openApplyModal(+el.dataset.apply));

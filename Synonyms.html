@@ -58,6 +58,13 @@ a{color:var(--lnk)}
 .back-a{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border-radius:var(--r2);text-decoration:none;border:1px solid var(--bdr);background:var(--sf);color:var(--text2);box-shadow:var(--sh1);flex-shrink:0;transition:background .1s}
 .back-a:hover{background:var(--sf-hov)}
 .card{background:var(--sf);border-radius:var(--r2);box-shadow:var(--sh3);overflow:hidden}
+.dt{width:100%;border-collapse:collapse;font-size:13px}
+.dt thead tr{background:var(--fill-t);border-bottom:1px solid var(--bdr)}
+.dt thead th{padding:10px 16px;text-align:left;font-size:11px;font-weight:650;text-transform:uppercase;letter-spacing:.06em;color:var(--text2)}
+.dt tbody tr{border-bottom:1px solid var(--bdr)}
+.dt tbody tr:last-child{border-bottom:none}
+.dt tbody tr:hover{background:var(--sf-hov)}
+.dt td{padding:12px 16px;vertical-align:middle}
 .inp{width:100%;border:1px solid var(--bdr);border-radius:var(--r2);padding:7px 12px;font-family:var(--ff);font-size:13px;color:var(--text);background:var(--sf);outline:none;transition:border-color .1s,box-shadow .1s}
 .inp::placeholder{color:var(--textd)}
 .inp:focus{border-color:var(--bdr-foc);box-shadow:0 0 0 3px rgba(0,91,211,.2)}
@@ -95,8 +102,8 @@ a{color:var(--lnk)}
           <svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M17 10a.75.75 0 0 1-.75.75H5.56l2.72 2.72a.75.75 0 1 1-1.06 1.06l-4-4a.75.75 0 0 1 0-1.06l4-4a.75.75 0 0 1 1.06 1.06L5.56 9.25H16.25A.75.75 0 0 1 17 10Z" fill="currentColor"/></svg>
         </a>
         <div>
-          <h1 style="font-size:1.25rem;font-weight:650;line-height:1.3">Synonyms</h1>
-          <p style="font-size:13px;color:var(--text2);margin-top:2px">Define word groups so shoppers find products even when using different terms.</p>
+          <h1 style="font-size:1.25rem;font-weight:650;line-height:1.3">Synonyms Search</h1>
+          <p style="font-size:13px;color:var(--text2);margin-top:2px">Help customers find products even if they type typos, abbreviations, or similar words.</p>
         </div>
       </div>
 
@@ -105,15 +112,26 @@ a{color:var(--lnk)}
         <p>If a customer searches for any word in a group, results for <strong>all words</strong> in that group will appear.</p>
       </div>
 
-      <div class="frow fbe mt5">
-        <span id="group-count" style="font-size:13px;color:var(--text2)"></span>
+      <span id="group-count" style="font-size:13px;color:var(--text2);display:block;margin-top:20px"></span>
+
+      <div class="card mt3">
+        <table class="dt">
+          <thead><tr>
+            <th>Terms</th>
+            <th style="width:56px"></th>
+            <th>Synonyms</th>
+            <th style="width:96px;text-align:center">Action</th>
+          </tr></thead>
+          <tbody id="synonym-tbody"></tbody>
+        </table>
+        <div id="synonym-empty" class="hidden" style="padding:56px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px"></div>
+      </div>
+      <div id="add-row" class="mt3 hidden">
         <button id="add-btn" class="btn btn-p">
           <svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M17 10a.75.75 0 0 1-.75.75h-5.5v5.5a.75.75 0 0 1-1.5 0v-5.5h-5.5a.75.75 0 0 1 0-1.5h5.5v-5.5a.75.75 0 0 1 1.5 0v5.5h5.5A.75.75 0 0 1 17 10Z" fill="currentColor"/></svg>
           Add Synonym
         </button>
       </div>
-
-      <div id="synonym-list" class="card mt3"></div>
     </div>
   </main>
 </div>
@@ -209,43 +227,48 @@ function updateSb(){
 }
 $('sidebar-toggle').onclick=()=>{col=!col;updateSb();};
 
-const _DEFAULT_GROUPS=[
-  {id:1,queries:['t-shirt','tee'],  synonyms:['shirt','top','polo']},
-  {id:2,queries:['laptop'],         synonyms:['notebook','computer']},
-];
-let synonymGroups=_DEFAULT_GROUPS.map(g=>({...g,queries:[...g.queries],synonyms:[...g.synonyms]}));
-let editingId=null,nextId=3;
+let synonymGroups=[];
+let editingId=null,nextId=1;
 // load from localStorage
 (()=>{const s=lsLoad();if(s&&s.length){synonymGroups=s;nextId=Math.max(...s.map(g=>g.id),0)+1;}})();
 
 function renderGroups(){
-  const list=$('synonym-list');
+  const table=$('synonym-tbody').closest('table');
+  const empty=$('synonym-empty');
+  const addRow=$('add-row');
   const count=synonymGroups.length;
   $('group-count').textContent=count===0?'':`${count} synonym group${count!==1?'s':''}`;
   if(count===0){
-    list.innerHTML=`<div style="padding:56px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
-      ${IC.tags}
+    table.classList.add('hidden');
+    empty.classList.remove('hidden');
+    addRow.classList.add('hidden');
+    empty.innerHTML=`${IC.tags}
       <p style="font-weight:550;color:var(--text2);margin-top:4px">No synonym groups yet</p>
       <p style="font-size:12px;color:var(--textd)">Add your first synonym group to improve search results.</p>
-    </div>`;
+      <button id="add-btn-empty" class="btn btn-p mt3">
+        <svg class="ic" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M17 10a.75.75 0 0 1-.75.75h-5.5v5.5a.75.75 0 0 1-1.5 0v-5.5h-5.5a.75.75 0 0 1 0-1.5h5.5v-5.5a.75.75 0 0 1 1.5 0v5.5h5.5A.75.75 0 0 1 17 10Z" fill="currentColor"/></svg>
+        Add Synonym Group
+      </button>`;
+    $('add-btn-empty').onclick=()=>openModal();
     return;
   }
-  list.innerHTML=`<div>${synonymGroups.map((g,i)=>`
-    <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;${i<synonymGroups.length-1?'border-bottom:1px solid var(--bdr)':''}">
-      <div style="display:flex;flex-wrap:wrap;gap:4px;flex:1;min-width:0">
-        ${g.queries.map(w=>`<span class="tag">${escapeHtml(w)}</span>`).join('')}
-      </div>
-      <span style="color:var(--textd);font-size:18px;flex-shrink:0">↔</span>
-      <div style="display:flex;flex-wrap:wrap;gap:4px;flex:1;min-width:0">
-        ${g.synonyms.map(w=>`<span class="tag">${escapeHtml(w)}</span>`).join('')}
-      </div>
-      <div style="display:flex;gap:6px;flex-shrink:0;margin-left:8px">
-        <button data-edit="${g.id}" class="ibtn" title="Edit">${IC.edit}</button>
-        <button data-delete="${g.id}" class="ibtn ibtn-del" title="Delete">${IC.del}</button>
-      </div>
-    </div>`).join('')}</div>`;
-  list.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openModal(+b.dataset.edit));
-  list.querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>deleteGroup(+b.dataset.delete));
+  table.classList.remove('hidden');
+  empty.classList.add('hidden');
+  addRow.classList.remove('hidden');
+  $('synonym-tbody').innerHTML=synonymGroups.map(g=>`
+    <tr>
+      <td><div style="display:flex;flex-wrap:wrap;gap:4px">${g.queries.map(w=>`<span class="tag">${escapeHtml(w)}</span>`).join('')}</div></td>
+      <td style="text-align:center;color:var(--textd);font-size:16px">↔</td>
+      <td><div style="display:flex;flex-wrap:wrap;gap:4px">${g.synonyms.map(w=>`<span class="tag">${escapeHtml(w)}</span>`).join('')}</div></td>
+      <td style="text-align:center">
+        <div style="display:flex;gap:6px;justify-content:center">
+          <button data-edit="${g.id}" class="ibtn" title="Edit">${IC.edit}</button>
+          <button data-delete="${g.id}" class="ibtn ibtn-del" title="Delete">${IC.del}</button>
+        </div>
+      </td>
+    </tr>`).join('');
+  $('synonym-tbody').querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openModal(+b.dataset.edit));
+  $('synonym-tbody').querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>deleteGroup(+b.dataset.delete));
 }
 
 function openModal(id=null){
