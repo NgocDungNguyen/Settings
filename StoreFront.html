@@ -401,11 +401,27 @@ let lastQuery='';
 let TRANSLATIONS={};
 
 /* ── Settings loader ── */
+// tolerates pre-relation records (array `queries`, missing `relation`, or missing `enabled`) that may still be sitting in localStorage
+function migrateSynGroup(g){
+  if(typeof g.keyword==='string')return{...g,relation:g.relation==='oneway'?'oneway':'twoway',enabled:g.enabled!==false};
+  const q=Array.isArray(g.queries)?g.queries.filter(Boolean):[];
+  const keyword=q[0]||g.synonyms?.[0]||'';
+  const rest=[...q.slice(1),...(g.synonyms||[])].filter(w=>w&&w.trim().toLowerCase()!==keyword.trim().toLowerCase());
+  const seen=new Set();
+  const synonyms=rest.filter(w=>{const n=w.trim().toLowerCase();if(seen.has(n))return false;seen.add(n);return true;});
+  return{id:g.id,keyword,relation:'twoway',synonyms,enabled:true}; // old groups were always fully mutual and active
+}
 function buildSynMap(groups){
   const map={};
-  groups.forEach(g=>{
-    g.queries.forEach(q=>{map[q]=[...(map[q]||[]),...g.synonyms,...g.queries.filter(x=>x!==q)];});
-    g.synonyms.forEach(s=>{map[s]=[...(map[s]||[]),...g.queries,...g.synonyms.filter(x=>x!==s)];});
+  groups.map(migrateSynGroup).filter(g=>g.keyword&&g.synonyms.length&&g.enabled).forEach(g=>{
+    if(g.relation==='oneway'){
+      // the Search Term expands to its synonyms; the synonyms do not expand back
+      map[g.keyword]=[...(map[g.keyword]||[]),...g.synonyms];
+    }else{
+      // every term in the group is mutually equivalent
+      map[g.keyword]=[...(map[g.keyword]||[]),...g.synonyms];
+      g.synonyms.forEach(s=>{map[s]=[...(map[s]||[]),g.keyword,...g.synonyms.filter(x=>x!==s)];});
+    }
   });
   return map;
 }
