@@ -703,21 +703,23 @@ function renderSynRelPicker(){
 // Live preview under the Synonyms field, driven by the current form values. Capped to a handful
 // of sample lines — beyond that, the pattern already repeats, so more lines add noise, not clarity.
 const PREVIEW_SAMPLE_CAP=3;
+// Reuses validateSynGroup's cleaned output (deduped, self-reference removed) so the preview never
+// shows a state that couldn't actually be saved. If the current input would produce any validation
+// notice, the preview is hidden entirely rather than showing something misleading.
 function updateSynModalDynamic(){
-  const kw=($('syn-modal-keyword').value||'').trim();
-  const syns=parseSynTags($('syn-modal-synonyms').value);
-  const kwDisp=kw||'Search Term';
-  if(!kw&&!syns.length){$('syn-modal-preview').innerHTML='';return;}
-  const synList=syns.length?syns.map(s=>`"${escapeHtml(s)}"`).join(', '):'…';
+  const result=validateSynGroup($('syn-modal-keyword').value,synSelectedRelation,$('syn-modal-synonyms').value,synEditingId,synGroups);
+  if(typeof result==='string'){$('syn-modal-preview').innerHTML='';return;}
+  const{keyword,relation,synonyms:syns}=result;
+  const synList=syns.map(s=>`"${escapeHtml(s)}"`).join(', ');
   let header,lines;
-  if(synSelectedRelation==='oneway'){
-    header=`"${escapeHtml(kwDisp)}" → ${synList}`;
-    const allTerms=[kwDisp,...syns].map(escapeHtml).join(', ');
-    lines=[`Search "${escapeHtml(kwDisp)}" → Returns ${allTerms}`,
+  if(relation==='oneway'){
+    header=`"${escapeHtml(keyword)}" → ${synList}`;
+    const allTerms=[keyword,...syns].map(escapeHtml).join(', ');
+    lines=[`Search "${escapeHtml(keyword)}" → Returns ${allTerms}`,
       ...syns.slice(0,PREVIEW_SAMPLE_CAP).map(s=>`Search "${escapeHtml(s)}" → Returns ${escapeHtml(s)}`)];
     if(syns.length>PREVIEW_SAMPLE_CAP)lines.push('...');
   }else{
-    const full=[kwDisp,...syns];
+    const full=[keyword,...syns];
     header=full.map(s=>`"${escapeHtml(s)}"`).join(' ⇄ ');
     const allTerms=full.map(escapeHtml).join(', ');
     lines=full.slice(0,PREVIEW_SAMPLE_CAP+1).map(t=>`Search "${escapeHtml(t)}" → Returns ${allTerms}`);
@@ -785,11 +787,12 @@ function validateSynGroup(keywordRaw,relation,synonymsRaw,editingId,groups){
   if(relation!=='oneway'&&relation!=='twoway')relation='twoway';
   // tolerate a stray trailing/leading comma (leftover habit from the old multi-keyword field) without blocking save
   const keyword=(keywordRaw||'').trim().replace(/^,+|,+$/g,'').trim();
+  let synonyms=parseSynTags(synonymsRaw);
+  if(!keyword&&!synonyms.length)return'Please enter a Search Term and at least 1 Synonym.';
   if(!keyword)return'Please enter a Search Term.';
   if(keyword.includes(','))return`Only one Search Term is allowed per group. "${keywordRaw.trim()}" looks like more than one word — put the extra words in the Synonyms field instead.`;
   const keyN=normSynWord(keyword);
 
-  let synonyms=parseSynTags(synonymsRaw);
   if(!synonyms.length)return'Please enter at least one synonym.';
   const seen=new Set();
   synonyms=synonyms.filter(w=>{const n=normSynWord(w);if(seen.has(n))return false;seen.add(n);return true;}); // de-dupe within this group, case-insensitive
