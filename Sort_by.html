@@ -90,6 +90,11 @@ a{color:var(--lnk)}
 .tip-box{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#303030;color:#fff;font-size:11px;border-radius:6px;padding:6px 10px;width:224px;white-space:normal;line-height:1.4;pointer-events:none;opacity:0;transition:opacity .15s;z-index:99;text-align:left;font-weight:400}
 .tip-box::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#303030}
 .tip-wrap:hover .tip-box{opacity:1}
+.app-card{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 8px;border:1.5px solid var(--bdr);border-radius:var(--r2);background:var(--sf);cursor:pointer;font-family:var(--ff);transition:border-color .1s,background .1s}
+.app-card img{width:26px;height:26px;border-radius:6px;object-fit:contain}
+.app-card span{font-size:12px;font-weight:550;color:var(--text)}
+.app-card:hover{background:var(--sf-hov)}
+.app-card.sel{border-color:var(--fill);background:var(--fill-t)}
 </style>
 </head>
 <body>
@@ -160,7 +165,21 @@ a{color:var(--lnk)}
         <label class="flbl" for="modal-label-input">Label</label>
         <input id="modal-label-input" type="text" class="inp">
       </div>
-      <p style="font-size:12px;color:var(--text2)">This only renames the option shown to shoppers. Sorting logic stays the same.</p>
+      <p id="modal-note" style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:4px"><span class="tip-wrap"><span class="tip-icon">i</span><span class="tip-box">This only renames the option shown to shoppers. Sorting logic stays the same.</span></span>This only renames the option shown to shoppers. Sorting logic stays the same.</p>
+      <div id="modal-app-section" class="hidden">
+        <label class="flbl">Choose integrated app</label>
+        <div class="frow">
+          <button type="button" class="app-card" data-app="judgeme">
+            <img src="https://cdn.shopify.com/s/files/1/0765/0302/3847/files/0660674ca187cb7b90a9.png?v=1785833456" alt="">
+            <span>Judge.me</span>
+          </button>
+          <button type="button" class="app-card" data-app="yotpo">
+            <img src="https://cdn.shopify.com/s/files/1/0765/0302/3847/files/934849961d1522ef7302.png?v=1785833460" alt="">
+            <span>Yotpo</span>
+          </button>
+        </div>
+        <p style="font-size:11px;color:var(--text2);margin-top:6px">Only one app can be active at a time.</p>
+      </div>
     </div>
     <div class="mo-ft">
       <button id="modal-cancel" class="btn btn-s">Cancel</button>
@@ -250,6 +269,11 @@ const DEFAULT_OPTIONS=[
 let workingOptions=[];
 let savedOptions=[];
 let editingId=null;
+let reviewApp=null;       // 'judgeme' | 'yotpo' | null — shared by Rating & Review
+let savedReviewApp=null;
+let pendingEnable=false;
+let selectedApp=null;
+const REVIEW_OPT_IDS=['rating','review'];
 
 function initFromStorage(){
   const stored=lsLoad();
@@ -260,16 +284,26 @@ function initFromStorage(){
     });
     // drop obsolete ids (e.g. 'oldest')
     workingOptions=workingOptions.filter(o=>DEFAULT_OPTIONS.find(d=>d.id===o.id));
+    reviewApp=stored.reviewApp||null;
   } else {
     workingOptions=DEFAULT_OPTIONS.map(o=>({...o}));
   }
+  workingOptions.forEach(o=>{
+    if(REVIEW_OPT_IDS.includes(o.id)&&o.configured===undefined)o.configured=!!reviewApp;
+  });
   savedOptions=JSON.parse(JSON.stringify(workingOptions));
+  savedReviewApp=reviewApp;
 }
 
 function toggleOption(id){
   const opt=workingOptions.find(o=>o.id===id);
   if(!opt)return;
   const newVal=!opt.enabled;
+  if(newVal&&REVIEW_OPT_IDS.includes(id)&&!opt.configured){
+    // first-time enable only: require label + review app in the edit modal
+    openEdit(id,true);
+    return;
+  }
   if(newVal){
     if(id==='featured'){
       // enabling featured disables best + relevant
@@ -284,9 +318,10 @@ function toggleOption(id){
   renderOptions();
 }
 
+const REVIEW_TOOLTIP='You need to configure Judge.me/Yotpo app before enable this sort by option';
 const TOOLTIPS={
-  rating:'You need to configure Judge.me app before enable this sort by option',
-  review:'You need to configure Yotpo app before enable this sort by option',
+  rating:REVIEW_TOOLTIP,
+  review:REVIEW_TOOLTIP,
 };
 function labelCell(o){
   let html=`<span style="font-weight:550">${escapeHtml(o.label)}</span>`;
@@ -330,23 +365,42 @@ function renderOptions(){
 }
 
 const DEFAULT_LABELS=Object.fromEntries(DEFAULT_OPTIONS.map(o=>[o.id,o.label]));
-function openEdit(id){
+function updateAppCards(){
+  document.querySelectorAll('.app-card').forEach(c=>c.classList.toggle('sel',c.dataset.app===selectedApp));
+}
+document.querySelectorAll('.app-card').forEach(c=>{
+  c.onclick=()=>{selectedApp=c.dataset.app;updateAppCards();};
+});
+function openEdit(id,forEnable){
   const o=workingOptions.find(o=>o.id===id);
   if(!o)return;
   editingId=id;
+  pendingEnable=!!forEnable;
+  const isReviewOpt=REVIEW_OPT_IDS.includes(id);
   $('modal-label-input').value=o.label;
   $('modal-ttl').textContent=`Edit Sort by ${DEFAULT_LABELS[id]||o.label}`;
+  $('modal-app-section').classList.toggle('hidden',!isReviewOpt);
+  if(isReviewOpt){selectedApp=reviewApp;updateAppCards();}
   $('edit-modal').classList.remove('hidden');
   setTimeout(()=>$('modal-label-input').focus(),50);
 }
-function closeEdit(){$('edit-modal').classList.add('hidden');editingId=null;}
+function closeEdit(){$('edit-modal').classList.add('hidden');editingId=null;pendingEnable=false;}
 $('modal-close').onclick=$('modal-cancel').onclick=closeEdit;
 $('modal-save').onclick=()=>{
   const v=$('modal-label-input').value.trim();
   if(!v){alert('Label cannot be empty.');return;}
+  const isReviewOpt=editingId!==null&&REVIEW_OPT_IDS.includes(editingId);
+  if(isReviewOpt){
+    if(!selectedApp){alert('Select an app to continue.');return;}
+    reviewApp=selectedApp;
+  }
   if(editingId!==null){
     const idx=workingOptions.findIndex(o=>o.id===editingId);
-    if(idx!==-1){workingOptions[idx].label=v;renderOptions();}
+    if(idx!==-1){
+      workingOptions[idx].label=v;
+      if(pendingEnable){workingOptions[idx].enabled=true;workingOptions[idx].configured=true;}
+      renderOptions();
+    }
   }
   closeEdit();
 };
@@ -355,12 +409,14 @@ $('modal-label-input').addEventListener('keydown',e=>{if(e.key==='Enter')$('moda
 
 $('save-sortby').onclick=()=>{
   savedOptions=JSON.parse(JSON.stringify(workingOptions));
-  lsSave({options:workingOptions});
+  savedReviewApp=reviewApp;
+  lsSave({options:workingOptions,reviewApp});
   const btn=$('save-sortby');btn.innerHTML=IC.chk+' Saved';
   setTimeout(()=>{btn.innerHTML='Save';},1500);
 };
 $('cancel-sortby').onclick=()=>{
   workingOptions=JSON.parse(JSON.stringify(savedOptions));
+  reviewApp=savedReviewApp;
   renderOptions();
 };
 
